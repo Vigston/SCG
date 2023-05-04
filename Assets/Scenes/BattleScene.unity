@@ -535,8 +535,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30af508a843417849ad31de978c59dcb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerArea: {fileID: 426260114}
-  EnemyArea: {fileID: 0}
+  PlayerArea: {fileID: 426260115}
+  EnemyArea: {fileID: 1326383939}
   cardPrefab: {fileID: 1777009815341847348, guid: 4866fde336971cf4584711bb938094c7, type: 3}
   heightNum: 2
   widthNum: 5

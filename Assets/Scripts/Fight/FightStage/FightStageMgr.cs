@@ -6,6 +6,8 @@ using System;
 public class FightStageMgr : MonoBehaviour
 {
     // =================変数=================
+    public static FightStageMgr instance;
+
     [SerializeField]
     private List<Area> areaList = new List<Area>();
 
@@ -19,11 +21,19 @@ public class FightStageMgr : MonoBehaviour
         public string name;
     }
 
+    void Awake()
+    {
+        // インスタンスを作成
+        CreateInstance();
+        // エリアリストの初期化
+        InitAreaList();
+    }
+
     // Start is called before the first frame update
     void Start()
     {
-        // エリアリストの初期化
-        InitAreaList();
+        // カードエリアの作成
+        FightStageCtr.instance.CreateCardArea();
     }
 
     // Update is called once per frame
@@ -33,6 +43,21 @@ public class FightStageMgr : MonoBehaviour
     }
 
     // =================関数=================
+    // インスタンスを作成
+    public bool CreateInstance()
+    {
+        // 既にインスタンスが作成されていなければ作成する
+        if (instance == null)
+        {
+            // 作成
+            instance = this;
+            return true;
+        }
+
+        Debug.LogError("FightStageMgrのインスタンスが生成できませんでした");
+        return false;
+    }
+
     // エリアリストの初期化
     void InitAreaList()
     {
