@@ -4,6 +4,7 @@ using UnityEngine;
 
 public static class Common
 {
+    // BoxCollisionの頂点座標を取得
     /*
      * 0 = 左上(上)
      * 1 = 右上(上)
@@ -49,5 +50,20 @@ public static class Common
         vertices[7] = cp - p4;
 
         return vertices;
+    }
+
+    // スクリーン座標からワールド座標に変換
+    public static Vector3 GetWorldPositionFromScreenPosition(Canvas _canvas, RectTransform _rect)
+    {
+        //UI座標からスクリーン座標に変換
+        Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(_canvas.worldCamera, _rect.position);
+
+        //ワールド座標
+        Vector3 worldPos = Vector3.zero;
+
+        //スクリーン座標からワールド座標に変換
+        RectTransformUtility.ScreenPointToWorldPointInRectangle(_rect, screenPos, _canvas.worldCamera, out worldPos);
+
+        return worldPos;
     }
 }
