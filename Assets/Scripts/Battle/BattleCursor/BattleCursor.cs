@@ -8,7 +8,7 @@ public class BattleCursor : MonoBehaviour
     ////////////////ïœêî///////////////////////
     // à íu
     [SerializeField]
-    private ePosition m_Position;
+    private Position m_Position;
 
     // Start is called before the first frame update
     void Start()
@@ -24,11 +24,11 @@ public class BattleCursor : MonoBehaviour
 
     ////////////////ä÷êî///////////////////////
     ///// à íu
-    public void SetPosiiton(ePosition _posiiton)
+    public void SetPosiiton(Position _posiiton)
     {
         m_Position = _posiiton;
     }
-    public ePosition GetPosiiton()
+    public Position GetPosition()
     {
         return m_Position;
     }

@@ -42,24 +42,74 @@ public class BattleStageCtr : MonoBehaviour
         {
             // 作成
             instance = this;
-            return true;
         }
+
+        // インスタンスが作成済みなら終了
+        if (instance != null) { return true; }
 
         Debug.LogError("BattleStageCtrのインスタンスが生成できませんでした");
         return false;
     }
 
     // カードエリア作成
-    public void CreateCardArea()
+    public void CreateCardArea(List<CardArea> _cardAreaList)
     {
+        //// 基準座標
+        //Vector3 baseVec = new Vector3();
+
+        //BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
+
+        //// 左上の手前
+        //Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardCollider)[0];
+        //// 左上の奥
+        //Vector3 vecCardLeftBottomUp = Common.GetBoxCollideVertices(cardCollider)[6];
+        //// 右上の手前
+        //Vector3 vecCardRightTopUp = Common.GetBoxCollideVertices(cardCollider)[1];
+
+        //// カードの半分だけ上に移動。
+        //baseVec.z += Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) / 2;
+        //// カード間の幅の半分上に移動。
+        //baseVec.z += interval_H / 2;
+
+        //// カード2枚分横に移動。
+        //baseVec.x += Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * 2;
+
+        //Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(PlayerArea)[0];
+        //Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(PlayerArea)[6];
+
+        //baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
+
+
+
+        //// 縦列の分回す
+        //for (int j = 0; j < heightNum; j++)
+        //{
+        //    // 横列の分回す
+        //    for (int k = 0; k < widthNum; k++)
+        //    {
+        //        // エリアの表示位置
+        //        Vector3 areaPos = baseVec;
+
+        //        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+        //        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+
+        //        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+
+        //        // カードエリアの情報設定
+        //        CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
+        //        cardArea.SetPosiiton((ePosition)(j + k));
+        //        _cardAreaList.Add(cardArea);
+        //    }
+        //}
+
         // 相手と自分の分回す
-        for (int i = 0; i < BattleMgr.instance.GetSideMax(); i++)
+        for (int i = 0; i < (int)Side.eSide_Max; i++)
         {
             // 基準座標
             Vector3 baseVec = new Vector3();
 
-            int playerIndex = (int)eSide.eSide_Player;
-            int enemyIndex = (int)eSide.eSide_Enemy;
+            int playerIndex = (int)Side.eSide_Player;
+            int enemyIndex = (int)Side.eSide_Enemy;
 
             BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
 
@@ -113,7 +163,8 @@ public class BattleStageCtr : MonoBehaviour
 
                     // カードエリアの情報設定
                     CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                    cardArea.SetPosiiton((ePosition)(j + k));
+                    cardArea.SetPosiiton((Position)(j + k));
+                    _cardAreaList.Add(cardArea);
                 }
             }
         }

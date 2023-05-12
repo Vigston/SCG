@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using battleTypes;
 
 public class BattleInfo : MonoBehaviour
 {
@@ -20,8 +21,10 @@ public class BattleInfo : MonoBehaviour
         {
             // 作成
             instance = this;
-            return true;
         }
+
+        // インスタンスが作成済みなら終了
+        if (instance != null) { return true; }
 
         Debug.LogError("BattleInfoのインスタンスが生成できませんでした");
         return false;

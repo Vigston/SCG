@@ -6,7 +6,7 @@ using battleTypes;
 public class BattleCard : MonoBehaviour
 {
     // í—Ş
-    public enum eKind
+    public enum Kind
     {
         eKind_People,
         eKind_Military,
@@ -20,27 +20,27 @@ public class BattleCard : MonoBehaviour
 
     ////////////////•Ï”///////////////////////
     [SerializeField]
-    private ePosition m_Position;
+    private Position m_Position;
     [SerializeField]
-    private eKind m_Kind;
+    private Kind m_Kind;
     [SerializeField]
     private bool m_IsEnable = true;
     ////////////////ŠÖ”///////////////////////
     // ˆÊ’u
-    public void SetPosiiton(ePosition _posiiton)
+    public void SetPosiiton(Position _posiiton)
     {
         m_Position = _posiiton;
     }
-    public ePosition GetPosiiton()
+    public Position GetPosition()
     {
         return m_Position;
     }
     // í—Ş
-    public void SetKind(eKind _kind)
+    public void SetKind(Kind _kind)
     {
         m_Kind = _kind;
     }
-    public eKind GetKind()
+    public Kind GetKind()
     {
         return m_Kind;
     }

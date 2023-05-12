@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using battleTypes;
 
 public class BattleStageMgr : MonoBehaviour
 {
@@ -9,17 +10,9 @@ public class BattleStageMgr : MonoBehaviour
     public static BattleStageMgr instance;
 
     [SerializeField]
-    private List<Area> areaList = new List<Area>();
+    private List<CardArea> m_CardAreaList = new List<CardArea>();
 
     // =================構造体=================
-    [System.Serializable]
-    private class Area
-    {
-        // インデックス
-        public int index;
-        // 名前
-        public string name;
-    }
 
     void Awake()
     {
@@ -33,7 +26,7 @@ public class BattleStageMgr : MonoBehaviour
     void Start()
     {
         // カードエリアの作成
-        BattleStageCtr.instance.CreateCardArea();
+        BattleStageCtr.instance.CreateCardArea(m_CardAreaList);
     }
 
     // Update is called once per frame
@@ -51,8 +44,10 @@ public class BattleStageMgr : MonoBehaviour
         {
             // 作成
             instance = this;
-            return true;
         }
+
+        // インスタンスが作成済みなら終了
+        if (instance != null) { return true; }
 
         Debug.LogError("BattleStageMgrのインスタンスが生成できませんでした");
         return false;
@@ -61,34 +56,51 @@ public class BattleStageMgr : MonoBehaviour
     // エリアリストの初期化
     void InitAreaList()
     {
-        areaList = new List<Area>();
+        m_CardAreaList = new List<CardArea>();
     }
 
     // エリアの追加
-    public void AddArea(int _index, string _name)
+    public void AddArea(Position _pos)
     {
-        Area area = new Area();
+        CardArea cardArea = new CardArea();
         // 値設定
-        area.index = _index;
-        area.name = _name;
+        cardArea.SetPosiiton(_pos);
         // 追加
-        areaList.Add(area);
+        m_CardAreaList.Add(cardArea);
     }
 
     // 指定エリアの削除
     public void RemoveArea(int index)
     {
-        Area area = new Area();
+        CardArea cardArea = new CardArea();
         // 指定Indexのエリアを取得
-        area = areaList[index];
+        cardArea = m_CardAreaList[index];
         // 削除
-        areaList.Remove(area);
+        m_CardAreaList.Remove(cardArea);
     }
 
     // 全てのエリアを削除
     public void AllRemoveArea()
     {
         // 全て削除
-        areaList.Clear();
+        m_CardAreaList.Clear();
+    }
+
+    // カードエリアを検索して取得
+    public CardArea GetSearchCardArea(Position _pos)
+    {
+        CardArea cardArea = m_CardAreaList.Find(x => x.GetPosition() == _pos);
+
+        return cardArea;
+    }
+
+    // カードエリアを検索してTransformを取得
+    public Transform GetTransformSearchCardArea(Position _pos)
+    {
+        CardArea cardArea = m_CardAreaList.Find(x => x.GetPosition() == _pos);
+
+        Transform transform = cardArea.gameObject.transform;
+
+        return transform;
     }
 }

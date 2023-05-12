@@ -7,17 +7,17 @@ public class CardArea : MonoBehaviour
 {
     ///////////ïœêî///////////////
     [SerializeField]
-    private ePosition m_Position;
+    private Position m_Position;
     [SerializeField]
     private List<BattleCard> m_CardList = new List<BattleCard>();
 
     ///////////ä÷êî///////////////
     // à íu
-    public void SetPosiiton(ePosition _position)
+    public void SetPosiiton(Position _position)
     {
         m_Position = _position;
     }
-    public ePosition GetPosiiton()
+    public Position GetPosition()
     {
         return m_Position;
     }
@@ -29,5 +29,21 @@ public class CardArea : MonoBehaviour
     public BattleCard GetCard(int _index)
     {
         return m_CardList[_index];
+    }
+    public void AddCard(BattleCard _battleCard)
+    {
+        m_CardList.Add(_battleCard);
+    }
+    public void CopyCardList(List<BattleCard> _battleCardList)
+    {
+        m_CardList = new List<BattleCard>(_battleCardList);
+    }
+    public void RemoveCard(int _index)
+    {
+        m_CardList.RemoveAt(_index);
+    }
+    public void RemoveCardList()
+    {
+        m_CardList.Clear();
     }
 }

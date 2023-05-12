@@ -5,7 +5,7 @@ using UnityEngine;
 namespace battleTypes
 {
     // èÍ(Field)à íu
-    public enum ePosition
+    public enum Position
     {
         ePosition_FF_Left,
         ePosition_FS_Left,
@@ -23,7 +23,7 @@ namespace battleTypes
     }
 
     // ë§
-    public enum eSide
+    public enum Side
     {
         eSide_Player,
         eSide_Enemy,

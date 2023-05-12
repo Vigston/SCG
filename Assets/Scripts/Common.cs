@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using battleTypes;
 
 public static class Common
 {
@@ -65,5 +66,22 @@ public static class Common
         RectTransformUtility.ScreenPointToWorldPointInRectangle(_rect, screenPos, _canvas.worldCamera, out worldPos);
 
         return worldPos;
+    }
+
+    // ‹t‚Ì‘¤‚ğæ“¾
+    public static Side GetRevSide(Side _side)
+    {
+        // ƒvƒŒƒCƒ„[
+        if(_side == Side.eSide_Player)
+        {
+            return Side.eSide_Enemy;
+        }
+        // “G
+        else if(_side == Side.eSide_Enemy)
+        {
+            return Side.eSide_Player;
+        }
+
+        return Side.eSide_None;
     }
 }
