@@ -55,3 +55,6 @@ sysinfo.txt
 crashlytics-build.properties
 ~*
 .DS_Store
+
+/Assets/Fonts/NotoSansJP-Medium SDF.asset
+/Assets/Fonts/NotoSansJP-Medium SDF.asset.meta

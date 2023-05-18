@@ -3,23 +3,41 @@ using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 using TMPro;
+using Cysharp.Threading.Tasks;
 
 public class BattleMgr : MonoBehaviour
 {
-    // =================構造体================
-    enum PhaseType
-    {
+    // =================クラス================
 
-    }
+    // =================構造体================
 
     // =================変数================
     // インスタンス
     public static BattleMgr instance;
-    // ターン側
+    // 現在のターン側
     [SerializeField]
     private Side m_TurnSide;
+    // 現在のターン数
+    [SerializeField]
+    private int m_TurnNum = 0;
+    // 現在のフェイズ
+    [SerializeField]
+    private PhaseType m_Phase;
+    private PhaseType m_NextPhase;
 
-    public TextMeshProUGUI text;
+    public TextMeshProUGUI m_TextTurnNum;
+    public TextMeshProUGUI m_TextTurnSide;
+    public TextMeshProUGUI m_TextPhase;
+
+    // 更新フラグ
+    private bool m_UpdateFlag = false;
+    // フェイズ進行フラグ
+    private bool m_NextPhaseFlag = false;
+    // ターンエンドフラグ
+    private bool m_TurnEndFlag = false;
+
+    // フェイズオブジェクト
+    public GameObject m_PhaseObject;
 
     private void Awake()
     {
@@ -29,16 +47,55 @@ public class BattleMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        // スタートフェイズから始める
+        SetPhase(PhaseType.ePhaseType_Start);
+        // フェイズループ処理
+        PhaseLoop().Forget();
     }
 
     // Update is called once per frame
     void Update()
     {
-        text.text = "ターン側 : " + m_TurnSide.ToString();
+        BattleMgrUpdate();
+
+        switch (m_Phase)
+        {
+            case PhaseType.ePhaseType_Start:
+                break;
+            case PhaseType.ePhaseType_Join:
+                break;
+            case PhaseType.ePhaseType_Main:
+                break;
+            case PhaseType.ePhaseType_End:
+                break;
+            default:
+                break;
+
+        }
     }
 
     // =================関数================
+    // BattleMgrの更新。
+    void BattleMgrUpdate()
+    {
+        // 更新フラグが立っていないなら処理しない。
+        if (!m_UpdateFlag) { return; }
+
+        // ↓更新処理↓
+        m_TextTurnNum.text = "ターン数：" + m_TurnNum.ToString();
+        m_TextTurnSide.text = "ターン側：" + m_TurnSide.ToString();
+        m_TextPhase.text = "フェイズ：" + m_Phase.ToString();
+
+        // 更新処理が終わったのでフラグ降ろす。
+        if (m_UpdateFlag) { m_UpdateFlag = false; }
+    }
+
+    // 更新のリクエスト。(次にUpdateで走る)
+    public void UpdateRequest()
+    {
+        m_UpdateFlag = true;
+    }
+
     // インスタンスを作成
     public bool CreateInstance()
     {
@@ -56,12 +113,137 @@ public class BattleMgr : MonoBehaviour
         return false;
     }
     // --システム--
+    async UniTask PhaseLoop()
+    {
+        Debug.Log("PhaseLoop起動");
+        while(true)
+        {
+            Debug.Log("フェイズ更新！！");
+            // FightMgrの更新リクエスト
+            UpdateRequest();
+            // 次のフェイズ(ここでは現在のフェイズを代入)
+            PhaseType nextPhase = GetPhase();
+            // 次のフェイズに移動するフラグ初期化
+            m_NextPhaseFlag = false;
+
+            switch(m_Phase)
+            {
+                case PhaseType.ePhaseType_Start:
+                    Debug.Log("スタートフェイズ");
+                    nextPhase = await PhaseStart();
+                    Debug.Log("次のフェイズへ");
+                    break;
+                case PhaseType.ePhaseType_Join:
+                    Debug.Log("ジョインフェイズ");
+                    nextPhase = await PhaseJoin();
+                    Debug.Log("次のフェイズへ");
+                    break;
+                case PhaseType.ePhaseType_Main:
+                    Debug.Log("メインフェイズ");
+                    nextPhase = await PhaseMain();
+                    Debug.Log("次のフェイズへ");
+                    break;
+                case PhaseType.ePhaseType_End:
+                    Debug.Log("エンドフェイズ");
+                    nextPhase = await PhaseEnd();
+                    Debug.Log("次のフェイズへ");
+                    break;
+                default:
+                    Debug.Log("PhaseLoopに記載されていないフェイズに遷移しようとしています");
+                    break;
+            }
+
+            // 次のフェイズが現在と同じならはじく
+            if(nextPhase == m_Phase) { continue; }
+
+            // 次のフェイズを設定
+            SetPhase(nextPhase);
+
+
+        }
+    }
+    // スタートフェイズ
+    async UniTask<PhaseType> PhaseStart()
+    {
+        // ターン数カウント
+        m_TurnNum++;
+
+        // フェイズオブジェクト設定
+        m_PhaseObject.AddComponent<StartPhase>();
+
+        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+
+        // フェイズオブジェクト削除
+        Destroy(m_PhaseObject.GetComponent<StartPhase>());
+
+        // 次のフェイズへ
+        return GetNextPhase();
+    }
+    // ジョインフェイズ
+    async UniTask<PhaseType> PhaseJoin()
+    {
+        // フェイズオブジェクト設定
+        m_PhaseObject.AddComponent<JoinPhase>();
+
+        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+
+        // フェイズオブジェクト削除
+        Destroy(m_PhaseObject.GetComponent<JoinPhase>());
+        // 次のフェイズへ
+        return GetNextPhase();
+    }
+    // メインフェイズ
+    async UniTask<PhaseType> PhaseMain()
+    {
+        // フェイズオブジェクト設定
+        m_PhaseObject.AddComponent<MainPhase>();
+
+        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+
+        // フェイズオブジェクト削除
+        Destroy(m_PhaseObject.GetComponent<MainPhase>());
+        // 次のフェイズへ
+        return GetNextPhase();
+    }
+    // エンドフェイズ
+    async UniTask<PhaseType> PhaseEnd()
+    {
+        // フェイズオブジェクト設定
+        m_PhaseObject.AddComponent<EndPhase>();
+
+        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+
+        // フェイズオブジェクト削除
+        Destroy(m_PhaseObject.GetComponent<EndPhase>());
+
+        // ターン終了処理
+        TurnEnd();
+
+        // 次のフェイズへ
+        return GetNextPhase();
+    }
+
+    // ターンエンドフラグの設定
+    public void SetTurnEndFlag()
+    {
+        m_TurnEndFlag = true;
+    }
+
+    // ターンエンドフラグが立っているか
+    public bool IsTurnEndFlag()
+    {
+        return m_TurnEndFlag;
+    }
+
     // ターン終了
     public void TurnEnd()
     {
         Side revSide = Common.GetRevSide(m_TurnSide);
 
         m_TurnSide = revSide;
+
+        // ターン終了リクエスト初期化
+        m_TurnEndFlag = false;
     }
 
     // -----側-----
@@ -113,5 +295,52 @@ public class BattleMgr : MonoBehaviour
     public int GetSideMax()
     {
         return (int)Side.eSide_Max;
+    }
+
+    // ターン数取得
+    public int GetTurnNum()
+    {
+        return m_TurnNum;
+    }
+
+    // -------フェイズ------
+    // フェイズ設定。
+    public void SetPhase(PhaseType _phase)
+    {
+        m_Phase = _phase;
+    }
+    public void SetNextPhase(PhaseType _nextPhase)
+    {
+        m_NextPhase = _nextPhase;
+    }
+    // フェイズ取得。
+    public PhaseType GetPhase()
+    {
+        return m_Phase;
+    }
+    public PhaseType GetNextPhase()
+    {
+        return m_NextPhase;
+    }
+    // 指定のフェイズか。
+    public bool IsPhase(PhaseType _phase)
+    {
+        return m_Phase == _phase;
+    }
+    // 次のフェイズに進むフラグを立てる
+    public void SetNextPhaseFlag()
+    {
+        m_NextPhaseFlag = true;
+    }
+    // 次のフェイズに進むフラグが立っているか
+    public bool IsNextPhaseFlag()
+    {
+        return m_NextPhaseFlag;
+    }
+    // 次のフェイズとフラグを設定
+    public void SetNextPhaseAndFlag(PhaseType _nextPhase)
+    {
+        SetNextPhase(_nextPhase);
+        SetNextPhaseFlag();
     }
 }

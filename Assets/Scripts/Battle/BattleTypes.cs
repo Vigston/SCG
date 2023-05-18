@@ -31,4 +31,13 @@ namespace battleTypes
 
         eSide_None = -1,
     }
+
+    // フェイズ
+    public enum PhaseType
+    {
+        ePhaseType_Start,
+        ePhaseType_Join,
+        ePhaseType_Main,
+        ePhaseType_End,
+    }
 }
