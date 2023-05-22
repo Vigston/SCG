@@ -1,32 +1,32 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 
 public class BattleStageCtr : MonoBehaviour
 {
-    // =================•Ï”=================
-    // ƒCƒ“ƒXƒ^ƒ“ƒX
+    // =================å¤‰æ•°=================
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static BattleStageCtr instance;
-    // ƒvƒŒƒCƒ„[ƒGƒŠƒA
+    // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼ã‚¨ãƒªã‚¢
     public BoxCollider PlayerArea;
-    // ƒGƒlƒ~[ƒGƒŠƒA
+    // ã‚¨ãƒãƒŸãƒ¼ã‚¨ãƒªã‚¢
     public BoxCollider EnemyArea;
-    // ƒJ[ƒhƒGƒŠƒAƒIƒuƒWƒFƒNƒg
+    // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     public GameObject cardAreaPrefab;
-    // c‚É•À‚ÔƒJ[ƒh–‡”
+    // ç¸¦ã«ä¸¦ã¶ã‚«ãƒ¼ãƒ‰æšæ•°
     [SerializeField]
     private int heightNum = 0;
-    // ‰¡‚É•À‚ÔƒJ[ƒh–‡”
+    // æ¨ªã«ä¸¦ã¶ã‚«ãƒ¼ãƒ‰æšæ•°
     [SerializeField]
     private int widthNum = 0;
-    // ƒJ[ƒhŠÔŠu
+    // ã‚«ãƒ¼ãƒ‰é–“éš”
     [SerializeField]
     private float interval_H;
     [SerializeField]
     private float interval_W;
 
-    // ƒJ[ƒhƒGƒŠƒA
+    // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢
     GameObject CardArea;
 
     private void Awake()
@@ -34,110 +34,61 @@ public class BattleStageCtr : MonoBehaviour
         CreateInstance();
     }
 
-    // ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆ
     public bool CreateInstance()
     {
-        // Šù‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îì¬‚·‚é
+        // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½œæˆã™ã‚‹
         if (instance == null)
         {
-            // ì¬
+            // ä½œæˆ
             instance = this;
         }
 
-        // ƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬Ï‚İ‚È‚çI—¹
+        // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆæ¸ˆã¿ãªã‚‰çµ‚äº†
         if (instance != null) { return true; }
 
-        Debug.LogError("BattleStageCtr‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶¬‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½");
+        Debug.LogError("BattleStageCtrã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿæˆã§ãã¾ã›ã‚“ã§ã—ãŸ");
         return false;
     }
 
-    // ƒJ[ƒhƒGƒŠƒAì¬
-    public void CreateCardArea(List<CardArea> _cardAreaList)
+    // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ä½œæˆ
+    public void CreateCardArea()
     {
-        //// Šî€À•W
-        //Vector3 baseVec = new Vector3();
-
-        //BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
-
-        //// ¶ã‚Ìè‘O
-        //Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardCollider)[0];
-        //// ¶ã‚Ì‰œ
-        //Vector3 vecCardLeftBottomUp = Common.GetBoxCollideVertices(cardCollider)[6];
-        //// ‰Eã‚Ìè‘O
-        //Vector3 vecCardRightTopUp = Common.GetBoxCollideVertices(cardCollider)[1];
-
-        //// ƒJ[ƒh‚Ì”¼•ª‚¾‚¯ã‚ÉˆÚ“®B
-        //baseVec.z += Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) / 2;
-        //// ƒJ[ƒhŠÔ‚Ì•‚Ì”¼•ªã‚ÉˆÚ“®B
-        //baseVec.z += interval_H / 2;
-
-        //// ƒJ[ƒh2–‡•ª‰¡‚ÉˆÚ“®B
-        //baseVec.x += Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * 2;
-
-        //Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(PlayerArea)[0];
-        //Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(PlayerArea)[6];
-
-        //baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
-
-
-
-        //// c—ñ‚Ì•ª‰ñ‚·
-        //for (int j = 0; j < heightNum; j++)
-        //{
-        //    // ‰¡—ñ‚Ì•ª‰ñ‚·
-        //    for (int k = 0; k < widthNum; k++)
-        //    {
-        //        // ƒGƒŠƒA‚Ì•\¦ˆÊ’u
-        //        Vector3 areaPos = baseVec;
-
-        //        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
-        //        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
-
-        //        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
-
-        //        // ƒJ[ƒhƒGƒŠƒA‚Ìî•ñİ’è
-        //        CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-        //        cardArea.SetPosiiton((ePosition)(j + k));
-        //        _cardAreaList.Add(cardArea);
-        //    }
-        //}
-
-        // ‘Šè‚Æ©•ª‚Ì•ª‰ñ‚·
+        // ç›¸æ‰‹ã¨è‡ªåˆ†ã®åˆ†å›ã™
         for (int i = 0; i < (int)Side.eSide_Max; i++)
         {
-            // Šî€À•W
+            // åŸºæº–åº§æ¨™
             Vector3 baseVec = new Vector3();
 
-            int playerIndex = (int)Side.eSide_Player;
-            int enemyIndex = (int)Side.eSide_Enemy;
+            Side side = BattleMgr.instance.GetSide(i);
 
             BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
 
-            // ¶ã‚Ìè‘O
+            // å·¦ä¸Šã®æ‰‹å‰
             Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardCollider)[0];
-            // ¶ã‚Ì‰œ
+            // å·¦ä¸Šã®å¥¥
             Vector3 vecCardLeftBottomUp = Common.GetBoxCollideVertices(cardCollider)[6];
-            // ‰Eã‚Ìè‘O
+            // å³ä¸Šã®æ‰‹å‰
             Vector3 vecCardRightTopUp = Common.GetBoxCollideVertices(cardCollider)[1];
 
-            // ƒJ[ƒh‚Ì”¼•ª‚¾‚¯ã‚ÉˆÚ“®B
+            // ã‚«ãƒ¼ãƒ‰ã®åŠåˆ†ã ã‘ä¸Šã«ç§»å‹•ã€‚
             baseVec.z += Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) / 2;
-            // ƒJ[ƒhŠÔ‚Ì•‚Ì”¼•ªã‚ÉˆÚ“®B
+            // ã‚«ãƒ¼ãƒ‰é–“ã®å¹…ã®åŠåˆ†ä¸Šã«ç§»å‹•ã€‚
             baseVec.z += interval_H / 2;
 
-            // ƒJ[ƒh2–‡•ª‰¡‚ÉˆÚ“®B
+            // ã‚«ãƒ¼ãƒ‰2æšåˆ†æ¨ªã«ç§»å‹•ã€‚
             baseVec.x += Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * 2;
 
-            // ƒvƒŒƒCƒ„[‘¤
-            if (i == playerIndex)
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å´
+            if (side == Side.eSide_Player)
             {
                 Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(PlayerArea)[0];
                 Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(PlayerArea)[6];
 
                 baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
             }
-            // “G‘¤
-            else if (i == enemyIndex)
+            // æ•µå´
+            else if (side == Side.eSide_Enemy)
             {
                 Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(EnemyArea)[0];
                 Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(EnemyArea)[6];
@@ -146,25 +97,59 @@ public class BattleStageCtr : MonoBehaviour
             }
 
 
-
-            // c—ñ‚Ì•ª‰ñ‚·
-            for (int j = 0; j < heightNum; j++)
+            // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼å´ã®ã‚¨ãƒªã‚¢ä½œæˆ
+            if(side == Side.eSide_Player)
             {
-                // ‰¡—ñ‚Ì•ª‰ñ‚·
-                for (int k = 0; k < widthNum; k++)
+                // ç¸¦åˆ—ã®åˆ†å›ã™
+                for (int j = 0; j < heightNum; j++)
                 {
-                    // ƒGƒŠƒA‚Ì•\¦ˆÊ’u
-                    Vector3 areaPos = baseVec;
+                    // æ¨ªåˆ—ã®åˆ†å›ã™
+                    for (int k = 0; k < widthNum; k++)
+                    {
+                        // ã‚¨ãƒªã‚¢ã®è¡¨ç¤ºä½ç½®
+                        Vector3 areaPos = baseVec;
 
-                    areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
-                    areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+                        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+                        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
-                    GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+                        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
 
-                    // ƒJ[ƒhƒGƒŠƒA‚Ìî•ñİ’è
-                    CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                    cardArea.SetPosiiton((Position)(j + k));
-                    _cardAreaList.Add(cardArea);
+                        // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ã®æƒ…å ±è¨­å®š
+                        CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
+                        cardArea.SetSide(side);
+                        cardArea.SetPosiiton((Position)((j * widthNum) + k));
+
+                        BattleStageMgr.instance.AddArea(cardArea);
+                    }
+                }
+            }
+
+            // æ•µå´ã®ã‚¨ãƒªã‚¢ä½œæˆ
+            if (side == Side.eSide_Enemy)
+            {
+                // ç¸¦åˆ—ã®åˆ†å›ã™
+                for (int j = 0; j < heightNum; j++)
+                {
+                    int jrev = heightNum - j - 1;
+                    // æ¨ªåˆ—ã®åˆ†å›ã™
+                    for (int k = 0; k < widthNum; k++)
+                    {
+                        int krev = widthNum - k - 1;
+                        // ã‚¨ãƒªã‚¢ã®è¡¨ç¤ºä½ç½®
+                        Vector3 areaPos = baseVec;
+
+                        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+                        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+
+                        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+
+                        // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ã®æƒ…å ±è¨­å®š
+                        CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
+                        cardArea.SetSide(side);
+                        cardArea.SetPosiiton((Position)(((jrev) * widthNum) + krev));
+
+                        BattleStageMgr.instance.AddArea(cardArea);
+                    }
                 }
             }
         }

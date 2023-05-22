@@ -1,28 +1,28 @@
-using System.Collections;
+Ôªøusing System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace battleTypes
 {
-    // èÍ(Field)à íu
+    // Â†¥(Field)‰ΩçÁΩÆ
     public enum Position
     {
         ePosition_FF_Left,
         ePosition_FS_Left,
         ePosition_F_Center,
-        ePosition_FF_Right,
         ePosition_FS_Right,
+        ePosition_FF_Right,
         ePosition_BF_Left,
         ePosition_BS_Left,
         ePosition_B_Center,
-        ePosition_BF_Right,
         ePosition_BS_Right,
+        ePosition_BF_Right,
         ePosiiton_Max,
 
         Exclusion = -1,
     }
 
-    // ë§
+    // ÂÅ¥
     public enum Side
     {
         eSide_Player,
@@ -32,7 +32,7 @@ namespace battleTypes
         eSide_None = -1,
     }
 
-    // ÉtÉFÉCÉY
+    // „Éï„Çß„Ç§„Ç∫
     public enum PhaseType
     {
         ePhaseType_Start,

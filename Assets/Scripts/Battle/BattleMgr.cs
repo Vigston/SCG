@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
@@ -7,36 +7,41 @@ using Cysharp.Threading.Tasks;
 
 public class BattleMgr : MonoBehaviour
 {
-    // =================ƒNƒ‰ƒX================
+    // =================ã‚¯ãƒ©ã‚¹================
 
-    // =================\‘¢‘Ì================
+    // =================æ§‹é€ ä½“================
 
-    // =================•Ï”================
-    // ƒCƒ“ƒXƒ^ƒ“ƒX
+    // =================å¤‰æ•°================
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static BattleMgr instance;
-    // Œ»İ‚Ìƒ^[ƒ“‘¤
+    // ç¾åœ¨ã®ã‚¿ãƒ¼ãƒ³å´
     [SerializeField]
     private Side m_TurnSide;
-    // Œ»İ‚Ìƒ^[ƒ“”
+    // ç¾åœ¨ã®ã‚¿ãƒ¼ãƒ³æ•°
     [SerializeField]
-    private int m_TurnNum = 0;
-    // Œ»İ‚ÌƒtƒFƒCƒY
+    private int m_TurnNum;
+    // ç¾åœ¨ã®ãƒ•ã‚§ã‚¤ã‚º
     [SerializeField]
     private PhaseType m_Phase;
     private PhaseType m_NextPhase;
+    // ç ”ç©¶ãƒã‚¤ãƒ³ãƒˆ
+    [SerializeField]
+    private int[] m_ResearchValue = new int[(int)Side.eSide_Max];
 
     public TextMeshProUGUI m_TextTurnNum;
     public TextMeshProUGUI m_TextTurnSide;
     public TextMeshProUGUI m_TextPhase;
+    public TextMeshProUGUI m_TextResearch_Player;
+    public TextMeshProUGUI m_TextResearch_Enemy;
 
-    // XVƒtƒ‰ƒO
+    // æ›´æ–°ãƒ•ãƒ©ã‚°
     private bool m_UpdateFlag = false;
-    // ƒtƒFƒCƒYisƒtƒ‰ƒO
+    // ãƒ•ã‚§ã‚¤ã‚ºé€²è¡Œãƒ•ãƒ©ã‚°
     private bool m_NextPhaseFlag = false;
-    // ƒ^[ƒ“ƒGƒ“ƒhƒtƒ‰ƒO
+    // ã‚¿ãƒ¼ãƒ³ã‚¨ãƒ³ãƒ‰ãƒ•ãƒ©ã‚°
     private bool m_TurnEndFlag = false;
 
-    // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒg
+    // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
     public GameObject m_PhaseObject;
 
     private void Awake()
@@ -47,9 +52,9 @@ public class BattleMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // ƒXƒ^[ƒgƒtƒFƒCƒY‚©‚çn‚ß‚é
+        // ã‚¹ã‚¿ãƒ¼ãƒˆãƒ•ã‚§ã‚¤ã‚ºã‹ã‚‰å§‹ã‚ã‚‹
         SetPhase(PhaseType.ePhaseType_Start);
-        // ƒtƒFƒCƒYƒ‹[ƒvˆ—
+        // ãƒ•ã‚§ã‚¤ã‚ºãƒ«ãƒ¼ãƒ—å‡¦ç†
         PhaseLoop().Forget();
     }
 
@@ -74,237 +79,234 @@ public class BattleMgr : MonoBehaviour
         }
     }
 
-    // =================ŠÖ”================
-    // BattleMgr‚ÌXVB
+    // =================é–¢æ•°================
+    // BattleMgrã®æ›´æ–°ã€‚
     void BattleMgrUpdate()
     {
-        // XVƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚È‚¢‚È‚çˆ—‚µ‚È‚¢B
+        // æ›´æ–°ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ãªã„ãªã‚‰å‡¦ç†ã—ãªã„ã€‚
         if (!m_UpdateFlag) { return; }
 
-        // «XVˆ—«
-        m_TextTurnNum.text = "ƒ^[ƒ“”F" + m_TurnNum.ToString();
-        m_TextTurnSide.text = "ƒ^[ƒ“‘¤F" + m_TurnSide.ToString();
-        m_TextPhase.text = "ƒtƒFƒCƒYF" + m_Phase.ToString();
+        // â†“æ›´æ–°å‡¦ç†â†“
+        m_TextTurnNum.text = "ã‚¿ãƒ¼ãƒ³æ•°ï¼š" + m_TurnNum.ToString();
+        m_TextTurnSide.text = "ã‚¿ãƒ¼ãƒ³å´ï¼š" + m_TurnSide.ToString();
+        m_TextPhase.text = "ãƒ•ã‚§ã‚¤ã‚ºï¼š" + m_Phase.ToString();
+        m_TextResearch_Player.text = "è‡ªåˆ†ã®ç ”ç©¶ï¼š" + GetResearchValue(Side.eSide_Player).ToString();
+        m_TextResearch_Enemy.text = "ç›¸æ‰‹ã®ç ”ç©¶ï¼š" + GetResearchValue(Side.eSide_Enemy).ToString();
 
-        // XVˆ—‚ªI‚í‚Á‚½‚Ì‚Åƒtƒ‰ƒO~‚ë‚·B
+        // æ›´æ–°å‡¦ç†ãŒçµ‚ã‚ã£ãŸã®ã§ãƒ•ãƒ©ã‚°é™ã‚ã™ã€‚
         if (m_UpdateFlag) { m_UpdateFlag = false; }
     }
 
-    // XV‚ÌƒŠƒNƒGƒXƒgB(Ÿ‚ÉUpdate‚Å‘–‚é)
+    // æ›´æ–°ã®ãƒªã‚¯ã‚¨ã‚¹ãƒˆã€‚(æ¬¡ã«Updateã§èµ°ã‚‹)
     public void UpdateRequest()
     {
         m_UpdateFlag = true;
     }
 
-    // ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆ
     public bool CreateInstance()
     {
-        // Šù‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îì¬‚·‚é
+        // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½œæˆã™ã‚‹
         if (instance == null)
         {
-            // ì¬
+            // ä½œæˆ
             instance = this;
         }
 
-        // ƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬Ï‚İ‚È‚çI—¹
+        // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆæ¸ˆã¿ãªã‚‰çµ‚äº†
         if (instance != null) { return true; }
 
-        Debug.LogError("BattleMgr‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶¬‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½");
+        Debug.LogError("BattleMgrã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿæˆã§ãã¾ã›ã‚“ã§ã—ãŸ");
         return false;
     }
-    // --ƒVƒXƒeƒ€--
+    // --ã‚·ã‚¹ãƒ†ãƒ --
     async UniTask PhaseLoop()
     {
-        Debug.Log("PhaseLoop‹N“®");
+        Debug.Log("PhaseLoopèµ·å‹•");
         while(true)
         {
-            Debug.Log("ƒtƒFƒCƒYXVII");
-            // FightMgr‚ÌXVƒŠƒNƒGƒXƒg
+            Debug.Log("ãƒ•ã‚§ã‚¤ã‚ºæ›´æ–°ï¼ï¼");
+            // FightMgrã®æ›´æ–°ãƒªã‚¯ã‚¨ã‚¹ãƒˆ
             UpdateRequest();
-            // Ÿ‚ÌƒtƒFƒCƒY(‚±‚±‚Å‚ÍŒ»İ‚ÌƒtƒFƒCƒY‚ğ‘ã“ü)
+            // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚º(ã“ã“ã§ã¯ç¾åœ¨ã®ãƒ•ã‚§ã‚¤ã‚ºã‚’ä»£å…¥)
             PhaseType nextPhase = GetPhase();
-            // Ÿ‚ÌƒtƒFƒCƒY‚ÉˆÚ“®‚·‚éƒtƒ‰ƒO‰Šú‰»
+            // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã«ç§»å‹•ã™ã‚‹ãƒ•ãƒ©ã‚°åˆæœŸåŒ–
             m_NextPhaseFlag = false;
 
             switch(m_Phase)
             {
                 case PhaseType.ePhaseType_Start:
-                    Debug.Log("ƒXƒ^[ƒgƒtƒFƒCƒY");
+                    Debug.Log("ã‚¹ã‚¿ãƒ¼ãƒˆãƒ•ã‚§ã‚¤ã‚º");
                     nextPhase = await PhaseStart();
-                    Debug.Log("Ÿ‚ÌƒtƒFƒCƒY‚Ö");
+                    Debug.Log("æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸");
                     break;
                 case PhaseType.ePhaseType_Join:
-                    Debug.Log("ƒWƒ‡ƒCƒ“ƒtƒFƒCƒY");
+                    Debug.Log("ã‚¸ãƒ§ã‚¤ãƒ³ãƒ•ã‚§ã‚¤ã‚º");
                     nextPhase = await PhaseJoin();
-                    Debug.Log("Ÿ‚ÌƒtƒFƒCƒY‚Ö");
+                    Debug.Log("æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸");
                     break;
                 case PhaseType.ePhaseType_Main:
-                    Debug.Log("ƒƒCƒ“ƒtƒFƒCƒY");
+                    Debug.Log("ãƒ¡ã‚¤ãƒ³ãƒ•ã‚§ã‚¤ã‚º");
                     nextPhase = await PhaseMain();
-                    Debug.Log("Ÿ‚ÌƒtƒFƒCƒY‚Ö");
+                    Debug.Log("æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸");
                     break;
                 case PhaseType.ePhaseType_End:
-                    Debug.Log("ƒGƒ“ƒhƒtƒFƒCƒY");
+                    Debug.Log("ã‚¨ãƒ³ãƒ‰ãƒ•ã‚§ã‚¤ã‚º");
                     nextPhase = await PhaseEnd();
-                    Debug.Log("Ÿ‚ÌƒtƒFƒCƒY‚Ö");
+                    Debug.Log("æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸");
                     break;
                 default:
-                    Debug.Log("PhaseLoop‚É‹LÚ‚³‚ê‚Ä‚¢‚È‚¢ƒtƒFƒCƒY‚É‘JˆÚ‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·");
+                    Debug.Log("PhaseLoopã«è¨˜è¼‰ã•ã‚Œã¦ã„ãªã„ãƒ•ã‚§ã‚¤ã‚ºã«é·ç§»ã—ã‚ˆã†ã¨ã—ã¦ã„ã¾ã™");
                     break;
             }
 
-            // Ÿ‚ÌƒtƒFƒCƒY‚ªŒ»İ‚Æ“¯‚¶‚È‚ç‚Í‚¶‚­
+            // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºãŒç¾åœ¨ã¨åŒã˜ãªã‚‰ã¯ã˜ã
             if(nextPhase == m_Phase) { continue; }
 
-            // Ÿ‚ÌƒtƒFƒCƒY‚ğİ’è
+            // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã‚’è¨­å®š
             SetPhase(nextPhase);
 
 
         }
     }
-    // ƒXƒ^[ƒgƒtƒFƒCƒY
+    // ã‚¹ã‚¿ãƒ¼ãƒˆãƒ•ã‚§ã‚¤ã‚º
     async UniTask<PhaseType> PhaseStart()
     {
-        // ƒ^[ƒ“”ƒJƒEƒ“ƒg
+        // ã‚¿ãƒ¼ãƒ³æ•°ã‚«ã‚¦ãƒ³ãƒˆ
         m_TurnNum++;
 
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgİ’è
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š
         m_PhaseObject.AddComponent<StartPhase>();
 
         await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgíœ
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(m_PhaseObject.GetComponent<StartPhase>());
 
-        // Ÿ‚ÌƒtƒFƒCƒY‚Ö
+        // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸
         return GetNextPhase();
     }
-    // ƒWƒ‡ƒCƒ“ƒtƒFƒCƒY
+    // ã‚¸ãƒ§ã‚¤ãƒ³ãƒ•ã‚§ã‚¤ã‚º
     async UniTask<PhaseType> PhaseJoin()
     {
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgİ’è
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š
         m_PhaseObject.AddComponent<JoinPhase>();
 
         await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgíœ
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(m_PhaseObject.GetComponent<JoinPhase>());
-        // Ÿ‚ÌƒtƒFƒCƒY‚Ö
+        // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸
         return GetNextPhase();
     }
-    // ƒƒCƒ“ƒtƒFƒCƒY
+    // ãƒ¡ã‚¤ãƒ³ãƒ•ã‚§ã‚¤ã‚º
     async UniTask<PhaseType> PhaseMain()
     {
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgİ’è
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š
         m_PhaseObject.AddComponent<MainPhase>();
 
         await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgíœ
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(m_PhaseObject.GetComponent<MainPhase>());
-        // Ÿ‚ÌƒtƒFƒCƒY‚Ö
+        // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸
         return GetNextPhase();
     }
-    // ƒGƒ“ƒhƒtƒFƒCƒY
+    // ã‚¨ãƒ³ãƒ‰ãƒ•ã‚§ã‚¤ã‚º
     async UniTask<PhaseType> PhaseEnd()
     {
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgİ’è
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆè¨­å®š
         m_PhaseObject.AddComponent<EndPhase>();
 
         await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // ƒtƒFƒCƒYƒIƒuƒWƒFƒNƒgíœ
+        // ãƒ•ã‚§ã‚¤ã‚ºã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆå‰Šé™¤
         Destroy(m_PhaseObject.GetComponent<EndPhase>());
 
-        // ƒ^[ƒ“I—¹ˆ—
+        // ã‚¿ãƒ¼ãƒ³çµ‚äº†å‡¦ç†
         TurnEnd();
 
-        // Ÿ‚ÌƒtƒFƒCƒY‚Ö
+        // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¸
         return GetNextPhase();
     }
 
-    // ƒ^[ƒ“ƒGƒ“ƒhƒtƒ‰ƒO‚Ìİ’è
+    // ã‚¿ãƒ¼ãƒ³ã‚¨ãƒ³ãƒ‰ãƒ•ãƒ©ã‚°ã®è¨­å®š
     public void SetTurnEndFlag()
     {
         m_TurnEndFlag = true;
     }
 
-    // ƒ^[ƒ“ƒGƒ“ƒhƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é‚©
+    // ã‚¿ãƒ¼ãƒ³ã‚¨ãƒ³ãƒ‰ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹ã‹
     public bool IsTurnEndFlag()
     {
         return m_TurnEndFlag;
     }
 
-    // ƒ^[ƒ“I—¹
+    // ã‚¿ãƒ¼ãƒ³çµ‚äº†
     public void TurnEnd()
     {
-        Side revSide = Common.GetRevSide(m_TurnSide);
+        // ç¾åœ¨ã®ã‚¿ãƒ¼ãƒ³ã‚’é€†ã«ã™ã‚‹
+        SetTurnSide(Common.GetRevSide(m_TurnSide));
 
-        m_TurnSide = revSide;
-
-        // ƒ^[ƒ“I—¹ƒŠƒNƒGƒXƒg‰Šú‰»
+        // ã‚¿ãƒ¼ãƒ³çµ‚äº†ãƒªã‚¯ã‚¨ã‚¹ãƒˆåˆæœŸåŒ–
         m_TurnEndFlag = false;
+
+        Debug.Log($"'{m_TurnSide}'ã‚¿ãƒ¼ãƒ³ã«é€²ã‚€");
     }
 
-    // -----‘¤-----
-    // ƒ^[ƒ“‘¤‚ğİ’è
-    public void SetSide(Side _side)
+    // -----å´-----
+    // ã‚¿ãƒ¼ãƒ³å´ã‚’è¨­å®š
+    public void SetTurnSide(Side _side)
     {
         m_TurnSide = _side;
     }
-    // ƒ^[ƒ“‘¤‚ğæ“¾
-    public Side GetSide()
+    // ã‚¿ãƒ¼ãƒ³å´ã‚’å–å¾—
+    public Side GetTurnSide()
     {
         return m_TurnSide;
     }
-    // ‘¤‚ğæ“¾(index‚©‚ç)
+    // å´ã‚’å–å¾—(indexã‹ã‚‰)
     public Side GetSide(int _index)
     {
-        // ”ÍˆÍŠO‚È‚ç‚Í‚¶‚­
+        // ç¯„å›²å¤–ãªã‚‰ã¯ã˜ã
         if( _index < 0 || _index > GetSideMax())
         {
-            Debug.LogError("”ÍˆÍŠO‚Ìindex" + "[" + _index.ToString() + "]" + "‚Ì‚½‚ß'eSide_None'‚ğ•Ô‚µ‚Ü‚µ‚½" );
+            Debug.LogError("ç¯„å›²å¤–ã®index" + "[" + _index.ToString() + "]" + "ã®ãŸã‚'eSide_None'ã‚’è¿”ã—ã¾ã—ãŸ" );
             return Side.eSide_None;
         }
 
-        for(int i = 0; i < (int)Side.eSide_Max; i++)
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
+        if (_index == (int)Side.eSide_Player)
         {
-            // w’èindexˆÈŠO‚Í‚Í‚¶‚­
-            if(i == _index) { return Side.eSide_None; }
-
-            // ƒvƒŒƒCƒ„[
-            if(_index == (int)Side.eSide_Player)
-            {
-                return Side.eSide_Player;
-            }
-            // “G
-            else if (_index == (int)Side.eSide_Enemy)
-            {
-                return Side.eSide_Enemy;
-            }
+            return Side.eSide_Player;
+        }
+        // æ•µ
+        else if (_index == (int)Side.eSide_Enemy)
+        {
+            return Side.eSide_Enemy;
         }
 
         return Side.eSide_None;
     }
-    // w’è‘¤‚ÌIndex‚ğæ“¾
+    // æŒ‡å®šå´ã®Indexã‚’å–å¾—
     public int GetSideIndex(Side _side)
     {
         return (int)_side;
     }
-    // ‘¤‚ÌÅ‘å”‚ğæ“¾
+    // å´ã®æœ€å¤§æ•°ã‚’å–å¾—
     public int GetSideMax()
     {
         return (int)Side.eSide_Max;
     }
 
-    // ƒ^[ƒ“”æ“¾
+    // ã‚¿ãƒ¼ãƒ³æ•°å–å¾—
     public int GetTurnNum()
     {
         return m_TurnNum;
     }
 
-    // -------ƒtƒFƒCƒY------
-    // ƒtƒFƒCƒYİ’èB
+    // -------ãƒ•ã‚§ã‚¤ã‚º------
+    // ãƒ•ã‚§ã‚¤ã‚ºè¨­å®šã€‚
     public void SetPhase(PhaseType _phase)
     {
         m_Phase = _phase;
@@ -313,7 +315,7 @@ public class BattleMgr : MonoBehaviour
     {
         m_NextPhase = _nextPhase;
     }
-    // ƒtƒFƒCƒYæ“¾B
+    // ãƒ•ã‚§ã‚¤ã‚ºå–å¾—ã€‚
     public PhaseType GetPhase()
     {
         return m_Phase;
@@ -322,25 +324,42 @@ public class BattleMgr : MonoBehaviour
     {
         return m_NextPhase;
     }
-    // w’è‚ÌƒtƒFƒCƒY‚©B
+    // æŒ‡å®šã®ãƒ•ã‚§ã‚¤ã‚ºã‹ã€‚
     public bool IsPhase(PhaseType _phase)
     {
         return m_Phase == _phase;
     }
-    // Ÿ‚ÌƒtƒFƒCƒY‚Éi‚Şƒtƒ‰ƒO‚ğ—§‚Ä‚é
+    // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã«é€²ã‚€ãƒ•ãƒ©ã‚°ã‚’ç«‹ã¦ã‚‹
     public void SetNextPhaseFlag()
     {
         m_NextPhaseFlag = true;
     }
-    // Ÿ‚ÌƒtƒFƒCƒY‚Éi‚Şƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é‚©
+    // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã«é€²ã‚€ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹ã‹
     public bool IsNextPhaseFlag()
     {
         return m_NextPhaseFlag;
     }
-    // Ÿ‚ÌƒtƒFƒCƒY‚Æƒtƒ‰ƒO‚ğİ’è
+    // æ¬¡ã®ãƒ•ã‚§ã‚¤ã‚ºã¨ãƒ•ãƒ©ã‚°ã‚’è¨­å®š
     public void SetNextPhaseAndFlag(PhaseType _nextPhase)
     {
         SetNextPhase(_nextPhase);
         SetNextPhaseFlag();
+    }
+
+    // ---ç ”ç©¶---
+    // ç ”ç©¶ãƒã‚¤ãƒ³ãƒˆè¨­å®š
+    public void SetResearchValue(Side _side, int _value)
+    {
+        m_ResearchValue[(int)_side] = _value;
+    }
+    // ç ”ç©¶ãƒã‚¤ãƒ³ãƒˆå–å¾—
+    public int GetResearchValue(Side _side)
+    {
+        return m_ResearchValue[(int)_side];
+    }
+    // ç ”ç©¶ãƒã‚¤ãƒ³ãƒˆè¿½åŠ 
+    public void AddResearchValue(Side _side, int _value)
+    {
+        m_ResearchValue[(int)_side] += _value;
     }
 }

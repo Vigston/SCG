@@ -1,47 +1,77 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 
 public class BattleCardCtr : MonoBehaviour
 {
-    // ƒCƒ“ƒXƒ^ƒ“ƒX
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static BattleCardCtr instance;
+
+    // ã‚«ãƒ¼ãƒ‰ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆ
+    public GameObject cardPrefab;
 
     private void Awake()
     {
         CreateInstance();
     }
 
-    // ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆ
     public bool CreateInstance()
     {
-        // Šù‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îì¬‚·‚é
+        // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½œæˆã™ã‚‹
         if (instance == null)
         {
-            // ì¬
+            // ä½œæˆ
             instance = this;
         }
 
-        // ƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬Ï‚İ‚È‚çI—¹
+        // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆæ¸ˆã¿ãªã‚‰çµ‚äº†
         if (instance != null) { return true; }
 
-        Debug.LogError("BattleCardCtr‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶¬‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½");
+        Debug.LogError("BattleCardCtrã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿæˆã§ãã¾ã›ã‚“ã§ã—ãŸ");
         return false;
     }
 
-    public void CreateBattleCard(Position _pos, BattleCard.Kind _kind, bool isEnable = true)
+    // æŒ‡å®šä½ç½®ã«ã‚«ãƒ¼ãƒ‰ã‚’ç”Ÿæˆ
+    public void CreateBattleCard(Side _side,Position _pos, BattleCard.Kind _kind, bool isEnable = true)
     {
-        BattleCard battleCard = new BattleCard();
-        // ’lİ’è
+        // æŒ‡å®šä½ç½®ã®ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢
+        CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, _pos);
+
+        GameObject cardClone = Instantiate(cardPrefab, cardArea.gameObject.transform.position, Quaternion.identity);
+        BattleCard battleCard = cardClone.GetComponent<BattleCard>();
+        // ç¾åœ¨ã®ã‚¿ãƒ¼ãƒ³
+        Side turnSide = BattleMgr.instance.GetTurnSide();
+        // å€¤è¨­å®š
+        battleCard.SetSide(turnSide);
         battleCard.SetPosiiton(_pos);
         battleCard.SetKind(_kind);
         battleCard.SetEnable(isEnable);
 
-        // w’èˆÊ’u‚ÌƒJ[ƒhƒGƒŠƒA
-        CardArea cardArea = BattleStageMgr.instance.GetSearchCardArea(_pos);
-
-        // w’èˆÊ’u‚ÌƒJ[ƒhƒGƒŠƒA‚ÉƒJ[ƒh‚ğˆÚ“®
+        // æŒ‡å®šä½ç½®ã®ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ã«ç™»éŒ²
         cardArea.AddCard(battleCard);
+
+        Debug.Log($"[{cardArea.GetSide()}]ã®'{cardArea.GetPosition()}'ã«ã‚«ãƒ¼ãƒ‰ã‚’ç”Ÿæˆã—ã¾ã—ãŸã€‚");
+    }
+    public void CreateBattleCard(CardArea _cardArea, BattleCard.Kind _kind, bool isEnable = true)
+    {
+        // NULLãƒã‚§ãƒƒã‚¯
+        if(_cardArea == null) { return; }
+
+        GameObject cardClone = Instantiate(cardPrefab, _cardArea.gameObject.transform.position, Quaternion.identity);
+        BattleCard battleCard = cardClone.GetComponent<BattleCard>();
+        // ç¾åœ¨ã®ã‚¿ãƒ¼ãƒ³
+        Side turnSide = BattleMgr.instance.GetTurnSide();
+        // å€¤è¨­å®š
+        battleCard.SetSide(turnSide);
+        battleCard.SetPosiiton(_cardArea.GetPosition());
+        battleCard.SetKind(_kind);
+        battleCard.SetEnable(isEnable);
+
+        // æŒ‡å®šä½ç½®ã®ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢ã«ç™»éŒ²
+        _cardArea.AddCard(battleCard);
+
+        Debug.Log($"[{_cardArea.GetSide()}]ã®'{_cardArea.GetPosition()}'ã«ã‚«ãƒ¼ãƒ‰ã‚’ç”Ÿæˆã—ã¾ã—ãŸã€‚");
     }
 }

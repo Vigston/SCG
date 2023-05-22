@@ -8,9 +8,8 @@ public class BattleCardMgr : MonoBehaviour
     // インスタンス
     public static BattleCardMgr instance;
 
-    // 変数
-    [SerializeField]
-    private List<BattleCard> m_BattleCardList;
+    // カードのPrehab
+    public GameObject battleCardPrehab;
 
     private void Awake()
     {

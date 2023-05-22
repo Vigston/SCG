@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -6,24 +6,26 @@ using battleTypes;
 
 public class MainPhase : MonoBehaviour
 {
-    // ===\‘¢‘Ì===
+    // ===æ§‹é€ ä½“===
     public enum State
     {
         eState_Init,
+        eState_GiveJob,
+        eState_Main,
         eState_End,
     }
 
-    // ===•Ï”===
-    // Œ»İ‚ÌƒXƒe[ƒg
+    // ===å¤‰æ•°===
+    // ç¾åœ¨ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
     State m_State;
-    // Ÿ‚ÌƒXƒe[ƒg
+    // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
     State m_NextState;
 
-    // ƒXƒe[ƒg‚²‚Æ‚ÌÀs‰ñ”
+    // ã‚¹ãƒ†ãƒ¼ãƒˆã”ã¨ã®å®Ÿè¡Œå›æ•°
     int m_StateValue = 0;
 
-    // ===ƒtƒ‰ƒO===
-    // ƒXƒe[ƒg‚ÌXVƒtƒ‰ƒO
+    // ===ãƒ•ãƒ©ã‚°===
+    // ã‚¹ãƒ†ãƒ¼ãƒˆã®æ›´æ–°ãƒ•ãƒ©ã‚°
     bool m_NextStateFlag = false;
 
     private void Awake()
@@ -34,9 +36,9 @@ public class MainPhase : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // ‰Šú‰»ƒXƒe[ƒg‚©‚çn‚ß‚é
+        // åˆæœŸåŒ–ã‚¹ãƒ†ãƒ¼ãƒˆã‹ã‚‰å§‹ã‚ã‚‹
         SetState(State.eState_Init);
-        // ƒXƒe[ƒgƒ‹[ƒvˆ—
+        // ã‚¹ãƒ†ãƒ¼ãƒˆãƒ«ãƒ¼ãƒ—å‡¦ç†
         StateLoop().Forget();
     }
 
@@ -49,98 +51,153 @@ public class MainPhase : MonoBehaviour
             case State.eState_Init:
                 Init();
                 break;
+            case State.eState_GiveJob:
+                GiveJob();
+                break;
+            case State.eState_Main:
+                Main();
+                break;
             case State.eState_End:
                 End();
                 break;
             default:
-                Debug.Log("“o˜^‚³‚ê‚Ä‚¢‚È‚¢ƒXƒe[ƒg‚Å‚·B");
+                Debug.Log("ç™»éŒ²ã•ã‚Œã¦ã„ãªã„ã‚¹ãƒ†ãƒ¼ãƒˆã§ã™ã€‚");
                 break;
         }
     }
 
-    // ‰Šú‰»
+    // åˆæœŸåŒ–
     void Init()
     {
         if(m_StateValue == 1)
         {
-            Debug.Log("‰Šú‰»ƒXƒe[ƒgˆ—ŠJn");
+            Debug.Log("åˆæœŸåŒ–ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†é–‹å§‹");
         }
 
-        // ƒ^[ƒ“ƒGƒ“ƒhƒtƒ‰ƒO‚ª—§‚Á‚Ä‚¢‚é‚È‚çI—¹‚·‚éB
+        // è·æ¥­ä»˜ä¸ã¸
+        SetNextStateAndFlag(State.eState_GiveJob);
+        Debug.Log("åˆæœŸåŒ–ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†çµ‚äº†");
+    }
+
+    // è·æ¥­ä»˜ä¸
+    void GiveJob()
+    {
+        if (m_StateValue == 1)
+        {
+            Debug.Log("è·æ¥­ä»˜ä¸ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†é–‹å§‹");
+        }
+
+        // ãƒ¡ã‚¤ãƒ³ã¸
+        SetNextStateAndFlag(State.eState_Main);
+        Debug.Log("è·æ¥­ä»˜ä¸ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†çµ‚äº†");
+    }
+
+    void Main()
+    {
+        if (m_StateValue == 1)
+        {
+            Debug.Log("è·æ¥­ä»˜ä¸ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†é–‹å§‹");
+        }
+
+        // ã‚¿ãƒ¼ãƒ³ã‚¨ãƒ³ãƒ‰ãƒ•ãƒ©ã‚°ãŒç«‹ã£ã¦ã„ã‚‹ãªã‚‰çµ‚äº†ã™ã‚‹ã€‚
         if (BattleMgr.instance.IsTurnEndFlag())
         {
-            // I—¹‚Ö
+            // çµ‚äº†ã¸
             SetNextStateAndFlag(State.eState_End);
-            Debug.Log("‰Šú‰»ƒXƒe[ƒgˆ—I—¹");
+            Debug.Log("è·æ¥­ä»˜ä¸ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†çµ‚äº†");
         }
     }
 
-    // I—¹
+    // çµ‚äº†
     void End()
     {
-        Debug.Log("I—¹ƒXƒe[ƒgˆ—ŠJn");
-        // ƒGƒ“ƒhƒtƒFƒCƒY‚ÉˆÚ“®B
+        Debug.Log("çµ‚äº†ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†é–‹å§‹");
+        // ã‚¨ãƒ³ãƒ‰ãƒ•ã‚§ã‚¤ã‚ºã«ç§»å‹•ã€‚
         BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
-        Debug.Log("I—¹ƒXƒe[ƒgˆ—I—¹");
+        Debug.Log("çµ‚äº†ã‚¹ãƒ†ãƒ¼ãƒˆå‡¦ç†çµ‚äº†");
     }
 
-    // --ƒVƒXƒeƒ€--
+    // --ã‚·ã‚¹ãƒ†ãƒ --
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop‹N“®");
+        Debug.Log("StateLoopèµ·å‹•");
         while (true)
         {
-            // ƒXƒe[ƒgXVˆ—
-            Debug.Log("ƒXƒe[ƒgXVII");
-            // Ÿ‚ÌƒXƒe[ƒgXV(¡‚ÌƒXƒe[ƒg‚Éİ’è)
+            // ã‚¹ãƒ†ãƒ¼ãƒˆæ›´æ–°å‡¦ç†
+            Debug.Log("ã‚¹ãƒ†ãƒ¼ãƒˆæ›´æ–°ï¼ï¼");
+            // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆæ›´æ–°(ä»Šã®ã‚¹ãƒ†ãƒ¼ãƒˆã«è¨­å®š)
             SetNextState(m_State);
-            // Ÿ‚ÌƒXƒe[ƒg
+            // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆ
             State nextState = GetNextState();
-            // Ÿ‚ÌƒXƒe[ƒg‚ÉˆÚ“®‚·‚éƒtƒ‰ƒO‰Šú‰»
+            // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã«ç§»å‹•ã™ã‚‹ãƒ•ãƒ©ã‚°åˆæœŸåŒ–
             m_NextStateFlag = false;
 
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("‰Šú‰»ƒXƒe[ƒg");
+                    Debug.Log("åˆæœŸåŒ–ã‚¹ãƒ†ãƒ¼ãƒˆ");
                     nextState = await StateInit();
-                    Debug.Log("Ÿ‚ÌƒXƒe[ƒg‚Ö");
+                    Debug.Log("æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸");
+                    break;
+                case State.eState_GiveJob:
+                    Debug.Log("è·æ¥­ä»˜ä¸ã‚¹ãƒ†ãƒ¼ãƒˆ");
+                    nextState = await StateGiveJob();
+                    Debug.Log("æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸");
+                    break;
+                case State.eState_Main:
+                    Debug.Log("ãƒ¡ã‚¤ãƒ³ã‚¹ãƒ†ãƒ¼ãƒˆ");
+                    nextState = await StateMain();
+                    Debug.Log("æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸");
                     break;
                 case State.eState_End:
-                    Debug.Log("I—¹ƒXƒe[ƒg");
+                    Debug.Log("çµ‚äº†ã‚¹ãƒ†ãƒ¼ãƒˆ");
                     nextState = await StateEnd();
-                    Debug.Log("Ÿ‚ÌƒXƒe[ƒg‚Ö");
+                    Debug.Log("æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸");
                     break;
                 default:
-                    Debug.Log("StateLoop‚É‹LÚ‚³‚ê‚Ä‚¢‚È‚¢ƒXƒe[ƒg‚É‘JˆÚ‚µ‚æ‚¤‚Æ‚µ‚Ä‚¢‚Ü‚·");
+                    Debug.Log("StateLoopã«è¨˜è¼‰ã•ã‚Œã¦ã„ãªã„ã‚¹ãƒ†ãƒ¼ãƒˆã«é·ç§»ã—ã‚ˆã†ã¨ã—ã¦ã„ã¾ã™");
                     break;
             }
 
-            // Ÿ‚ÌƒXƒe[ƒg‚ªŒ»İ‚Æ“¯‚¶‚È‚ç‚Í‚¶‚­
+            // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆãŒç¾åœ¨ã¨åŒã˜ãªã‚‰ã¯ã˜ã
             if (nextState == m_State) { continue; }
 
-            // Ÿ‚ÌƒXƒe[ƒg‚ğİ’è
+            // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã‚’è¨­å®š
             SetState(nextState);
         }
     }
-    // ‰Šú‰»
+    // åˆæœŸåŒ–
     async UniTask<State> StateInit()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
-        // Ÿ‚ÌƒXƒe[ƒg‚Ö
+        // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸
         return GetNextState();
     }
-    // I—¹
+    // è·æ¥­ä»˜ä¸
+    async UniTask<State> StateGiveJob()
+    {
+        await UniTask.WaitUntil(() => IsNextStateFlag());
+        // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸
+        return GetNextState();
+    }
+    // ãƒ¡ã‚¤ãƒ³å‡¦ç†
+    async UniTask<State> StateMain()
+    {
+        await UniTask.WaitUntil(() => IsNextStateFlag());
+        // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸
+        return GetNextState();
+    }
+    // çµ‚äº†
     async UniTask<State> StateEnd()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
 
-        // Ÿ‚ÌƒXƒe[ƒg‚Ö
+        // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¸
         return GetNextState();
     }
 
-    // --ƒXƒe[ƒg--
-    // ƒXƒe[ƒgİ’è
+    // --ã‚¹ãƒ†ãƒ¼ãƒˆ--
+    // ã‚¹ãƒ†ãƒ¼ãƒˆè¨­å®š
     public void SetState(State _state)
     {
         m_State = _state;
@@ -149,7 +206,7 @@ public class MainPhase : MonoBehaviour
     {
         m_NextState = _nextState;
     }
-    // ƒXƒe[ƒgæ“¾
+    // ã‚¹ãƒ†ãƒ¼ãƒˆå–å¾—
     public State GetState()
     {
         return m_State;
@@ -158,7 +215,7 @@ public class MainPhase : MonoBehaviour
     {
         return m_NextState;
     }
-    // w’è‚ÌƒXƒe[ƒg‚©
+    // æŒ‡å®šã®ã‚¹ãƒ†ãƒ¼ãƒˆã‹
     public bool IsState(State _state)
     {
         return m_State == _state;
@@ -168,7 +225,7 @@ public class MainPhase : MonoBehaviour
         return m_NextState == _nextState;
     }
 
-    // --ƒtƒ‰ƒO--
+    // --ãƒ•ãƒ©ã‚°--
     public void SetNextStateFlag()
     {
         m_NextStateFlag = true;
@@ -179,7 +236,7 @@ public class MainPhase : MonoBehaviour
         return m_NextStateFlag;
     }
 
-    // Ÿ‚ÌƒXƒe[ƒg‚Æƒtƒ‰ƒO‚ğİ’è
+    // æ¬¡ã®ã‚¹ãƒ†ãƒ¼ãƒˆã¨ãƒ•ãƒ©ã‚°ã‚’è¨­å®š
     public void SetNextStateAndFlag(State _nextState)
     {
         SetNextState(_nextState);
