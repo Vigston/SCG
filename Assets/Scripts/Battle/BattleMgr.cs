@@ -87,6 +87,16 @@ public class BattleMgr : MonoBehaviour
         if (!m_UpdateFlag) { return; }
 
         // ↓更新処理↓
+        // 研究ポイント計算
+        for (int i = 0; i < (int)Side.eSide_Max; i++)
+        {
+            Side side = (Side)i;
+
+            int ResearchNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_Science);
+
+            SetResearchValue(side, ResearchNum);
+        }
+
         m_TextTurnNum.text = "ターン数：" + m_TurnNum.ToString();
         m_TextTurnSide.text = "ターン側：" + m_TurnSide.ToString();
         m_TextPhase.text = "フェイズ：" + m_Phase.ToString();

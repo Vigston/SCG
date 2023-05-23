@@ -17,7 +17,7 @@ namespace battleTypes
         ePosition_B_Center,
         ePosition_BS_Right,
         ePosition_BF_Right,
-        ePosiiton_Max,
+        ePosition_Max,
 
         Exclusion = -1,
     }

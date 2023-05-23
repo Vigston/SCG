@@ -34,7 +34,7 @@ public class BattleCardCtr : MonoBehaviour
     }
 
     // 指定位置にカードを生成
-    public void CreateBattleCard(Side _side,Position _pos, BattleCard.Kind _kind, bool isEnable = true)
+    public void CreateBattleCard(Side _side, Position _pos, BattleCard.Kind _kind, bool isEnable = true)
     {
         // 指定位置のカードエリア
         CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, _pos);

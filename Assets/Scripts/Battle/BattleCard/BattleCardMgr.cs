@@ -1,14 +1,15 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
+using System.Linq;
 
 public class BattleCardMgr : MonoBehaviour
 {
-    // ƒCƒ“ƒXƒ^ƒ“ƒX
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static BattleCardMgr instance;
 
-    // ƒJ[ƒh‚ÌPrehab
+    // ã‚«ãƒ¼ãƒ‰ã®Prehab
     public GameObject battleCardPrehab;
 
     private void Awake()
@@ -16,32 +17,57 @@ public class BattleCardMgr : MonoBehaviour
         CreateInstance();
     }
 
-    // ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆ
     public bool CreateInstance()
     {
-        // Šù‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îì¬‚·‚é
+        // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½œæˆã™ã‚‹
         if (instance == null)
         {
-            // ì¬
+            // ä½œæˆ
             instance = this;
         }
 
-        // ƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬Ï‚İ‚È‚çI—¹
+        // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆæ¸ˆã¿ãªã‚‰çµ‚äº†
         if (instance != null) { return true; }
 
-        Debug.LogError("BattleCardMgr‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶¬‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½");
+        Debug.LogError("BattleCardMgrã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿæˆã§ãã¾ã›ã‚“ã§ã—ãŸ");
         return false;
     }
 
-    // Start is called before the first frame update
-    void Start()
+    // ---é–¢æ•°---
+    // æŒ‡å®šç¨®é¡ã‚«ãƒ¼ãƒ‰ã‚’å…¨ã¦å–å¾—
+    public List<BattleCard> GetCardListFromKind(Side _side, BattleCard.Kind _kind)
     {
-        
-    }
+        List<BattleCard> searchCardList = new List<BattleCard>();
+        for(int i = 0; i < (int)Position.ePosition_Max; i++)
+        {
+            Position pos = (Position)i;
 
-    // Update is called once per frame
-    void Update()
+            // ã‚«ãƒ¼ãƒ‰ã‚¨ãƒªã‚¢
+            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, pos);
+
+            List<BattleCard> areaCardList = cardArea.GetCardList();
+
+            // ã‚¨ãƒªã‚¢ã«ã‚«ãƒ¼ãƒ‰ãŒãªã„ãªã‚‰æ¬¡ã®ã‚¨ãƒªã‚¢æ¤œç´¢ã¸
+            if (!areaCardList.Any()) { continue; }
+
+            // ã‚«ãƒ¼ãƒ‰æ¡ä»¶è¿½åŠ 
+            foreach(BattleCard areaCard in areaCardList)
+            {
+                // æŒ‡å®šç¨®é¡ã˜ã‚ƒãªã„ãªã‚‰ã¯ã˜ã
+                if(areaCard.GetKind() != _kind) { continue; }
+
+                // è¿½åŠ 
+                searchCardList.Add(areaCard);
+            }
+        }
+
+        return searchCardList;
+    }
+    // æŒ‡å®šç¨®é¡ã‚«ãƒ¼ãƒ‰æ•°ã‚’å–å¾—
+    public int GetCardNumFromKind(Side _side, BattleCard.Kind _kind)
     {
-        
+        List<BattleCard> battleCardList = GetCardListFromKind(_side, _kind);
+        return battleCardList.Count;
     }
 }
