@@ -7,6 +7,9 @@ TagManager:
   - JobCard
   - BattleCard
   - CardArea
+  - StageArea
+  - EnemyArea
+  - PlayerArea
   layers:
   - Default
   - TransparentFX

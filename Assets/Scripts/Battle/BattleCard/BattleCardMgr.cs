@@ -35,7 +35,7 @@ public class BattleCardMgr : MonoBehaviour
     }
 
     // ---関数---
-    // 指定種類カードを全て取得
+    // 指定基本種類カードを全て取得
     public List<BattleCard> GetCardListFromKind(Side _side, BattleCard.Kind _kind)
     {
         List<BattleCard> searchCardList = new List<BattleCard>();
@@ -64,10 +64,45 @@ public class BattleCardMgr : MonoBehaviour
 
         return searchCardList;
     }
-    // 指定種類カード数を取得
+    // 指定追加種類カードを全て取得
+    public List<BattleCard> GetCardListFromAppendKind(Side _side, BattleCard.AppendKind _appendKind)
+    {
+        List<BattleCard> searchCardList = new List<BattleCard>();
+        for (int i = 0; i < (int)Position.ePosition_Max; i++)
+        {
+            Position pos = (Position)i;
+
+            // カードエリア
+            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, pos);
+
+            List<BattleCard> areaCardList = cardArea.GetCardList();
+
+            // エリアにカードがないなら次のエリア検索へ
+            if (!areaCardList.Any()) { continue; }
+
+            // カード条件追加
+            foreach (BattleCard areaCard in areaCardList)
+            {
+                // 指定追加種類を持っていないならはじく
+                if (!areaCard.IsHaveAppendKind(_appendKind)) { continue; }
+
+                // 追加
+                searchCardList.Add(areaCard);
+            }
+        }
+
+        return searchCardList;
+    }
+    // 指定基本種類カード数を取得
     public int GetCardNumFromKind(Side _side, BattleCard.Kind _kind)
     {
         List<BattleCard> battleCardList = GetCardListFromKind(_side, _kind);
+        return battleCardList.Count;
+    }
+    // 指定追加種類カード数を取得
+    public int GetCardNumFromAppendKind(Side _side, BattleCard.AppendKind _appendKind)
+    {
+        List<BattleCard> battleCardList = GetCardListFromAppendKind(_side, _appendKind);
         return battleCardList.Count;
     }
 }

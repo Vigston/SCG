@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
-using TMPro;
 using Cysharp.Threading.Tasks;
 
 public class BattleMgr : MonoBehaviour
@@ -24,15 +23,18 @@ public class BattleMgr : MonoBehaviour
     [SerializeField]
     private PhaseType m_Phase;
     private PhaseType m_NextPhase;
-    // 研究ポイント
+    // 国民数
     [SerializeField]
-    private int[] m_ResearchValue = new int[(int)Side.eSide_Max];
-
-    public TextMeshProUGUI m_TextTurnNum;
-    public TextMeshProUGUI m_TextTurnSide;
-    public TextMeshProUGUI m_TextPhase;
-    public TextMeshProUGUI m_TextResearch_Player;
-    public TextMeshProUGUI m_TextResearch_Enemy;
+    private int[] m_PeopleValue = new int[(int)Side.eSide_Max];
+    // 研究数
+    [SerializeField]
+    private int[] m_ScienceValue = new int[(int)Side.eSide_Max];
+    // 軍事数
+    [SerializeField]
+    private int[] m_MilitaryValue = new int[(int)Side.eSide_Max];
+    // スパイ数
+    [SerializeField]
+    private int[] m_SpyValue = new int[(int)Side.eSide_Max];
 
     // 更新フラグ
     private bool m_UpdateFlag = false;
@@ -87,21 +89,26 @@ public class BattleMgr : MonoBehaviour
         if (!m_UpdateFlag) { return; }
 
         // ↓更新処理↓
-        // 研究ポイント計算
         for (int i = 0; i < (int)Side.eSide_Max; i++)
         {
             Side side = (Side)i;
 
-            int ResearchNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_Science);
-
-            SetResearchValue(side, ResearchNum);
+            // 国民数計算
+            int peopleNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_People);
+            SetPeopleValue(side, peopleNum);
+            // 研究数計算
+            int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Science);
+            SetScienceValue(side, scienceNum);
+            // 軍事数計算
+            int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Military);
+            SetMilitaryValue(side, militaryNum);
+            // スパイ数計算
+            int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Spy);
+            SetSpyValue(side, spyNum);
         }
 
-        m_TextTurnNum.text = "ターン数：" + m_TurnNum.ToString();
-        m_TextTurnSide.text = "ターン側：" + m_TurnSide.ToString();
-        m_TextPhase.text = "フェイズ：" + m_Phase.ToString();
-        m_TextResearch_Player.text = "自分の研究：" + GetResearchValue(Side.eSide_Player).ToString();
-        m_TextResearch_Enemy.text = "相手の研究：" + GetResearchValue(Side.eSide_Enemy).ToString();
+        // DebugMgrの更新リクエスト
+        DebugMgr.instance.UpdateRequest();
 
         // 更新処理が終わったのでフラグ降ろす。
         if (m_UpdateFlag) { m_UpdateFlag = false; }
@@ -139,7 +146,7 @@ public class BattleMgr : MonoBehaviour
             // FightMgrの更新リクエスト
             UpdateRequest();
             // 次のフェイズ(ここでは現在のフェイズを代入)
-            PhaseType nextPhase = GetPhase();
+            PhaseType nextPhase = GetPhaseType();
             // 次のフェイズに移動するフラグ初期化
             m_NextPhaseFlag = false;
 
@@ -194,7 +201,7 @@ public class BattleMgr : MonoBehaviour
         Destroy(m_PhaseObject.GetComponent<StartPhase>());
 
         // 次のフェイズへ
-        return GetNextPhase();
+        return GetNextPhaseType();
     }
     // ジョインフェイズ
     async UniTask<PhaseType> PhaseJoin()
@@ -207,7 +214,7 @@ public class BattleMgr : MonoBehaviour
         // フェイズオブジェクト削除
         Destroy(m_PhaseObject.GetComponent<JoinPhase>());
         // 次のフェイズへ
-        return GetNextPhase();
+        return GetNextPhaseType();
     }
     // メインフェイズ
     async UniTask<PhaseType> PhaseMain()
@@ -220,7 +227,7 @@ public class BattleMgr : MonoBehaviour
         // フェイズオブジェクト削除
         Destroy(m_PhaseObject.GetComponent<MainPhase>());
         // 次のフェイズへ
-        return GetNextPhase();
+        return GetNextPhaseType();
     }
     // エンドフェイズ
     async UniTask<PhaseType> PhaseEnd()
@@ -237,7 +244,7 @@ public class BattleMgr : MonoBehaviour
         TurnEnd();
 
         // 次のフェイズへ
-        return GetNextPhase();
+        return GetNextPhaseType();
     }
 
     // ターンエンドフラグの設定
@@ -326,13 +333,38 @@ public class BattleMgr : MonoBehaviour
         m_NextPhase = _nextPhase;
     }
     // フェイズ取得。
-    public PhaseType GetPhase()
+    public PhaseType GetPhaseType()
     {
         return m_Phase;
     }
-    public PhaseType GetNextPhase()
+    public PhaseType GetNextPhaseType()
     {
         return m_NextPhase;
+    }
+    // 指定フェイズのオブジェクトを取得する
+    public GameObject GetPhaseObject(PhaseType _phase)
+    {
+        // 指定フェイズじゃなければnullを返す
+        switch (_phase)
+        {
+            case PhaseType.ePhaseType_Start:
+                if(m_PhaseObject.GetComponent<StartPhase>() == null) { return null; }
+                break;
+            case PhaseType.ePhaseType_Join:
+                if (m_PhaseObject.GetComponent<JoinPhase>() == null) { return null; }
+                break;
+            case PhaseType.ePhaseType_Main:
+                if (m_PhaseObject.GetComponent<MainPhase>() == null) { return null; }
+                break;
+            case PhaseType.ePhaseType_End:
+                if (m_PhaseObject.GetComponent<EndPhase>() == null) { return null; }
+                break;
+            default:
+                Debug.Log("指定されたフェイズはGetPhaseObjectのSwitch文に記載されていません");
+                break;
+        }
+
+        return m_PhaseObject;
     }
     // 指定のフェイズか。
     public bool IsPhase(PhaseType _phase)
@@ -355,21 +387,71 @@ public class BattleMgr : MonoBehaviour
         SetNextPhase(_nextPhase);
         SetNextPhaseFlag();
     }
+    // ---国民---
+    // 国民数設定
+    public void SetPeopleValue(Side _side, int _value)
+    {
+        m_PeopleValue[(int)_side] = _value;
+    }
+    // 国民数取得
+    public int GetPeopleValue(Side _side)
+    {
+        return m_PeopleValue[(int)_side];
+    }
+    // 国民数追加
+    public void AddPeopleValue(Side _side, int _value)
+    {
+        m_PeopleValue[(int)_side] += _value;
+    }
 
     // ---研究---
-    // 研究ポイント設定
-    public void SetResearchValue(Side _side, int _value)
+    // 研究数設定
+    public void SetScienceValue(Side _side, int _value)
     {
-        m_ResearchValue[(int)_side] = _value;
+        m_ScienceValue[(int)_side] = _value;
     }
-    // 研究ポイント取得
-    public int GetResearchValue(Side _side)
+    // 研究数取得
+    public int GetScienceValue(Side _side)
     {
-        return m_ResearchValue[(int)_side];
+        return m_ScienceValue[(int)_side];
     }
-    // 研究ポイント追加
-    public void AddResearchValue(Side _side, int _value)
+    // 研究数追加
+    public void AddScienceValue(Side _side, int _value)
     {
-        m_ResearchValue[(int)_side] += _value;
+        m_ScienceValue[(int)_side] += _value;
+    }
+
+    // ---軍事---
+    // 軍事数設定
+    public void SetMilitaryValue(Side _side, int _value)
+    {
+        m_MilitaryValue[(int)_side] = _value;
+    }
+    // 軍事数取得
+    public int GetMilitaryValue(Side _side)
+    {
+        return m_MilitaryValue[(int)_side];
+    }
+    // 軍事数追加
+    public void AddMilitaryValue(Side _side, int _value)
+    {
+        m_MilitaryValue[(int)_side] += _value;
+    }
+
+    // ---スパイ---
+    // スパイ数設定
+    public void SetSpyValue(Side _side, int _value)
+    {
+        m_SpyValue[(int)_side] = _value;
+    }
+    // スパイ数取得
+    public int GetSpyValue(Side _side)
+    {
+        return m_SpyValue[(int)_side];
+    }
+    // スパイ数追加
+    public void AddSpyValue(Side _side, int _value)
+    {
+        m_SpyValue[(int)_side] += _value;
     }
 }

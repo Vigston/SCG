@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
@@ -7,17 +7,24 @@ using System.Threading;
 
 public class BattleCard : MonoBehaviour
 {
-    // 種類
+    // 基本種類
     public enum Kind
     {
         eKind_People,
-        eKind_Military,
-        eKind_Science,
-        eKind_Spy,
-        eKind_Agent,
         eKind_Max,
 
         eKind_None = -1,
+    }
+
+    // 追加種類
+    public enum AppendKind
+    {
+        eAppendKind_Military,
+        eAppendKind_Science,
+        eAppendKind_Spy,
+        eAppendKind_Max,
+
+        eAppendKind_None = -1,
     }
 
     ////////////////変数///////////////////////
@@ -27,6 +34,8 @@ public class BattleCard : MonoBehaviour
     private Position m_Position;
     [SerializeField]
     private Kind m_Kind;
+    [SerializeField]
+    private List<AppendKind> m_AppendKindList;
     [SerializeField]
     private bool m_IsEnable = true;
     [SerializeField]
@@ -87,6 +96,31 @@ public class BattleCard : MonoBehaviour
     public Kind GetKind()
     {
         return m_Kind;
+    }
+    // 付与種類取得
+    public AppendKind GetAppendKind(int index)
+    {
+        return m_AppendKindList[index];
+    }
+    // 付与種類追加
+    public void AddAppendKind(AppendKind _appendKind)
+    {
+        m_AppendKindList.Add(_appendKind);
+    }
+    // 指定の追加種類を持つか
+    public bool IsHaveAppendKind(AppendKind _appendKind)
+    {
+        return m_AppendKindList.Contains(_appendKind);
+    }
+    // 全ての付与種類取得
+    public List<AppendKind> AllGetAppendKind()
+    {
+        return m_AppendKindList;
+    }
+    // 全ての付与種類削除
+    public void AllRemoveAppendKind()
+    {
+        m_AppendKindList.Clear();
     }
     // ---有効フラグ---
     // 有効フラグ設定
