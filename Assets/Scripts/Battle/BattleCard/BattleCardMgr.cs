@@ -103,6 +103,7 @@ public class BattleCardMgr : MonoBehaviour
     public int GetCardNumFromAppendKind(Side _side, BattleCard.AppendKind _appendKind)
     {
         List<BattleCard> battleCardList = GetCardListFromAppendKind(_side, _appendKind);
+
         return battleCardList.Count;
     }
 }

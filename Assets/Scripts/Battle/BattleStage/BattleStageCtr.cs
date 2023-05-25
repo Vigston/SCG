@@ -67,6 +67,8 @@ public class BattleStageCtr : MonoBehaviour
             // 左上の手前
             Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardCollider)[0];
             // 左上の奥
+            Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardCollider)[3];
+            // 左下の手前
             Vector3 vecCardLeftBottomUp = Common.GetBoxCollideVertices(cardCollider)[6];
             // 右上の手前
             Vector3 vecCardRightTopUp = Common.GetBoxCollideVertices(cardCollider)[1];
@@ -96,9 +98,11 @@ public class BattleStageCtr : MonoBehaviour
                 baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
             }
 
+            // カードの厚み
+            float CardHeightSize = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
 
             // プレイヤー側のエリア作成
-            if(side == Side.eSide_Player)
+            if (side == Side.eSide_Player)
             {
                 // 縦列の分回す
                 for (int j = 0; j < heightNum; j++)
@@ -110,6 +114,7 @@ public class BattleStageCtr : MonoBehaviour
                         Vector3 areaPos = baseVec;
 
                         areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+                        areaPos.y += CardHeightSize;
                         areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
                         GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
@@ -139,6 +144,7 @@ public class BattleStageCtr : MonoBehaviour
                         Vector3 areaPos = baseVec;
 
                         areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+                        areaPos.y += CardHeightSize;
                         areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
                         GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);

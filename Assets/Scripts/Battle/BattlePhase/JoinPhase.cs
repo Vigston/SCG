@@ -89,8 +89,15 @@ public class JoinPhase : MonoBehaviour
             if(joinArea != null)
             {
                 Debug.Log($"{joinArea.GetSide()}の{joinArea.GetPosition()}に国民カードを追加");
+                bool isSpy = BattleMgr.instance.IsNextJoinSpyFlag();
                 // 国民カード追加
-                BattleCardCtr.instance.CreateBattleCard(joinArea, BattleCard.Kind.eKind_People);
+                BattleCardCtr.instance.CreateBattleCard(joinArea, BattleCard.Kind.eKind_People, isSpy);
+
+                // スパイ追加フラグが立っているなら初期化
+                if(isSpy)
+                {
+                    BattleMgr.instance.SetNextJoinSpyFlag(false);
+                }
             }
         }
         // 終了へ

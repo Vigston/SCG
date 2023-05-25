@@ -105,12 +105,28 @@ public class BattleCard : MonoBehaviour
     // 付与種類追加
     public void AddAppendKind(AppendKind _appendKind)
     {
+        // 既にこの追加種類を持っているならはじく。
+        if (IsHaveAppendKind(_appendKind)) { return; }
+
+        Debug.Log($"{_appendKind}を付与する");
+
+        // 軍事の付与ならMilitaryDragActionをアタッチする
+        if(_appendKind == AppendKind.eAppendKind_Military)
+        {
+            gameObject.AddComponent<MilitaryDragAction>();
+        }
+
         m_AppendKindList.Add(_appendKind);
     }
     // 指定の追加種類を持つか
     public bool IsHaveAppendKind(AppendKind _appendKind)
     {
         return m_AppendKindList.Contains(_appendKind);
+    }
+    // 付与効果の数を取得
+    public int GetAppendKindNum()
+    {
+        return m_AppendKindList.Count;
     }
     // 全ての付与種類取得
     public List<AppendKind> AllGetAppendKind()

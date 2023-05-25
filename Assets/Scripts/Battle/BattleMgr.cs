@@ -9,6 +9,13 @@ public class BattleMgr : MonoBehaviour
     // =================クラス================
 
     // =================構造体================
+    public enum BattleResult
+    {
+        eBattleResult_InBattle,
+        eBattleResult_Win,
+        eBattleResult_Lose,
+        eBattleResult_Draw,
+    }
 
     // =================変数================
     // インスタンス
@@ -23,18 +30,25 @@ public class BattleMgr : MonoBehaviour
     [SerializeField]
     private PhaseType m_Phase;
     private PhaseType m_NextPhase;
-    // 国民数
+    // 勝敗
     [SerializeField]
-    private int[] m_PeopleValue = new int[(int)Side.eSide_Max];
-    // 研究数
+    BattleResult m_BattleResult;
+    // 国民カード数
+    [SerializeField]
+    private int[] m_PeopleCardNum = new int[(int)Side.eSide_Max];
+    // 研究カード数
+    [SerializeField]
+    private int[] m_ScienceCardNum = new int[(int)Side.eSide_Max];
+    // 軍事カード数
+    [SerializeField]
+    private int[] m_MilitaryCardNum = new int[(int)Side.eSide_Max];
+    // スパイカード数
+    [SerializeField]
+    private int[] m_SpyCardNum = new int[(int)Side.eSide_Max];
+
+    // 研究値
     [SerializeField]
     private int[] m_ScienceValue = new int[(int)Side.eSide_Max];
-    // 軍事数
-    [SerializeField]
-    private int[] m_MilitaryValue = new int[(int)Side.eSide_Max];
-    // スパイ数
-    [SerializeField]
-    private int[] m_SpyValue = new int[(int)Side.eSide_Max];
 
     // 更新フラグ
     private bool m_UpdateFlag = false;
@@ -42,6 +56,14 @@ public class BattleMgr : MonoBehaviour
     private bool m_NextPhaseFlag = false;
     // ターンエンドフラグ
     private bool m_TurnEndFlag = false;
+
+    // 追加種類付与フラグ
+    private bool m_AddAppendKindFlag = false;
+    private const int m_AddAppendKindLimitedCount = 1;
+    private int m_AddAppendKindCount = 0;
+
+    // 次のターンに追加される国民カードにスパイを付与するフラグ
+    private bool m_NextJoinSpyFlag = false;
 
     // フェイズオブジェクト
     public GameObject m_PhaseObject;
@@ -58,6 +80,8 @@ public class BattleMgr : MonoBehaviour
         SetPhase(PhaseType.ePhaseType_Start);
         // フェイズループ処理
         PhaseLoop().Forget();
+        // 勝敗更新
+        BattleResultUpdate().Forget();
     }
 
     // Update is called once per frame
@@ -93,18 +117,22 @@ public class BattleMgr : MonoBehaviour
         {
             Side side = (Side)i;
 
-            // 国民数計算
+            // 国民カード数計算
             int peopleNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_People);
-            SetPeopleValue(side, peopleNum);
-            // 研究数計算
+            SetPeopleCardNum(side, peopleNum);
+            // 研究カード数計算
             int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Science);
-            SetScienceValue(side, scienceNum);
-            // 軍事数計算
+            SetScienceCardNum(side, scienceNum);
+            // 軍事カード数計算
             int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Military);
-            SetMilitaryValue(side, militaryNum);
-            // スパイ数計算
+            SetMilitaryCardNum(side, militaryNum);
+            // スパイカード数計算
             int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Spy);
-            SetSpyValue(side, spyNum);
+            SetSpyCardNum(side, spyNum);
+
+            // 研究値計算
+            int scienceValue = MathScienceValue(side);
+            SetScienceValue(side, scienceValue);
         }
 
         // DebugMgrの更新リクエスト
@@ -137,6 +165,7 @@ public class BattleMgr : MonoBehaviour
         return false;
     }
     // --システム--
+    // フェイズ更新
     async UniTask PhaseLoop()
     {
         Debug.Log("PhaseLoop起動");
@@ -247,9 +276,81 @@ public class BattleMgr : MonoBehaviour
         return GetNextPhaseType();
     }
 
+    // 勝敗の更新
+    async UniTask BattleResultUpdate()
+    {
+        while(true)
+        {
+            await CheckBattleResult();
+        }
+    }
+
+    // 勝敗をチェックする
+    async UniTask CheckBattleResult()
+    {
+        await UniTask.WaitUntil(() => IsWinCondition() || IsLoseCondition());
+        // 勝利条件
+        bool isWin = IsWinCondition();
+        // 敗北条件
+        bool isLose = IsLoseCondition();
+
+        // 勝敗を設定
+        if (isWin)
+        {
+            m_BattleResult = BattleResult.eBattleResult_Win;
+        }
+        else if (isLose)
+        {
+            m_BattleResult = BattleResult.eBattleResult_Lose;
+        }
+    }
+
+    // 勝利条件を満たしているか
+    public bool IsWinCondition()
+    {
+        bool isWin = false;
+
+        // 自分の研究値が6以上で勝利
+        if (GetScienceValue(Side.eSide_Player) >= 6)
+        {
+            isWin = true;
+        }
+
+        return isWin;
+    }
+
+    // 敗北条件を満たしているか
+    public bool IsLoseCondition()
+    {
+        bool isLose = false;
+
+        // 相手の研究値が6以上で敗北
+        if (GetScienceValue(Side.eSide_Enemy) >= 6)
+        {
+            isLose = true;
+        }
+
+        return isLose;
+    }
+    // 勝敗を取得
+    public BattleResult GetBattleResult()
+    {
+        return m_BattleResult;
+    }
+
     // ターンエンドフラグの設定
     public void SetTurnEndFlag()
     {
+        GameObject phaseObj = GetPhaseObject();
+        // フェイズオブジェクトのnullチェック
+        if (phaseObj == null) { return; }
+        MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
+        // メインフェイズじゃないならはじく
+        if (mainPhase == null) { return; }
+        // メインステートじゃなければはじく
+        if(mainPhase.GetState() != MainPhase.State.eState_Main) { return; }
+
+        // ターンエンドフラグを立てる
         m_TurnEndFlag = true;
     }
 
@@ -268,7 +369,26 @@ public class BattleMgr : MonoBehaviour
         // ターン終了リクエスト初期化
         m_TurnEndFlag = false;
 
+        // 追加種類付与カウント初期化
+        InitAddAppendKindCount();
+
         Debug.Log($"'{m_TurnSide}'ターンに進む");
+    }
+
+    // 追加種類追加ステートの終了処理
+    public void AppendKindStateEnd()
+    {
+        GameObject phaseObj = GetPhaseObject();
+        // フェイズオブジェクトのnullチェック
+        if (phaseObj == null) { return; }
+        MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
+        // メインフェイズじゃないならはじく
+        if (mainPhase == null) { return; }
+        // 追加種類付与ステートじゃなければはじく
+        if (mainPhase.GetState() != MainPhase.State.eState_GiveJob) { return; }
+
+        // 追加種類付与フラグを初期化
+        SetAddAppendKindFlag(false);
     }
 
     // -----側-----
@@ -342,28 +462,8 @@ public class BattleMgr : MonoBehaviour
         return m_NextPhase;
     }
     // 指定フェイズのオブジェクトを取得する
-    public GameObject GetPhaseObject(PhaseType _phase)
+    public GameObject GetPhaseObject()
     {
-        // 指定フェイズじゃなければnullを返す
-        switch (_phase)
-        {
-            case PhaseType.ePhaseType_Start:
-                if(m_PhaseObject.GetComponent<StartPhase>() == null) { return null; }
-                break;
-            case PhaseType.ePhaseType_Join:
-                if (m_PhaseObject.GetComponent<JoinPhase>() == null) { return null; }
-                break;
-            case PhaseType.ePhaseType_Main:
-                if (m_PhaseObject.GetComponent<MainPhase>() == null) { return null; }
-                break;
-            case PhaseType.ePhaseType_End:
-                if (m_PhaseObject.GetComponent<EndPhase>() == null) { return null; }
-                break;
-            default:
-                Debug.Log("指定されたフェイズはGetPhaseObjectのSwitch文に記載されていません");
-                break;
-        }
-
         return m_PhaseObject;
     }
     // 指定のフェイズか。
@@ -388,70 +488,154 @@ public class BattleMgr : MonoBehaviour
         SetNextPhaseFlag();
     }
     // ---国民---
-    // 国民数設定
-    public void SetPeopleValue(Side _side, int _value)
+    // 国民カード数設定
+    public void SetPeopleCardNum(Side _side, int _value)
     {
-        m_PeopleValue[(int)_side] = _value;
+        m_PeopleCardNum[(int)_side] = _value;
     }
-    // 国民数取得
-    public int GetPeopleValue(Side _side)
+    // 国民カード数取得
+    public int GetPeopleCardNum(Side _side)
     {
-        return m_PeopleValue[(int)_side];
+        return m_PeopleCardNum[(int)_side];
     }
-    // 国民数追加
-    public void AddPeopleValue(Side _side, int _value)
+    // 国民カード数追加
+    public void AddPeopleCardNum(Side _side, int _value)
     {
-        m_PeopleValue[(int)_side] += _value;
+        m_PeopleCardNum[(int)_side] += _value;
     }
 
     // ---研究---
-    // 研究数設定
+    // 研究カード数設定
+    public void SetScienceCardNum(Side _side, int _value)
+    {
+        m_ScienceCardNum[(int)_side] = _value;
+    }
+    // 研究カード数取得
+    public int GetScienceCardNum(Side _side)
+    {
+        return m_ScienceCardNum[(int)_side];
+    }
+    // 研究カード数追加
+    public void AddScienceCardNum(Side _side, int _value)
+    {
+        m_ScienceCardNum[(int)_side] += _value;
+    }
+
+    // 研究値設定
     public void SetScienceValue(Side _side, int _value)
     {
         m_ScienceValue[(int)_side] = _value;
     }
-    // 研究数取得
+    // 研究値取得
     public int GetScienceValue(Side _side)
     {
         return m_ScienceValue[(int)_side];
     }
-    // 研究数追加
+    // 研究値追加
     public void AddScienceValue(Side _side, int _value)
     {
         m_ScienceValue[(int)_side] += _value;
     }
+    // 研究値計算
+    public int MathScienceValue(Side side)
+    {
+        List<BattleCard> cardList = new List<BattleCard>();
+
+        var scienceCardList = BattleCardMgr.instance.GetCardListFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Science);
+
+        foreach(var battleCard in scienceCardList)
+        {
+            // スパイの追加種類を持っているならはじく
+            if (battleCard.IsHaveAppendKind(BattleCard.AppendKind.eAppendKind_Spy)) { continue; }
+
+            // 追加
+            cardList.Add(battleCard);
+        }
+
+        return cardList.Count;
+    }
 
     // ---軍事---
-    // 軍事数設定
-    public void SetMilitaryValue(Side _side, int _value)
+    // 軍事カード数設定
+    public void SetMilitaryCardNum(Side _side, int _value)
     {
-        m_MilitaryValue[(int)_side] = _value;
+        m_MilitaryCardNum[(int)_side] = _value;
     }
-    // 軍事数取得
-    public int GetMilitaryValue(Side _side)
+    // 軍事カード数取得
+    public int GetMilitaryCardNum(Side _side)
     {
-        return m_MilitaryValue[(int)_side];
+        return m_MilitaryCardNum[(int)_side];
     }
-    // 軍事数追加
-    public void AddMilitaryValue(Side _side, int _value)
+    // 軍事カード数追加
+    public void AddMilitaryCardNum(Side _side, int _value)
     {
-        m_MilitaryValue[(int)_side] += _value;
+        m_MilitaryCardNum[(int)_side] += _value;
     }
 
     // ---スパイ---
-    // スパイ数設定
-    public void SetSpyValue(Side _side, int _value)
+    // スパイカード数設定
+    public void SetSpyCardNum(Side _side, int _value)
     {
-        m_SpyValue[(int)_side] = _value;
+        m_SpyCardNum[(int)_side] = _value;
     }
-    // スパイ数取得
-    public int GetSpyValue(Side _side)
+    // スパイカード数取得
+    public int GetSpyCardNum(Side _side)
     {
-        return m_SpyValue[(int)_side];
+        return m_SpyCardNum[(int)_side];
     }
-    // スパイ数追加
-    public void AddSpyValue(Side _side, int _value)
+    // スパイカード数追加
+    public void AddSpyCardNum(Side _side, int _value)
     {
-        m_SpyValue[(int)_side] += _value;
+        m_SpyCardNum[(int)_side] += _value;
+    }
+
+    // 追加種類付与フラグ設定
+    public void SetAddAppendKindFlag(bool _flag)
+    {
+        m_AddAppendKindFlag = _flag;
+    }
+    // 追加種類付与フラグが立っているか
+    public bool IsAddAppendKindFlag()
+    {
+        return m_AddAppendKindFlag;
+    }
+
+    // 追加種類付与カウント初期化
+    public void InitAddAppendKindCount()
+    {
+        m_AddAppendKindCount = 0;
+    }
+
+    // 追加種類付与カウント
+    public void AddAppendKindCount()
+    {
+        m_AddAppendKindCount++;
+    }
+
+    // 追加種類付与カウント取得
+    public int GetAddAppendKindCount()
+    {
+        return m_AddAppendKindCount;
+    }
+
+    // 追加種類付与を行えるか
+    public bool IsPlayAddAppendKind()
+    {
+        // １ターンの付与上限を超えるので行えない
+        if(m_AddAppendKindCount >= m_AddAppendKindLimitedCount) { return false; }
+
+        // 行える
+        return true;
+    }
+
+    // 次のターンに追加される国民カードにスパイを付与するフラグを立てる
+    public void SetNextJoinSpyFlag(bool _flag)
+    {
+        m_NextJoinSpyFlag = _flag;
+    }
+    // 次のターンに追加される国民カードにスパイを付与するフラグが立っているか
+    public bool IsNextJoinSpyFlag()
+    {
+        return m_NextJoinSpyFlag;
     }
 }

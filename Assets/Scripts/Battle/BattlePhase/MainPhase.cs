@@ -27,8 +27,6 @@ public class MainPhase : MonoBehaviour
     // ===フラグ===
     // ステートの更新フラグ
     bool m_NextStateFlag = false;
-    // 職業付与フラグ
-    bool m_GiveJobFlag = false;
 
     private void Awake()
     {
@@ -76,32 +74,9 @@ public class MainPhase : MonoBehaviour
             Debug.Log("初期化ステート処理開始");
         }
 
-        // メインへ
-        SetNextStateAndFlag(State.eState_Main);
+        // 職業付与へ
+        SetNextStateAndFlag(State.eState_GiveJob);
         Debug.Log("初期化ステート処理終了");
-    }
-
-    void Main()
-    {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("メインステート処理開始");
-        }
-
-        // 職業付与フラグが立っているなら職業付与へ進む
-        if(m_GiveJobFlag)
-        {
-            // 職業付与へ
-            SetNextStateAndFlag(State.eState_GiveJob);
-        }
-
-        // ターンエンドフラグが立っているなら終了する。
-        if (BattleMgr.instance.IsTurnEndFlag())
-        {
-            // 終了へ
-            SetNextStateAndFlag(State.eState_End);
-            Debug.Log("メインステート処理終了");
-        }
     }
 
     // 職業付与
@@ -112,9 +87,39 @@ public class MainPhase : MonoBehaviour
             Debug.Log("職業付与ステート処理開始");
         }
 
-        // メインへ
-        SetNextStateAndFlag(State.eState_Main);
-        Debug.Log("職業付与ステート処理終了");
+        // 追加種類付与が終わっているなら
+        if (BattleMgr.instance.IsAddAppendKindFlag() == false)
+        {
+            // メインへ
+            SetNextStateAndFlag(State.eState_Main);
+            Debug.Log("職業付与ステート処理終了");
+        }
+    }
+
+    void Main()
+    {
+        if (m_StateValue == 1)
+        {
+            Debug.Log("メインステート処理開始");
+        }
+
+        // 追加種類付与フラグが立っているなら
+        if(BattleMgr.instance.IsAddAppendKindFlag())
+        {
+            // 職業付与へ
+            SetNextStateAndFlag(State.eState_GiveJob);
+            Debug.Log("メインステート処理終了");
+            return;
+        }
+
+        // ターンエンドフラグが立っているなら終了する。
+        if (BattleMgr.instance.IsTurnEndFlag())
+        {
+            // 終了へ
+            SetNextStateAndFlag(State.eState_End);
+            Debug.Log("メインステート処理終了");
+            return;
+        }
     }
 
     // 終了

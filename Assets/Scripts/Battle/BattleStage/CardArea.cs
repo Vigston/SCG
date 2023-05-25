@@ -69,6 +69,10 @@ public class CardArea : MonoBehaviour
     {
         m_CardList.RemoveAt(_index);
     }
+    public void RemoveCard(BattleCard _battleCard)
+    {
+        m_CardList.Remove(_battleCard);
+    }
     // カードリスト削除
     public void RemoveCardList()
     {
