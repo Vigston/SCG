@@ -40,6 +40,12 @@ public class BattleCard : MonoBehaviour
     private bool m_IsEnable = true;
     [SerializeField]
     private bool m_IsDraw = true;
+    [SerializeField]
+    private int m_EntryTurn = 0;
+    [SerializeField]
+    private const int m_LimitedActionNum = 1;
+    [SerializeField]
+    private int m_ActionNum = 0;
 
     void Start()
     {
@@ -48,6 +54,7 @@ public class BattleCard : MonoBehaviour
     }
 
     // ---システム---
+    // 描画フラグ処理
     async UniTask CheckDrawFlag(CancellationToken token)
     {
         // ゲームオブジェクトが破棄されているならはじく
@@ -61,6 +68,12 @@ public class BattleCard : MonoBehaviour
         {
             renderer.enabled = false;
         }
+    }
+    // ターン情報初期化
+    public void InitTurnInfo()
+    {
+        // ターン中行動回数初期化
+        InitActionNum();
     }
 
     ////////////////関数///////////////////////
@@ -158,5 +171,81 @@ public class BattleCard : MonoBehaviour
     public bool IsDraw()
     {
         return m_IsDraw;
+    }
+    // 登場したターン設定
+    public void SetEntryTurn()
+    {
+        int turnNum = BattleMgr.instance.GetTurnNum();
+
+        m_EntryTurn = turnNum;
+    }
+    // 登場したターン取得
+    public int GetEntryTurn()
+    {
+        return m_EntryTurn;
+    }
+    // このターンに登場したか
+    public bool IsEntryThisTurn()
+    {
+        int turnNum = BattleMgr.instance.GetTurnNum();
+        int entryTurn = GetEntryTurn();
+
+        return turnNum == entryTurn;
+    }
+    // 行動した回数を初期化
+    public void InitActionNum()
+    {
+        m_ActionNum = 0;
+    }
+    // 行動した回数を追加
+    public void AddActionNum()
+    {
+        m_ActionNum += 1;
+    }
+    // 行動した回数を取得
+    public int GetActionNum()
+    {
+        return m_ActionNum;
+    }
+    // 行動できるか
+    public bool IsAction()
+    {
+        int actionNum = GetActionNum();
+
+        // 行動可能数を超えるなら行動できない
+        if(actionNum >= m_LimitedActionNum)
+        {
+            // 行動できない
+            return false;
+        }
+
+        // 行動できる
+        return true;
+    }
+
+    // マテリアル設定
+    public void SetMaterial(AppendKind _apppendKind)
+    {
+
+        MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
+        switch (_apppendKind)
+        {
+            case AppendKind.eAppendKind_Military:
+                meshRenderer.material = BattleCardMgr.instance.m_MilitaryMaterial;
+                break;
+            case AppendKind.eAppendKind_Science:
+                meshRenderer.material = BattleCardMgr.instance.m_ScienceMaterial;
+                break;
+            case AppendKind.eAppendKind_Spy:
+                meshRenderer.sharedMaterials = new Material[]
+                {
+                    meshRenderer.sharedMaterial,
+                    BattleCardMgr.instance.m_SpyMaterial,
+                };
+                break;
+            default:
+                Debug.Log("SetMaterialに登録されていないマテリアルを設定しようとしています");
+                break;
+        }
     }
 }

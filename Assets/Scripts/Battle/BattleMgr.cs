@@ -372,6 +372,13 @@ public class BattleMgr : MonoBehaviour
         // 追加種類付与カウント初期化
         InitAddAppendKindCount();
 
+        // カードのターン情報初期化
+        foreach(BattleCard battleCard in BattleCardMgr.instance.GetCardList())
+        {
+            // ターン情報初期化
+            battleCard.InitTurnInfo();
+        }
+
         Debug.Log($"'{m_TurnSide}'ターンに進む");
     }
 

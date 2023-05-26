@@ -54,6 +54,8 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                         {
                             BattleMgr.instance.SetNextJoinSpyFlag(true);
                             Debug.Log("次に参加してくる相手の国民は自分のスパイになる");
+                            // 追加種類付与カウント
+                            BattleMgr.instance.AddAppendKindCount();
                         }
                     }
                     else if (turnSide == Side.eSide_Enemy)
@@ -62,6 +64,8 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                         {
                             BattleMgr.instance.SetNextJoinSpyFlag(true);
                             Debug.Log("次に参加してくる自分の国民は相手のスパイになる");
+                            // 追加種類付与カウント
+                            BattleMgr.instance.AddAppendKindCount();
                         }
                     }
                 }
@@ -84,15 +88,20 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 Side turnSide = BattleMgr.instance.GetTurnSide();
                 if (turnSide == battleCard.GetSide())
                 {
-                    // カードの種類設定
-                    battleCard.AddAppendKind(m_giveKind);
+                    // 同じ追加種類を持っていないなら
+                    if(!battleCard.IsHaveAppendKind(m_giveKind))
+                    {
+                        // マテリアル設定
+                        battleCard.SetMaterial(m_giveKind);
+                        // カードの種類設定
+                        battleCard.AddAppendKind(m_giveKind);
 
-                    // BattleMgr更新リクエスト
-                    BattleMgr.instance.UpdateRequest();
-                    // 追加種類付与カウント
-                    BattleMgr.instance.AddAppendKindCount();
+                        // BattleMgr更新リクエスト
+                        BattleMgr.instance.UpdateRequest();
+                        // 追加種類付与カウント
+                        BattleMgr.instance.AddAppendKindCount();
+                    }
                 }
-
             }
 
             dragObj = null;

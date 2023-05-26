@@ -54,7 +54,7 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.identity);
+        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン側
         Side turnSide = BattleMgr.instance.GetTurnSide();
@@ -66,14 +66,19 @@ public class BattleCardCtr : MonoBehaviour
         battleCard.SetPosiiton(_pos);
         battleCard.SetKind(_kind);
         battleCard.SetEnable(isEnable);
+        battleCard.SetEntryTurn();
 
         // スパイの場合の処理
         if (IsSpy)
         {
             // スパイの追加種類を設定
             battleCard.AddAppendKind(BattleCard.AppendKind.eAppendKind_Spy);
+            // マテリアルの設定
+            battleCard.SetMaterial(BattleCard.AppendKind.eAppendKind_Spy);
         }
 
+        // BattleCardMgrに登録
+        BattleCardMgr.instance.AddCard(battleCard);
         // 指定位置のカードエリアに登録
         cardArea.AddCard(battleCard);
 
@@ -98,7 +103,7 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.identity);
+        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン
         Side turnSide = BattleMgr.instance.GetTurnSide();
@@ -110,14 +115,19 @@ public class BattleCardCtr : MonoBehaviour
         battleCard.SetPosiiton(_cardArea.GetPosition());
         battleCard.SetKind(_kind);
         battleCard.SetEnable(isEnable);
+        battleCard.SetEntryTurn();
 
         // スパイの場合の処理
         if (IsSpy)
         {
             // スパイの追加種類を設定
             battleCard.AddAppendKind(BattleCard.AppendKind.eAppendKind_Spy);
+            // マテリアルの設定
+            battleCard.SetMaterial(BattleCard.AppendKind.eAppendKind_Spy);
         }
 
+        // BattleCardMgrに登録
+        BattleCardMgr.instance.AddCard(battleCard);
         // 指定位置のカードエリアに登録
         _cardArea.AddCard(battleCard);
 
@@ -132,6 +142,8 @@ public class BattleCardCtr : MonoBehaviour
         // 指定カードがいるカードエリア
         CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(cardSide, cardPos);
 
+        // BattleCardMgrから情報を削除
+        BattleCardMgr.instance.RemoveCard(_battleCard);
         // カードエリアから情報を削除
         cardArea.RemoveCard(_battleCard);
         // ゲームオブジェクトがあれば

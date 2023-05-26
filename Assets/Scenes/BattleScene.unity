@@ -4293,7 +4293,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92215055b3a8d464d9e7a4d9154405dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  battleCardPrehab: {fileID: 0}
+  m_BattleCardList: []
+  battleCardPrehab: {fileID: 1777009815341847348, guid: 4866fde336971cf4584711bb938094c7, type: 3}
+  m_ScienceMaterial: {fileID: 2100000, guid: 3c54b4cddeb241e4ab1c40b775946467, type: 2}
+  m_MilitaryMaterial: {fileID: 2100000, guid: 7c11a5639380ce84c865fe4ce0ac14ce, type: 2}
+  m_SpyMaterial: {fileID: 2100000, guid: b909db78e57575048bc58c7b7c177a7c, type: 2}
 --- !u!1 &2136302445
 GameObject:
   m_ObjectHideFlags: 0
@@ -4482,7 +4486,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: d77b57482f7e3ed468469f637e372e11, type: 2}
+  - {fileID: 2100000, guid: 3c54b4cddeb241e4ab1c40b775946467, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
