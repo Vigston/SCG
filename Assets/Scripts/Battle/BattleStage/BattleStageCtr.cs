@@ -124,7 +124,7 @@ public class BattleStageCtr : MonoBehaviour
                         cardArea.SetSide(side);
                         cardArea.SetPosiiton((Position)((j * widthNum) + k));
 
-                        BattleStageMgr.instance.AddArea(cardArea);
+                        BattleStageMgr.instance.AddCardArea(cardArea);
                     }
                 }
             }
@@ -154,7 +154,7 @@ public class BattleStageCtr : MonoBehaviour
                         cardArea.SetSide(side);
                         cardArea.SetPosiiton((Position)(((jrev) * widthNum) + krev));
 
-                        BattleStageMgr.instance.AddArea(cardArea);
+                        BattleStageMgr.instance.AddCardArea(cardArea);
                     }
                 }
             }

@@ -97,7 +97,7 @@ public class BattleCardMgr : MonoBehaviour
         return searchCardList;
     }
     // 指定追加種類カードを全て取得
-    public List<BattleCard> GetCardListFromAppendKind(Side _side, BattleCard.AppendKind _appendKind)
+    public List<BattleCard> GetCardListFromAppendKind(Side _side, BattleCard.JobKind _appendKind)
     {
         List<BattleCard> searchCardList = new List<BattleCard>();
         for (int i = 0; i < (int)Position.ePosition_Max; i++)
@@ -132,7 +132,7 @@ public class BattleCardMgr : MonoBehaviour
         return battleCardList.Count;
     }
     // 指定追加種類カード数を取得
-    public int GetCardNumFromAppendKind(Side _side, BattleCard.AppendKind _appendKind)
+    public int GetCardNumFromAppendKind(Side _side, BattleCard.JobKind _appendKind)
     {
         List<BattleCard> battleCardList = GetCardListFromAppendKind(_side, _appendKind);
 

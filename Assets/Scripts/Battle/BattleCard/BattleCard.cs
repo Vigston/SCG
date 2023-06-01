@@ -17,11 +17,12 @@ public class BattleCard : MonoBehaviour
     }
 
     // 追加種類
-    public enum AppendKind
+    public enum JobKind
     {
         eAppendKind_Military,
         eAppendKind_Science,
         eAppendKind_Spy,
+        eAppendKind_Merchant,
         eAppendKind_Max,
 
         eAppendKind_None = -1,
@@ -35,7 +36,7 @@ public class BattleCard : MonoBehaviour
     [SerializeField]
     private Kind m_Kind;
     [SerializeField]
-    private List<AppendKind> m_AppendKindList;
+    private List<JobKind> m_AppendKindList;
     [SerializeField]
     private bool m_IsEnable = true;
     [SerializeField]
@@ -46,6 +47,28 @@ public class BattleCard : MonoBehaviour
     private const int m_LimitedActionNum = 1;
     [SerializeField]
     private int m_ActionNum = 0;
+
+    // 付与職業
+    // 軍事
+    [SerializeField]
+    private Military m_Military;
+    // 研究
+    [SerializeField]
+    private Science m_Science;
+    // スパイ
+    [SerializeField]
+    private Spy m_Spy;
+    // 商人
+    [SerializeField]
+    private Merchant m_Merchant;
+
+    private void Awake()
+    {
+        m_Military = null;
+        m_Science = null;
+        m_Spy = null;
+        m_Merchant = null;
+    }
 
     void Start()
     {
@@ -111,28 +134,28 @@ public class BattleCard : MonoBehaviour
         return m_Kind;
     }
     // 付与種類取得
-    public AppendKind GetAppendKind(int index)
+    public JobKind GetAppendKind(int index)
     {
         return m_AppendKindList[index];
     }
     // 付与種類追加
-    public void AddAppendKind(AppendKind _appendKind)
+    public void AddAppendKind(JobKind _jobKind)
     {
         // 既にこの追加種類を持っているならはじく。
-        if (IsHaveAppendKind(_appendKind)) { return; }
+        if (IsHaveAppendKind(_jobKind)) { return; }
 
-        Debug.Log($"{_appendKind}を付与する");
+        m_AppendKindList.Add(_jobKind);
+    }
+    // 付与種類削除
+    public void RemoveAppendKind(JobKind _jobKind)
+    {
+        // この付与種類を持っていないならはじく
+        if (!IsHaveAppendKind(_jobKind)) { return; }
 
-        // 軍事の付与ならMilitaryDragActionをアタッチする
-        if(_appendKind == AppendKind.eAppendKind_Military)
-        {
-            gameObject.AddComponent<MilitaryDragAction>();
-        }
-
-        m_AppendKindList.Add(_appendKind);
+        m_AppendKindList.Remove(_jobKind);
     }
     // 指定の追加種類を持つか
-    public bool IsHaveAppendKind(AppendKind _appendKind)
+    public bool IsHaveAppendKind(JobKind _appendKind)
     {
         return m_AppendKindList.Contains(_appendKind);
     }
@@ -142,7 +165,7 @@ public class BattleCard : MonoBehaviour
         return m_AppendKindList.Count;
     }
     // 全ての付与種類取得
-    public List<AppendKind> AllGetAppendKind()
+    public List<JobKind> AllGetAppendKind()
     {
         return m_AppendKindList;
     }
@@ -224,19 +247,19 @@ public class BattleCard : MonoBehaviour
     }
 
     // マテリアル設定
-    public void SetMaterial(AppendKind _apppendKind)
+    public void SetMaterial(JobKind _apppendKind)
     {
 
         MeshRenderer meshRenderer = GetComponent<MeshRenderer>();
         switch (_apppendKind)
         {
-            case AppendKind.eAppendKind_Military:
+            case JobKind.eAppendKind_Military:
                 meshRenderer.material = BattleCardMgr.instance.m_MilitaryMaterial;
                 break;
-            case AppendKind.eAppendKind_Science:
+            case JobKind.eAppendKind_Science:
                 meshRenderer.material = BattleCardMgr.instance.m_ScienceMaterial;
                 break;
-            case AppendKind.eAppendKind_Spy:
+            case JobKind.eAppendKind_Spy:
                 meshRenderer.sharedMaterials = new Material[]
                 {
                     meshRenderer.sharedMaterial,
@@ -247,5 +270,136 @@ public class BattleCard : MonoBehaviour
                 Debug.Log("SetMaterialに登録されていないマテリアルを設定しようとしています");
                 break;
         }
+    }
+
+    // 職業を付与する
+    public void AppendJob(JobKind _jobKind)
+    {
+        // スパイを除く職業が付与されているならはじく
+        if (GetAppendJobNum(true) >= 1) { return; }
+
+        // 既にこの職業が付与されているならはじく
+        if (IsAppendJob(_jobKind)) { return; }
+
+        // 付与
+        switch (_jobKind)
+        {
+            case JobKind.eAppendKind_Military:
+                m_Military = new Military();
+                // 軍事の付与なのでMilitaryDragActionをアタッチする
+                gameObject.AddComponent<MilitaryDragAction>();
+                Debug.Log("軍事の付与");
+                break;
+            case JobKind.eAppendKind_Science:
+                m_Science = new Science();
+                Debug.Log("研究の付与");
+                break;
+            case JobKind.eAppendKind_Spy:
+                m_Spy = new Spy();
+                Debug.Log("スパイの付与");
+                break;
+            case JobKind.eAppendKind_Merchant:
+                m_Merchant = new Merchant();
+                Debug.Log("商人の付与");
+                break;
+            default:
+                Debug.Log($"登録されていない職業({_jobKind})を付与しようとしているので確認お願いします");
+                break;
+        }
+
+        // 付与職業種類にも設定
+        AddAppendKind(_jobKind);
+    }
+
+    // 職業を全て削除する
+    public void AllRemoveAppendJob()
+    {
+        for (int i = 0; i < (int)JobKind.eAppendKind_Max; i++)
+        {
+            // 職業削除
+            RemoveAppendJob((JobKind)i);
+        }
+
+        // 全ての付与職業種類削除
+        AllRemoveAppendKind();
+    }
+
+    // 職業を削除する
+    public void RemoveAppendJob(JobKind _jobKind)
+    {
+        // 指定の職業が付与されていないならはじく
+        if (!IsAppendJob(_jobKind)) { return; }
+
+        // 削除
+        switch (_jobKind)
+        {
+            case JobKind.eAppendKind_Military:
+                m_Military = null;
+                break;
+            case JobKind.eAppendKind_Science:
+                m_Science = null;
+                break;
+            case JobKind.eAppendKind_Spy:
+                m_Spy = null;
+                break;
+            case JobKind.eAppendKind_Merchant:
+                m_Merchant = null;
+                break;
+            default:
+                break;
+        }
+
+        // 付与職業種類削除
+        RemoveAppendKind(_jobKind);
+    }
+
+    // 職業の付与されている数を取得
+    public int GetAppendJobNum(bool isNoSpy)
+    {
+        int appendJobNum = 0;
+
+        for(int i = 0; i < (int)JobKind.eAppendKind_Max; i++)
+        {
+            // スパイを除くフラグが立っている場合
+            if(isNoSpy)
+            {
+                // スパイならはじく
+                if((JobKind)i == JobKind.eAppendKind_Spy) { continue; }
+            }
+
+            // 付与されていないならはじく
+            if (!IsAppendJob((JobKind)i)) { continue; }
+
+            // 付与されている数を加算
+            appendJobNum++;
+        }
+
+        return appendJobNum;
+    }
+
+    // 指定の職業が付与されているか
+    public bool IsAppendJob(JobKind _jobKind)
+    {
+        switch(_jobKind)
+        {
+            case JobKind.eAppendKind_Military:
+                if(m_Military != null) { return true; }
+                break;
+            case JobKind.eAppendKind_Science:
+                if (m_Science != null) { return true; }
+                break;
+            case JobKind.eAppendKind_Spy:
+                if (m_Spy != null) { return true; }
+                break;
+            case JobKind.eAppendKind_Merchant:
+                if (m_Merchant != null) { return true; }
+                break;
+            default:
+                Debug.Log("指定の職業について記載がありませんので確認してください");
+                break;
+        }
+
+        // その職業は付与されていない
+        return false;
     }
 }

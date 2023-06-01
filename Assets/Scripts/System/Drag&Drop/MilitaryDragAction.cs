@@ -53,34 +53,42 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
             // ターゲットがカードの場合
             if(targetCard != null)
             {
-                Side turnSide = BattleMgr.instance.GetTurnSide();
-                // 対象カードがターン側
-                if (targetCard.GetSide() == turnSide)
+                Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+                // 対象カードが自分のカードなら
+                if (targetCard.GetSide() == userSide)
                 {
                     // 対象カードがスパイなら
-                    if(targetCard.IsHaveAppendKind(BattleCard.AppendKind.eAppendKind_Spy))
+                    if(targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy))
                     {
                         // 対象カードを破壊
                         BattleCardCtr.instance.RemoveBattleCard(targetCard);
                     }
+                    else
+                    {
+                        Debug.Log("指定のカードはスパイではありませんでした");
+                    }
 
                     IsAction = true;
                 }
-                // 対象カードがターンの逆側
-                else if(targetCard.GetSide() != turnSide)
+                // 対象カードが相手のカードなら
+                else
                 {
                     BattleCard actionCard = m_ActionObj.GetComponent<BattleCard>();
                     // 自分がスパイじゃないなら
-                    if(!actionCard.IsHaveAppendKind(BattleCard.AppendKind.eAppendKind_Spy))
+                    if(!actionCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy))
                     {
                         // 対象カードを破壊
                         BattleCardCtr.instance.RemoveBattleCard(targetCard);
                         // 対象カードが軍事カードなら自分も破壊
-                        if (targetCard.IsHaveAppendKind(BattleCard.AppendKind.eAppendKind_Military))
+                        if (targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Military))
                         {
                             // 自分を破壊
                             BattleCardCtr.instance.RemoveBattleCard(actionCard);
                         }
+                    }
+                    else
+                    {
+                        Debug.Log("このカードはスパイなので軍事行動できません");
                     }
 
                     IsAction = true;

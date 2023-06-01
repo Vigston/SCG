@@ -76,6 +76,10 @@ public class BattleMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        // バトルユーザー作成
+        BattleUserCtr.instance.CreatePlayerUser();
+        BattleUserCtr.instance.CreateEnemyUser();
+
         // スタートフェイズから始める
         SetPhase(PhaseType.ePhaseType_Start);
         // フェイズループ処理
@@ -121,13 +125,13 @@ public class BattleMgr : MonoBehaviour
             int peopleNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_People);
             SetPeopleCardNum(side, peopleNum);
             // 研究カード数計算
-            int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Science);
+            int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Science);
             SetScienceCardNum(side, scienceNum);
             // 軍事カード数計算
-            int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Military);
+            int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Military);
             SetMilitaryCardNum(side, militaryNum);
             // スパイカード数計算
-            int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Spy);
+            int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Spy);
             SetSpyCardNum(side, spyNum);
 
             // 研究値計算
@@ -379,6 +383,19 @@ public class BattleMgr : MonoBehaviour
             battleCard.InitTurnInfo();
         }
 
+        // デバッグモードなら
+        if(DebugMgr.instance.IsDebugMode())
+        {
+            // 操作側切り替え
+            BattleUserMgr.instance.ChangeOperateUserSide();
+        }
+        // デバッグモードじゃないなら
+        else
+        {
+            // 操作側をプレイヤーにする
+            BattleUserMgr.instance.SetOperateUserSide(Side.eSide_Player);
+        }
+
         Debug.Log($"'{m_TurnSide}'ターンに進む");
     }
 
@@ -447,6 +464,15 @@ public class BattleMgr : MonoBehaviour
     public int GetTurnNum()
     {
         return m_TurnNum;
+    }
+
+    // 自分のターンか
+    public bool IsMyTurn()
+    {
+        Side turnSide = GetTurnSide();
+        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+
+        return turnSide == userSide;
     }
 
     // -------フェイズ------
@@ -548,12 +574,12 @@ public class BattleMgr : MonoBehaviour
     {
         List<BattleCard> cardList = new List<BattleCard>();
 
-        var scienceCardList = BattleCardMgr.instance.GetCardListFromAppendKind(side, BattleCard.AppendKind.eAppendKind_Science);
+        var scienceCardList = BattleCardMgr.instance.GetCardListFromAppendKind(side, BattleCard.JobKind.eAppendKind_Science);
 
         foreach(var battleCard in scienceCardList)
         {
             // スパイの追加種類を持っているならはじく
-            if (battleCard.IsHaveAppendKind(BattleCard.AppendKind.eAppendKind_Spy)) { continue; }
+            if (battleCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy)) { continue; }
 
             // 追加
             cardList.Add(battleCard);

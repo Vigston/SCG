@@ -10,6 +10,9 @@ public class DebugMgr : MonoBehaviour
     // インスタンス
     public static DebugMgr instance;
 
+    // デバッグモードフラグ
+    public bool m_DebugModeFlag;
+
     // バトル情報テキスト
     public TextMeshProUGUI m_TextTurnNum;
     public TextMeshProUGUI m_TextTurnSide;
@@ -105,5 +108,17 @@ public class DebugMgr : MonoBehaviour
 
         Debug.LogError("DebugMgrのインスタンスが生成できませんでした");
         return false;
+    }
+
+    // ===関数===
+    // デバッグモード設定
+    public void SetDebugMode(bool _flag)
+    {
+        m_DebugModeFlag = _flag;
+    }
+    // デバッグモードか
+    public bool IsDebugMode()
+    {
+        return m_DebugModeFlag;
     }
 }

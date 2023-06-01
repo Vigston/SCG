@@ -71,10 +71,10 @@ public class BattleCardCtr : MonoBehaviour
         // スパイの場合の処理
         if (IsSpy)
         {
-            // スパイの追加種類を設定
-            battleCard.AddAppendKind(BattleCard.AppendKind.eAppendKind_Spy);
+            // スパイ職業を付与
+            battleCard.AppendJob(BattleCard.JobKind.eAppendKind_Spy);
             // マテリアルの設定
-            battleCard.SetMaterial(BattleCard.AppendKind.eAppendKind_Spy);
+            battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Spy);
         }
 
         // BattleCardMgrに登録
@@ -120,10 +120,10 @@ public class BattleCardCtr : MonoBehaviour
         // スパイの場合の処理
         if (IsSpy)
         {
-            // スパイの追加種類を設定
-            battleCard.AddAppendKind(BattleCard.AppendKind.eAppendKind_Spy);
+            // スパイ職業を付与
+            battleCard.AppendJob(BattleCard.JobKind.eAppendKind_Spy);
             // マテリアルの設定
-            battleCard.SetMaterial(BattleCard.AppendKind.eAppendKind_Spy);
+            battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Spy);
         }
 
         // BattleCardMgrに登録

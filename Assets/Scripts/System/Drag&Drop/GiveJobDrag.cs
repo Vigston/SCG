@@ -5,7 +5,7 @@ using battleTypes;
 public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDragHandler
 {
     [SerializeField]
-    private BattleCard.AppendKind m_giveKind;
+    private BattleCard.JobKind m_giveKind;
     [SerializeField]
     private GameObject dragObj;
 
@@ -43,29 +43,31 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
 
             foreach (RaycastHit hit in Physics.RaycastAll(ray))
             {
+                // クリックしたオブジェクト
+                GameObject hitObj = hit.transform.gameObject;
+
                 // スパイを付与するのは次に相手の場に参加する国民なので例外処理。
-                if (m_giveKind == BattleCard.AppendKind.eAppendKind_Spy)
+                if (m_giveKind == BattleCard.JobKind.eAppendKind_Spy)
                 {
-                    // ターンとカードの側が一緒なら職業付与する
-                    Side turnSide = BattleMgr.instance.GetTurnSide();
-                    if (turnSide == Side.eSide_Player)
+                    // 自分のターンなら
+                    if(BattleMgr.instance.IsMyTurn())
                     {
-                        if (hit.collider.tag == "EnemyArea")
+                        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+
+                        BattleArea battleArea = hitObj.GetComponent<BattleArea>();
+
+                        // バトルエリアなら
+                        if (battleArea != null)
                         {
-                            BattleMgr.instance.SetNextJoinSpyFlag(true);
-                            Debug.Log("次に参加してくる相手の国民は自分のスパイになる");
-                            // 追加種類付与カウント
-                            BattleMgr.instance.AddAppendKindCount();
-                        }
-                    }
-                    else if (turnSide == Side.eSide_Enemy)
-                    {
-                        if (hit.collider.tag == "PlayerArea")
-                        {
-                            BattleMgr.instance.SetNextJoinSpyFlag(true);
-                            Debug.Log("次に参加してくる自分の国民は相手のスパイになる");
-                            // 追加種類付与カウント
-                            BattleMgr.instance.AddAppendKindCount();
+                            Side areaSide = battleArea.GetSide();
+                            // 相手のバトルエリアなら
+                            if (areaSide != userSide)
+                            {
+                                BattleMgr.instance.SetNextJoinSpyFlag(true);
+                                Debug.Log($"次に参加してくる'{battleArea}'の国民は自分のスパイになる");
+                                // 追加種類付与カウント
+                                BattleMgr.instance.AddAppendKindCount();
+                            }
                         }
                     }
                 }
@@ -73,7 +75,7 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 {
                     if (hit.collider.tag == "BattleCard")
                     {
-                        targetCard = hit.transform.gameObject;
+                        targetCard = hitObj;
                     }
                 }
             }
@@ -84,17 +86,20 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 // カード種類を設定
                 BattleCard battleCard = targetCard.GetComponent<BattleCard>();
 
-                // ターンとカードの側が一緒なら職業付与する
+                // 自分のターンで自分のカードなら職業付与できる
                 Side turnSide = BattleMgr.instance.GetTurnSide();
-                if (turnSide == battleCard.GetSide())
+                Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+                //Debug.Log($"職業付与のターン側：{turnSide}");
+                //Debug.Log($"職業付与のユーザー側：{turnSide}");
+                if (turnSide == userSide)
                 {
                     // 同じ追加種類を持っていないなら
                     if(!battleCard.IsHaveAppendKind(m_giveKind))
                     {
                         // マテリアル設定
                         battleCard.SetMaterial(m_giveKind);
-                        // カードの種類設定
-                        battleCard.AddAppendKind(m_giveKind);
+                        // 職業付与
+                        battleCard.AppendJob(m_giveKind);
 
                         // BattleMgr更新リクエスト
                         BattleMgr.instance.UpdateRequest();

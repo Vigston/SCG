@@ -10,6 +10,11 @@ public class BattleStageMgr : MonoBehaviour
     // =================変数=================
     public static BattleStageMgr instance;
 
+    // プレイヤーエリア
+    public BoxCollider PlayerArea;
+    // エネミーエリア
+    public BoxCollider EnemyArea;
+
     [SerializeField]
     private List<CardArea> m_CardAreaList = new List<CardArea>();
 
@@ -19,8 +24,8 @@ public class BattleStageMgr : MonoBehaviour
     {
         // インスタンスを作成
         CreateInstance();
-        // エリアリストの初期化
-        InitAreaList();
+        // カードエリアリストの初期化
+        InitCardAreaList();
     }
 
     // Start is called before the first frame update
@@ -54,25 +59,29 @@ public class BattleStageMgr : MonoBehaviour
         return false;
     }
 
-    // エリアリストの初期化
-    void InitAreaList()
+    // ===エリア===
+    // 自分のエリア
+
+    // ===カードエリア===
+    // カードエリアリストの初期化
+    void InitCardAreaList()
     {
         m_CardAreaList = new List<CardArea>();
     }
 
-    // エリアリストのコピー
-    public void CopyAreaList(List<CardArea> areaList)
+    // カードエリアリストのコピー
+    public void CopyCardAreaList(List<CardArea> areaList)
     {
         m_CardAreaList = areaList;
     }
 
-    // エリアの追加
-    public void AddArea(CardArea _cardArea)
+    // カードエリアの追加
+    public void AddCardArea(CardArea _cardArea)
     {
         // 追加
         m_CardAreaList.Add(_cardArea);
     }
-    public void AddArea(Position _pos)
+    public void AddCardArea(Position _pos)
     {
         CardArea cardArea = new CardArea();
         // 値設定
@@ -82,8 +91,8 @@ public class BattleStageMgr : MonoBehaviour
     }
 
 
-    // 指定エリアの削除
-    public void RemoveArea(int index)
+    // 指定カードエリアの削除
+    public void RemoveCardArea(int index)
     {
         CardArea cardArea = new CardArea();
         // 指定Indexのエリアを取得
@@ -92,8 +101,8 @@ public class BattleStageMgr : MonoBehaviour
         m_CardAreaList.Remove(cardArea);
     }
 
-    // 全てのエリアを削除
-    public void AllRemoveArea()
+    // 全てのカードエリアを削除
+    public void AllRemoveCardArea()
     {
         // 全て削除
         m_CardAreaList.Clear();
