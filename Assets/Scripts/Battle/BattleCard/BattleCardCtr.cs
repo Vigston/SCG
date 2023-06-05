@@ -64,6 +64,7 @@ public class BattleCardCtr : MonoBehaviour
         // 値設定
         battleCard.SetSide(cardSide);
         battleCard.SetPosiiton(_pos);
+        battleCard.SetStatus(BattleCard.Status.eStatus_Fatigue);
         battleCard.SetKind(_kind);
         battleCard.SetEnable(isEnable);
         battleCard.SetEntryTurn();
@@ -113,6 +114,7 @@ public class BattleCardCtr : MonoBehaviour
         // 値設定
         battleCard.SetSide(cardSide);
         battleCard.SetPosiiton(_cardArea.GetPosition());
+        battleCard.SetStatus(BattleCard.Status.eStatus_Fatigue);
         battleCard.SetKind(_kind);
         battleCard.SetEnable(isEnable);
         battleCard.SetEntryTurn();

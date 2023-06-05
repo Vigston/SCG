@@ -127,12 +127,14 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
         BattleCard battleCard = gameObject.GetComponent<BattleCard>();
         // バトルカードじゃないならはじく
         if (battleCard == null) { return false; }
-        // このターンに登場したならはじく
-        if (battleCard.IsEntryThisTurn()) { return false; }
+        // 疲労状態ならはじく
+        if (battleCard.IsStatus(BattleCard.Status.eStatus_Fatigue)) { return false; }
         // 行動できないならはじく
         if (!battleCard.IsAction()) { return false; }
-        // 自分のカードじゃないならはじく
-        if(BattleUserMgr.instance.GetOperateUserSide() != battleCard.GetSide()) { return false; }
+        // 自分のターンで自分のカードじゃないならはじく
+        if(!Common.IsMyTurnAndMyCard(battleCard)) { return false; }
+        // メインフェイズじゃなければはじく
+        if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
 
         Military military = battleCard.GetMilitary();
         // 軍事じゃないならはじく

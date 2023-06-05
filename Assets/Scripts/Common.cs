@@ -1,20 +1,20 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 
 public static class Common
 {
-    // BoxCollision‚Ì’¸“_À•W‚ğæ“¾
+    // BoxCollisionã®é ‚ç‚¹åº§æ¨™ã‚’å–å¾—
     /*
-     * 0 = ¶ã(ã)
-     * 1 = ‰Eã(ã)
-     * 2 = ‰Eã(‰º)
-     * 3 = ¶ã(‰º)
-     * 4 = ‰E‰º(‰º)
-     * 5 = ¶‰º(‰º)
-     * 6 = ¶‰º(ã)
-     * 7 = ‰E‰º(ã)
+     * 0 = å·¦ä¸Š(ä¸Š)
+     * 1 = å³ä¸Š(ä¸Š)
+     * 2 = å³ä¸Š(ä¸‹)
+     * 3 = å·¦ä¸Š(ä¸‹)
+     * 4 = å³ä¸‹(ä¸‹)
+     * 5 = å·¦ä¸‹(ä¸‹)
+     * 6 = å·¦ä¸‹(ä¸Š)
+     * 7 = å³ä¸‹(ä¸Š)
      */
     public static Vector3[] GetBoxCollideVertices(BoxCollider Col)
     {
@@ -53,35 +53,47 @@ public static class Common
         return vertices;
     }
 
-    // ƒXƒNƒŠ[ƒ“À•W‚©‚çƒ[ƒ‹ƒhÀ•W‚É•ÏŠ·
+    // ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã«å¤‰æ›
     public static Vector3 GetWorldPositionFromScreenPosition(Canvas _canvas, RectTransform _rect)
     {
-        //UIÀ•W‚©‚çƒXƒNƒŠ[ƒ“À•W‚É•ÏŠ·
+        //UIåº§æ¨™ã‹ã‚‰ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã«å¤‰æ›
         Vector2 screenPos = RectTransformUtility.WorldToScreenPoint(_canvas.worldCamera, _rect.position);
 
-        //ƒ[ƒ‹ƒhÀ•W
+        //ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™
         Vector3 worldPos = Vector3.zero;
 
-        //ƒXƒNƒŠ[ƒ“À•W‚©‚çƒ[ƒ‹ƒhÀ•W‚É•ÏŠ·
+        //ã‚¹ã‚¯ãƒªãƒ¼ãƒ³åº§æ¨™ã‹ã‚‰ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™ã«å¤‰æ›
         RectTransformUtility.ScreenPointToWorldPointInRectangle(_rect, screenPos, _canvas.worldCamera, out worldPos);
 
         return worldPos;
     }
 
-    // ‹t‚Ì‘¤‚ğæ“¾
+    // é€†ã®å´ã‚’å–å¾—
     public static Side GetRevSide(Side _side)
     {
-        // ƒvƒŒƒCƒ„[
+        // ãƒ—ãƒ¬ã‚¤ãƒ¤ãƒ¼
         if(_side == Side.eSide_Player)
         {
             return Side.eSide_Enemy;
         }
-        // “G
+        // æ•µ
         else if(_side == Side.eSide_Enemy)
         {
             return Side.eSide_Player;
         }
 
         return Side.eSide_None;
+    }
+
+    // è‡ªåˆ†ã®ã‚¿ãƒ¼ãƒ³ã§è‡ªåˆ†ã®ã‚«ãƒ¼ãƒ‰ã‹
+    public static bool IsMyTurnAndMyCard(BattleCard battleCard)
+    {
+        if(battleCard == null) { return false; }
+
+        Side turnSide = BattleMgr.instance.GetTurnSide();
+        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+        Side cardSide = battleCard.GetSide();
+
+        return turnSide == userSide && cardSide == userSide;
     }
 }

@@ -18,8 +18,10 @@ public class BattleCardMgr : MonoBehaviour
 
     // 科学カードマテリアル
     public Material m_ScienceMaterial;
-    // 軍事カードマテリアル
-    public Material m_MilitaryMaterial;
+    // 軍事カード(非武装)マテリアル
+    public Material m_MilitaryUnarmedMaterial;
+    // 軍事カード(武装)マテリアル
+    public Material m_MilitaryArmedMaterial;
     // スパイカードマテリアル
     public Material m_SpyMaterial;
     // 商人カードマテリアル

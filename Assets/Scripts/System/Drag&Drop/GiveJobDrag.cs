@@ -87,19 +87,15 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 BattleCard battleCard = targetCard.GetComponent<BattleCard>();
 
                 // 自分のターンで自分のカードなら職業付与できる
-                Side turnSide = BattleMgr.instance.GetTurnSide();
-                Side userSide = BattleUserMgr.instance.GetOperateUserSide();
-                //Debug.Log($"職業付与のターン側：{turnSide}");
-                //Debug.Log($"職業付与のユーザー側：{turnSide}");
-                if (turnSide == userSide)
+                if (Common.IsMyTurnAndMyCard(battleCard))
                 {
                     // 同じ追加種類を持っていないなら
                     if(!battleCard.IsHaveAppendKind(m_giveKind))
                     {
-                        // マテリアル設定
-                        battleCard.SetMaterial(m_giveKind);
                         // 職業付与
                         battleCard.AppendJob(m_giveKind);
+                        // マテリアル設定
+                        battleCard.SetMaterial(m_giveKind);
 
                         // BattleMgr更新リクエスト
                         BattleMgr.instance.UpdateRequest();

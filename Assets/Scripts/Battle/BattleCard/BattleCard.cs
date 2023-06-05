@@ -7,6 +7,15 @@ using System.Threading;
 
 public class BattleCard : MonoBehaviour
 {
+    // ステータス
+    public enum Status
+    {
+        // 通常
+        eStatus_Normal,
+        // 疲労
+        eStatus_Fatigue,
+    }
+
     // 基本種類
     public enum Kind
     {
@@ -33,6 +42,8 @@ public class BattleCard : MonoBehaviour
     private Side m_Side;
     [SerializeField]
     private Position m_Position;
+    [SerializeField]
+    private Status m_Status;
     [SerializeField]
     private Kind m_Kind;
     [SerializeField]
@@ -92,6 +103,7 @@ public class BattleCard : MonoBehaviour
             renderer.enabled = false;
         }
     }
+
     // ターン情報初期化
     public void InitTurnInfo()
     {
@@ -122,6 +134,23 @@ public class BattleCard : MonoBehaviour
     {
         return m_Position;
     }
+    // ---ステータス---
+    // ステータス設定
+    public void SetStatus(Status _status)
+    {
+        m_Status = _status;
+    }
+    // ステータス取得
+    public Status GetStatus()
+    {
+        return m_Status;
+    }
+    // 指定のステータスか
+    public bool IsStatus(Status _status)
+    {
+        return m_Status == _status;
+    }
+
     // ---種類---
     // 種類設定
     public void SetKind(Kind _kind)
@@ -254,7 +283,29 @@ public class BattleCard : MonoBehaviour
         switch (_apppendKind)
         {
             case JobKind.eAppendKind_Military:
-                meshRenderer.material = BattleCardMgr.instance.m_MilitaryMaterial;
+                Debug.Log("軍事カードマテリアル設定！！！");
+                Military military = GetMilitary();
+                if(military != null)
+                {
+                    Military.Status status = military.GetStatus();
+                    Debug.Log($"{status}のマテリアル設定！！");
+                    switch (status)
+                    {
+                        case Military.Status.eStatus_Unarmed:
+                            meshRenderer.material = BattleCardMgr.instance.m_MilitaryUnarmedMaterial;
+                            break;
+                        case Military.Status.eStatus_Armed:
+                            meshRenderer.material = BattleCardMgr.instance.m_MilitaryArmedMaterial;
+                            break;
+                        default:
+                            Debug.Log("未登録のマテリアルを検知！！");
+                            break;
+                    }
+                }
+                else
+                {
+                    Debug.Log("軍事カードが取得できない！！！");
+                }
                 break;
             case JobKind.eAppendKind_Science:
                 meshRenderer.material = BattleCardMgr.instance.m_ScienceMaterial;

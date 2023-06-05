@@ -381,6 +381,9 @@ public class BattleMgr : MonoBehaviour
         {
             // ターン情報初期化
             battleCard.InitTurnInfo();
+
+            // ステータスを通常に設定する
+            battleCard.SetStatus(BattleCard.Status.eStatus_Normal);
         }
 
         // デバッグモードなら
