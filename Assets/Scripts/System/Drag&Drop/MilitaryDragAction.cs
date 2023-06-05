@@ -100,6 +100,14 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
                     BattleCard actionCard = m_ActionObj.GetComponent<BattleCard>();
                     if(actionCard != null)
                     {
+                        Military military = actionCard.GetMilitary();
+
+                        if(military != null)
+                        {
+                            // アクションが終わったので非武装にする
+                            military.SetStatus(Military.Status.eStatus_Unarmed);
+                        }
+
                         // カードの行動回数加算
                         actionCard.AddActionNum();
                     }
@@ -123,6 +131,18 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
         if (battleCard.IsEntryThisTurn()) { return false; }
         // 行動できないならはじく
         if (!battleCard.IsAction()) { return false; }
+        // 自分のカードじゃないならはじく
+        if(BattleUserMgr.instance.GetOperateUserSide() != battleCard.GetSide()) { return false; }
+
+        Military military = battleCard.GetMilitary();
+        // 軍事じゃないならはじく
+        if(military == null) { return false; }
+        // 非武装状態ならはじく
+        if (military.IsStatus(Military.Status.eStatus_Unarmed))
+        {
+            Debug.Log("非武装状態なので行動出来ません！！");
+            return false;
+        }
 
         // 行動できる
         return true;

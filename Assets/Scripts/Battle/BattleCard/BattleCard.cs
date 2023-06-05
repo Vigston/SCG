@@ -266,10 +266,34 @@ public class BattleCard : MonoBehaviour
                     BattleCardMgr.instance.m_SpyMaterial,
                 };
                 break;
+            case JobKind.eAppendKind_Merchant:
+                meshRenderer.material = BattleCardMgr.instance.m_MerchantMaterial;
+                break;
             default:
                 Debug.Log("SetMaterialに登録されていないマテリアルを設定しようとしています");
                 break;
         }
+    }
+
+    // 軍事を取得する
+    public Military GetMilitary()
+    {
+        return m_Military;
+    }
+    // 研究を取得する
+    public Science GetScience()
+    {
+        return m_Science;
+    }
+    // スパイを取得する
+    public Spy GetSpy()
+    {
+        return m_Spy;
+    }
+    // 商人を取得する
+    public Merchant GetMerchant()
+    {
+        return m_Merchant;
     }
 
     // 職業を付与する
@@ -285,7 +309,8 @@ public class BattleCard : MonoBehaviour
         switch (_jobKind)
         {
             case JobKind.eAppendKind_Military:
-                m_Military = new Military();
+                // 非武装状態で付与
+                m_Military = new Military(Military.Status.eStatus_Unarmed);
                 // 軍事の付与なのでMilitaryDragActionをアタッチする
                 gameObject.AddComponent<MilitaryDragAction>();
                 Debug.Log("軍事の付与");

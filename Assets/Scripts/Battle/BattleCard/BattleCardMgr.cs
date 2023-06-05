@@ -22,6 +22,8 @@ public class BattleCardMgr : MonoBehaviour
     public Material m_MilitaryMaterial;
     // スパイカードマテリアル
     public Material m_SpyMaterial;
+    // 商人カードマテリアル
+    public Material m_MerchantMaterial;
 
     private void Awake()
     {
