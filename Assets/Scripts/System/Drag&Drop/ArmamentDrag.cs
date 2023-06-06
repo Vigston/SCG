@@ -7,6 +7,8 @@ using battleTypes;
 public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField]
+    private const int costGoldValue = 20;
+    [SerializeField]
     private GameObject targetCard;
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -58,10 +60,11 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                     return;
                 }
 
-                // 自分のターンで自分のカードなら職業付与できる
+                // 自分のターンで自分のカードなら武装付与できる
                 if (Common.IsMyTurnAndMyCard(battleCard))
                 {
                     Military military = battleCard.GetMilitary();
+                    Side userSide = BattleUserMgr.instance.GetOperateUserSide();
 
                     // 軍事カードじゃないならはじく
                     if(military == null) { return; }
@@ -69,6 +72,11 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                     // 武装付与
                     military.SetStatus(Military.Status.eStatus_Armed);
                     battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
+                    // コスト分Goldを減らす
+                    BattleMgr.instance.ReduceGoldValue(userSide, costGoldValue);
+
+                    // BattleMgr更新リクエスト
+                    BattleMgr.instance.UpdateRequest();
                 }
             }
 
@@ -79,6 +87,21 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
     // 武装付与が行えるか
     public bool IsArmament()
     {
+        // ユーザー側
+        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+        // ゴールド数
+        int GoldValue = BattleMgr.instance.GetGoldValue(userSide);
+
+        // 自分のターンじゃなければはじく
+        if (!BattleMgr.instance.IsMyTurn()) { return false; }
+        // メインフェイズじゃなければはじく
+        if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
+        // 場に軍事カードがいなければはじく
+        if(BattleCardMgr.instance.GetCardNumFromAppendKind(userSide, BattleCard.JobKind.eAppendKind_Military) <= 0) { return false; }
+        // 武装に必要なゴールドが足らないならはじく
+        if (GoldValue < costGoldValue) { return false; }
+
+
         // 行える
         return true;
     }

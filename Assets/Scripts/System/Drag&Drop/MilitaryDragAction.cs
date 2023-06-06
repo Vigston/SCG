@@ -106,6 +106,7 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
                         {
                             // アクションが終わったので非武装にする
                             military.SetStatus(Military.Status.eStatus_Unarmed);
+                            actionCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
                         }
 
                         // カードの行動回数加算

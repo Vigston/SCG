@@ -5,6 +5,12 @@ using battleTypes;
 
 public static class Common
 {
+    // バトルの共通定数
+    public static class BattleConst
+    {
+        public const int ADD_GOLD_EVERY_MERCHANT = 10;
+    }
+
     // BoxCollisionの頂点座標を取得
     /*
      * 0 = 左上(上)

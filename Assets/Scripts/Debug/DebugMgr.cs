@@ -20,6 +20,7 @@ public class DebugMgr : MonoBehaviour
     public TextMeshProUGUI m_TextBattleResult;
 
     // プレイヤー情報テキスト
+    public TextMeshProUGUI m_TextGoldValue_P;
     public TextMeshProUGUI m_TextPeopleCardNum_P;
     public TextMeshProUGUI m_TextScienceCardNum_P;
     public TextMeshProUGUI m_TextScienceValue_P;
@@ -27,6 +28,7 @@ public class DebugMgr : MonoBehaviour
     public TextMeshProUGUI m_TextSpyCardNum_P;
 
     // 敵情報テキスト
+    public TextMeshProUGUI m_TextGoldValue_E;
     public TextMeshProUGUI m_TextPeopleCardNum_E;
     public TextMeshProUGUI m_TextScienceCardNum_E;
     public TextMeshProUGUI m_TextScienceValue_E;
@@ -70,6 +72,7 @@ public class DebugMgr : MonoBehaviour
         m_TextBattleResult.text = "勝敗：" + BattleMgr.instance.GetBattleResult().ToString();
 
         // プレイヤー情報
+        m_TextGoldValue_P.text = "Gold：" + BattleMgr.instance.GetGoldValue(Side.eSide_Player).ToString();
         m_TextPeopleCardNum_P.text = "国民カード：" + BattleMgr.instance.GetPeopleCardNum(Side.eSide_Player).ToString();
         m_TextScienceCardNum_P.text = "研究カード：" + BattleMgr.instance.GetScienceCardNum(Side.eSide_Player).ToString();
         m_TextScienceValue_P.text = "研究値：" + BattleMgr.instance.GetScienceValue(Side.eSide_Player).ToString();
@@ -77,6 +80,7 @@ public class DebugMgr : MonoBehaviour
         m_TextSpyCardNum_P.text = "スパイカード：" + BattleMgr.instance.GetSpyCardNum(Side.eSide_Player).ToString();
 
         // 敵情報
+        m_TextGoldValue_E.text = "Gold：" + BattleMgr.instance.GetGoldValue(Side.eSide_Enemy).ToString();
         m_TextPeopleCardNum_E.text = "国民カード：" + BattleMgr.instance.GetPeopleCardNum(Side.eSide_Enemy).ToString();
         m_TextScienceCardNum_E.text = "研究カード：" + BattleMgr.instance.GetScienceCardNum(Side.eSide_Enemy).ToString();
         m_TextScienceValue_E.text = "研究値：" + BattleMgr.instance.GetScienceValue(Side.eSide_Enemy).ToString();

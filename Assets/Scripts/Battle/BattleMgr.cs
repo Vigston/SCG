@@ -49,6 +49,9 @@ public class BattleMgr : MonoBehaviour
     // 研究値
     [SerializeField]
     private int[] m_ScienceValue = new int[(int)Side.eSide_Max];
+    // Gold値
+    [SerializeField]
+    private int[] m_GoldValue = new int[(int)Side.eSide_Max];
 
     // 更新フラグ
     private bool m_UpdateFlag = false;
@@ -589,6 +592,34 @@ public class BattleMgr : MonoBehaviour
         }
 
         return cardList.Count;
+    }
+
+    // ---Gold---
+    // Gold数設定
+    public void SetGoldValue(Side _side, int _value)
+    {
+        m_GoldValue[(int)_side] = _value;
+    }
+    // Gold数取得
+    public int GetGoldValue(Side _side)
+    {
+        return m_GoldValue[(int)_side];
+    }
+    // Gold数追加
+    public void AddGoldValue(Side _side, int _value)
+    {
+        m_GoldValue[(int)_side] += _value;
+    }
+    // Gold数減らす
+    public void ReduceGoldValue(Side _side, int _value)
+    {
+        m_GoldValue[(int)_side] -= _value;
+
+        // 0より小さくなる場合には0とする
+        if(m_GoldValue[(int)_side] < 0)
+        {
+            m_GoldValue[(int)_side] = 0;
+        }
     }
 
     // ---軍事---

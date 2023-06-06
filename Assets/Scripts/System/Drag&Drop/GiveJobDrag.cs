@@ -36,6 +36,9 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        // 職業付与を行ったか
+        bool isAppendAction = false;
+
         // 追加種類付与フラグが立っているなら
         if (BattleMgr.instance.IsAddAppendKindFlag())
         {
@@ -65,8 +68,8 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                             {
                                 BattleMgr.instance.SetNextJoinSpyFlag(true);
                                 Debug.Log($"次に参加してくる'{battleArea}'の国民は自分のスパイになる");
-                                // 追加種類付与カウント
-                                BattleMgr.instance.AddAppendKindCount();
+                                // 付与しました
+                                isAppendAction = true;
                             }
                         }
                     }
@@ -89,20 +92,24 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 // 自分のターンで自分のカードなら職業付与できる
                 if (Common.IsMyTurnAndMyCard(battleCard))
                 {
-                    // 同じ追加種類を持っていないなら
-                    if(!battleCard.IsHaveAppendKind(m_giveKind))
+                    // スパイを除く職業が付与されていないなら
+                    if (battleCard.GetAppendJobNum(true) <= 0)
                     {
                         // 職業付与
                         battleCard.AppendJob(m_giveKind);
-                        // マテリアル設定
-                        battleCard.SetMaterial(m_giveKind);
-
-                        // BattleMgr更新リクエスト
-                        BattleMgr.instance.UpdateRequest();
-                        // 追加種類付与カウント
-                        BattleMgr.instance.AddAppendKindCount();
+                        // 付与しました
+                        isAppendAction = true;
                     }
                 }
+            }
+
+            // 職業付与を行ったなら
+            if(isAppendAction)
+            {
+                // BattleMgr更新リクエスト
+                BattleMgr.instance.UpdateRequest();
+                // 追加種類付与カウント
+                BattleMgr.instance.AddAppendKindCount();
             }
 
             dragObj = null;

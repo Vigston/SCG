@@ -1,4 +1,6 @@
-﻿public class Job
+﻿using UnityEngine;
+
+public class Job : MonoBehaviour
 {
     /////////構造体/////////
 
@@ -9,6 +11,7 @@
 
     // ===フラグ===
     // 有効か
+    [SerializeField]
     private bool m_IsEnable;
 
     // 職業設定

@@ -14,15 +14,13 @@ public class Military : Job
 
     //////////変数////////////
     // ステータス
+    [SerializeField]
     private Status m_Status;
 
-    public Military(Status _status, bool isEnable = true)
+    public void Start()
     {
         //職業設定
-        SetUpJob(isEnable);
-
-        // ステータス設定
-        SetStatus(_status);
+        SetUpJob();
 
         Debug.Log("Militaryクラスが生成されました");
     }

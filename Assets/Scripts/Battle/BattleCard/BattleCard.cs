@@ -59,19 +59,14 @@ public class BattleCard : MonoBehaviour
     [SerializeField]
     private int m_ActionNum = 0;
 
-    // 付与職業
-    // 軍事
     [SerializeField]
-    private Military m_Military;
-    // 研究
+    Military m_Military;
     [SerializeField]
-    private Science m_Science;
-    // スパイ
+    Science m_Science;
     [SerializeField]
-    private Spy m_Spy;
-    // 商人
+    Spy m_Spy;
     [SerializeField]
-    private Merchant m_Merchant;
+    Merchant m_Merchant;
 
     private void Awake()
     {
@@ -284,7 +279,7 @@ public class BattleCard : MonoBehaviour
         {
             case JobKind.eAppendKind_Military:
                 Debug.Log("軍事カードマテリアル設定！！！");
-                Military military = GetMilitary();
+                Military military = gameObject.GetComponent<Military>();
                 if(military != null)
                 {
                     Military.Status status = military.GetStatus();
@@ -360,28 +355,32 @@ public class BattleCard : MonoBehaviour
         switch (_jobKind)
         {
             case JobKind.eAppendKind_Military:
-                // 非武装状態で付与
-                m_Military = new Military(Military.Status.eStatus_Unarmed);
+                // 非武装状態でアタッチ
+                m_Military = gameObject.AddComponent<Military>();
+                m_Military.SetStatus(Military.Status.eStatus_Unarmed);
                 // 軍事の付与なのでMilitaryDragActionをアタッチする
                 gameObject.AddComponent<MilitaryDragAction>();
                 Debug.Log("軍事の付与");
                 break;
             case JobKind.eAppendKind_Science:
-                m_Science = new Science();
+                m_Science = gameObject.AddComponent<Science>();
                 Debug.Log("研究の付与");
                 break;
             case JobKind.eAppendKind_Spy:
-                m_Spy = new Spy();
+                m_Spy = gameObject.AddComponent<Spy>();
                 Debug.Log("スパイの付与");
                 break;
             case JobKind.eAppendKind_Merchant:
-                m_Merchant = new Merchant();
+                m_Merchant = gameObject.AddComponent<Merchant>();
                 Debug.Log("商人の付与");
                 break;
             default:
                 Debug.Log($"登録されていない職業({_jobKind})を付与しようとしているので確認お願いします");
                 break;
         }
+
+        // マテリアル設定
+        SetMaterial(_jobKind);
 
         // 付与職業種類にも設定
         AddAppendKind(_jobKind);

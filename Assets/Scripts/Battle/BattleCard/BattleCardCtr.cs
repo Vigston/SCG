@@ -74,8 +74,6 @@ public class BattleCardCtr : MonoBehaviour
         {
             // スパイ職業を付与
             battleCard.AppendJob(BattleCard.JobKind.eAppendKind_Spy);
-            // マテリアルの設定
-            battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Spy);
         }
 
         // BattleCardMgrに登録
@@ -124,8 +122,6 @@ public class BattleCardCtr : MonoBehaviour
         {
             // スパイ職業を付与
             battleCard.AppendJob(BattleCard.JobKind.eAppendKind_Spy);
-            // マテリアルの設定
-            battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Spy);
         }
 
         // BattleCardMgrに登録
