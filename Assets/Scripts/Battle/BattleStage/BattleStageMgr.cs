@@ -144,6 +144,24 @@ public class BattleStageMgr : MonoBehaviour
         return cardAreaList;
     }
 
+    // カードが入ってないカードエリアリスト数を取得
+    public int GetCardAreaNumFromEmptyCard()
+    {
+        // カードが入ってないカードエリアリスト
+        List<CardArea> cardAreaList = new List<CardArea>();
+
+        foreach (CardArea cardArea in m_CardAreaList)
+        {
+            // カードが入っているならはじく
+            if (!cardArea.IsCardEmpty()) { continue; }
+
+            // 指定された側のエリアを追加
+            cardAreaList.Add(cardArea);
+        }
+
+        return cardAreaList.Count;
+    }
+
     // 指定側のカードが入っていないカードリストエリアを取得
     public List<CardArea> GetCardAreaFromSideEmptyCard(Side _side)
     {

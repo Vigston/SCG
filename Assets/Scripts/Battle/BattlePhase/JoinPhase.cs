@@ -11,6 +11,7 @@ public class JoinPhase : MonoBehaviour
     public enum State
     {
         eState_Init,
+        eState_SelectField,
         eState_JoinPeople,
         eState_End,
     }
@@ -51,6 +52,9 @@ public class JoinPhase : MonoBehaviour
             case State.eState_Init:
                 Init();
                 break;
+            case State.eState_SelectField:
+                SelectField();
+                break;
             case State.eState_JoinPeople:
                 JoinPeople();
                 break;
@@ -67,17 +71,42 @@ public class JoinPhase : MonoBehaviour
     void Init()
     {
         Debug.Log("初期化ステート処理開始");
-        // 国民カード追加へ
-        SetNextStateAndFlag(State.eState_JoinPeople);
+        // 参加する場を選択へ
+        SetNextStateAndFlag(State.eState_SelectField);
         Debug.Log("初期化ステート処理終了");
     }
+    // 参加する場を選択
+    void SelectField()
+    {
+        if(m_StateValue == 1)
+        {
+            Debug.Log("場選択ステート処理開始");
+        }
 
+        // 場に空きがないなら終了へ
+        if (BattleStageMgr.instance.GetCardAreaNumFromEmptyCard() <= 0)
+        {
+            // 終了へ
+            SetNextStateAndFlag(State.eState_End);
+            Debug.Log("場選択ステート処理終了");
+        }
+
+        // 選択処理
+
+
+        if(m_StateValue == 1)
+        {
+            // 国民カード追加へ
+            SetNextStateAndFlag(State.eState_JoinPeople);
+            Debug.Log("場選択ステート処理終了");
+        }
+    }
     // 国民カード追加
     void JoinPeople()
     {
-        Debug.Log("国民追加ステート処理開始");
         if (m_StateValue == 1)
         {
+            Debug.Log("国民追加ステート処理開始");
             // 現在のターン側
             Side turnSide = BattleMgr.instance.GetTurnSide();
             // ターン側のカードが入っていないカードエリアリスト
@@ -136,6 +165,11 @@ public class JoinPhase : MonoBehaviour
                     nextState = await StateInit();
                     Debug.Log("次のステートへ");
                     break;
+                case State.eState_SelectField:
+                    Debug.Log("場選択ステート");
+                    nextState = await StateSelectField();
+                    Debug.Log("次のステートへ");
+                    break;
                 case State.eState_JoinPeople:
                     Debug.Log("国民追加ステート");
                     nextState = await StateJoinPeople();
@@ -160,6 +194,13 @@ public class JoinPhase : MonoBehaviour
     }
     // 初期化
     async UniTask<State> StateInit()
+    {
+        await UniTask.WaitUntil(() => IsNextStateFlag());
+        // 次のステートへ
+        return GetNextState();
+    }
+    // 参加させる場を選択
+    async UniTask<State> StateSelectField()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
