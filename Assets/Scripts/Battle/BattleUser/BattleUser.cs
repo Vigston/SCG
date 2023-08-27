@@ -11,7 +11,7 @@ public class BattleUser : MonoBehaviour
     {
         eState_Init,
         eState_Main,
-        eState_Think,
+        eState_ThinkSelectCardArea,
         eState_End,
     }
 
@@ -27,13 +27,22 @@ public class BattleUser : MonoBehaviour
     // ステートごとの実行回数
     int m_StateValue = 0;
 
+    // ===思考結果変数===
+    [SerializeField, ReadOnly]
+    // 選択したカードエリア
+    CardArea m_SelectedCardArea;
+
     // ===フラグ===
     // ステートの更新フラグ
     bool m_NextStateFlag = false;
+
+    // カードエリア選択フラグ
+    bool m_SelectCardAreaFlag = false;
+    // カードがいないエリアを選択するフラグ
+    bool m_SelectIsNoCardArea = false;
+
     // ユーザー終了フラグ
     bool m_UserEndFlag = false;
-    // 思考フラグ
-    bool m_ThinkFlag = false;
 
     // Start is called before the first frame update
     void Start()
@@ -56,8 +65,8 @@ public class BattleUser : MonoBehaviour
             case State.eState_Main:
                 Main();
                 break;
-            case State.eState_Think:
-                Think();
+            case State.eState_ThinkSelectCardArea:
+                ThinkSelectCardField();
                 break;
             case State.eState_End:
                 End();
@@ -89,17 +98,17 @@ public class BattleUser : MonoBehaviour
             Debug.Log("メインステート処理開始");
         }
 
-        // 思考フラグが立っているなら
-        if(m_ThinkFlag)
+        // カードエリア選択フラグが立っているなら
+        if (m_SelectCardAreaFlag)
         {
-            // 思考へ
-            SetNextStateAndFlag(State.eState_Think);
+            // カードエリア選択フラグへ
+            SetNextStateAndFlag(State.eState_ThinkSelectCardArea);
             Debug.Log("メインステート処理終了");
             return;
         }
 
         // ユーザーの終了フラグが立っているなら
-        if(m_UserEndFlag)
+        if (m_UserEndFlag)
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
@@ -108,17 +117,46 @@ public class BattleUser : MonoBehaviour
         }
     }
 
-    // 思考処理
-    void Think()
+    // カードエリア選択思考処理
+    void ThinkSelectCardField()
     {
         if (m_StateValue == 1)
         {
+            // 選択したカードエリアを初期化。
+            m_SelectedCardArea = null;
             Debug.Log("思考ステート処理開始");
         }
 
-        // メイン処理へ
-        SetNextStateAndFlag(State.eState_Main);
-        Debug.Log("思考ステート処理終了");
+        // 左クリックをしたら。
+        if(Input.GetMouseButtonDown(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            foreach (RaycastHit hit in Physics.RaycastAll(ray))
+            {
+                // カードエリアをクリックしているなら。
+                if (hit.collider.tag == "CardArea")
+                {
+                    // カードエリアを取得。
+                    if(hit.transform.gameObject)
+                    {
+                        m_SelectedCardArea = hit.transform.gameObject.GetComponent<CardArea>();
+                    }
+                }
+            }
+        }
+
+        // カードエリアを選択しているならメイン処理へ。
+        if (m_SelectedCardArea != null)
+        {
+            // フラグの初期化
+            m_SelectCardAreaFlag = false;
+
+            // メイン処理へ
+            SetNextStateAndFlag(State.eState_Main);
+            Debug.Log("思考ステート処理終了");
+            return;
+        }
     }
 
     // 終了
@@ -127,11 +165,10 @@ public class BattleUser : MonoBehaviour
         if (m_StateValue == 1)
         {
             Debug.Log("終了ステート処理開始");
+            // メインフェイズに移動。
+            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+            Debug.Log("終了ステート処理終了");
         }
-
-        // メインフェイズに移動。
-        BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-        Debug.Log("終了ステート処理終了");
     }
 
     // --システム--
@@ -161,9 +198,9 @@ public class BattleUser : MonoBehaviour
                     nextState = await StateMain();
                     Debug.Log("次のステートへ");
                     break;
-                case State.eState_Think:
+                case State.eState_ThinkSelectCardArea:
                     Debug.Log("思考ステート");
-                    nextState = await StateThink();
+                    nextState = await StateThinkSelectCardField();
                     Debug.Log("次のステートへ");
                     break;
                 case State.eState_End:
@@ -198,7 +235,7 @@ public class BattleUser : MonoBehaviour
         return GetNextState();
     }
     // 思考処理
-    async UniTask<State> StateThink()
+    async UniTask<State> StateThinkSelectCardField()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
@@ -255,6 +292,12 @@ public class BattleUser : MonoBehaviour
         return m_NextState == _nextState;
     }
 
+    // ---思考結果---
+    public CardArea GetSelectedCardArea()
+    {
+        return m_SelectedCardArea;
+    }
+
     // --フラグ--
     public void SetNextStateFlag()
     {
@@ -273,20 +316,27 @@ public class BattleUser : MonoBehaviour
         SetNextStateFlag();
     }
 
+    // カードエリア選択開始
+    public void StartThinkSelectCardArea(bool _selectFlag ,bool _isNoCardArea)
+    {
+        m_SelectCardAreaFlag = _selectFlag;
+        m_SelectIsNoCardArea = _isNoCardArea;
+    }
+
+    // カードエリア選択フラグが立っているか。
+    public bool IsSelectCardAreaFlag()
+    {
+        return m_SelectCardAreaFlag;
+    }
+
+    // ユーザー終了フラグ設定。
     public void SetUserEndFlag(bool _flag)
     {
         m_UserEndFlag = _flag;
     }
+    // ユーザー終了フラグが立っているか。
     public bool IsUserEndFlag()
     {
         return m_UserEndFlag;
-    }
-    public void SetThinkFlag(bool _flag)
-    {
-        m_ThinkFlag = _flag;
-    }
-    public bool IsThinkFlag()
-    {
-        return m_ThinkFlag;
     }
 }

@@ -11,12 +11,15 @@ public class JoinPhase : MonoBehaviour
     public enum State
     {
         eState_Init,
+        eState_Start,
         eState_SelectField,
         eState_JoinPeople,
         eState_End,
     }
 
     // ===変数===
+    // ターン側
+    Side m_TurnSide;
     // 現在のステート
     State m_State;
     // 次のステート
@@ -31,7 +34,6 @@ public class JoinPhase : MonoBehaviour
 
     private void Awake()
     {
-
     }
 
     // Start is called before the first frame update
@@ -70,15 +72,22 @@ public class JoinPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        Debug.Log("初期化ステート処理開始");
-        // 参加する場を選択へ
-        SetNextStateAndFlag(State.eState_SelectField);
-        Debug.Log("初期化ステート処理終了");
+        if (m_StateValue == 1)
+        {
+            Debug.Log("初期化ステート処理開始");
+
+            // ターン側を取得
+            m_TurnSide = BattleMgr.instance.GetTurnSide();
+
+            // 参加する場を選択へ
+            SetNextStateAndFlag(State.eState_SelectField);
+            Debug.Log("初期化ステート処理終了");
+        }
     }
     // 参加する場を選択
     void SelectField()
     {
-        if(m_StateValue == 1)
+        if (m_StateValue == 1)
         {
             Debug.Log("場選択ステート処理開始");
         }
@@ -89,16 +98,22 @@ public class JoinPhase : MonoBehaviour
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
             Debug.Log("場選択ステート処理終了");
+            return;
         }
 
-        // 選択処理
+        if (m_StateValue == 1)
+        {
+            // 選択処理開始。
+            bool isNoCardArea = true;
+            BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide, isNoCardArea);
+        }
 
-
-        if(m_StateValue == 1)
+        // 選択思考が終わっているなら次へ
+        if (!BattleUserMgr.instance.IsThinkCardAreaSelectFromSide(m_TurnSide))
         {
             // 国民カード追加へ
             SetNextStateAndFlag(State.eState_JoinPeople);
-            Debug.Log("場選択ステート処理終了");
+            return;
         }
     }
     // 国民カード追加
@@ -107,13 +122,12 @@ public class JoinPhase : MonoBehaviour
         if (m_StateValue == 1)
         {
             Debug.Log("国民追加ステート処理開始");
-            // 現在のターン側
-            Side turnSide = BattleMgr.instance.GetTurnSide();
-            // ターン側のカードが入っていないカードエリアリスト
-            List<CardArea> cardAreaList = BattleStageMgr.instance.GetCardAreaFromSideEmptyCard(turnSide);
+
+            // ターン側のユーザーを取得。
+            BattleUser battleUser = BattleUserMgr.instance.GetUser(m_TurnSide);
 
             // 追加するカードエリア
-            CardArea joinArea = cardAreaList.FirstOrDefault();
+            CardArea joinArea = battleUser.GetSelectedCardArea();
 
             if(joinArea != null)
             {
@@ -137,10 +151,13 @@ public class JoinPhase : MonoBehaviour
     // 終了
     void End()
     {
-        Debug.Log("終了ステート処理開始");
-        // メインフェイズに移動。
-        BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-        Debug.Log("終了ステート処理終了");
+        if (m_StateValue == 1)
+        {
+            Debug.Log("終了ステート処理開始");
+            // メインフェイズに移動。
+            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+            Debug.Log("終了ステート処理終了");
+        }
     }
 
     // --システム--

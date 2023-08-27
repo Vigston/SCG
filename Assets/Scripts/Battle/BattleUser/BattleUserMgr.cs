@@ -10,9 +10,7 @@ public class BattleUserMgr : MonoBehaviour
     public static BattleUserMgr instance;
 
     [SerializeField]
-    private BattleUser m_UserPlayer;
-    [SerializeField]
-    private BattleUser m_UserEnemy;
+    private BattleUser[] m_BattleUsers = new BattleUser[(int)Side.eSide_Max];
 
     [SerializeField]
     private Side m_OperateUserSide;
@@ -52,26 +50,40 @@ public class BattleUserMgr : MonoBehaviour
     }
 
     // ===関数===
+    // ---思考---
+    // 指定側のユーザーがカードエリア選択思考を行っているか
+    public bool IsThinkCardAreaSelectFromSide(Side _side)
+    {
+        BattleUser battleUser = GetUser(_side);
+
+        return battleUser.IsSelectCardAreaFlag();
+    }
+
     // ---ユーザー---
     // プレイヤーユーザー設定
     public void SetPlayerUser(BattleUser playerUser)
     {
-        m_UserPlayer = playerUser;
+        m_BattleUsers[(int)Side.eSide_Player] = playerUser;
     }
     // 敵ユーザー設定
     public void SetEnemyUser(BattleUser enemyUser)
     {
-        m_UserEnemy = enemyUser;
+        m_BattleUsers[(int)Side.eSide_Enemy] = enemyUser;
     }
     // プレイヤーユーザー取得
     public BattleUser GetPlayerUser()
     {
-        return m_UserPlayer;
+        return m_BattleUsers[(int)Side.eSide_Player];
     }
     // 敵ユーザー取得
     public BattleUser GetEnemyUser()
     {
-        return m_UserEnemy;
+        return m_BattleUsers[(int)Side.eSide_Enemy];
+    }
+    // 指定側のユーザー取得
+    public BattleUser GetUser(Side side)
+    {
+        return m_BattleUsers[(int)side];
     }
 
     // ---操作側---
@@ -93,15 +105,6 @@ public class BattleUserMgr : MonoBehaviour
     // 操作側のユーザーを取得
     public BattleUser GetOperateUser()
     {
-        if(m_OperateUserSide == Side.eSide_Player)
-        {
-            return m_UserPlayer;
-        }
-        else if(m_OperateUserSide == Side.eSide_Enemy)
-        {
-            return m_UserEnemy;
-        }
-
-        return null;
+        return m_BattleUsers[(int)m_OperateUserSide];
     }
 }

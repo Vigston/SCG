@@ -14,6 +14,7 @@ public class DebugMgr : MonoBehaviour
     public bool m_DebugModeFlag;
 
     // バトル情報テキスト
+    public TextMeshProUGUI m_TextOperateUser;
     public TextMeshProUGUI m_TextTurnNum;
     public TextMeshProUGUI m_TextTurnSide;
     public TextMeshProUGUI m_TextPhase;
@@ -66,6 +67,7 @@ public class DebugMgr : MonoBehaviour
 
         // ↓更新処理↓
         // バトル情報
+        m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetOperateUserSide().ToString();
         m_TextTurnNum.text = "ターン数：" + BattleMgr.instance.GetTurnNum();
         m_TextTurnSide.text = "ターン側：" + BattleMgr.instance.GetTurnSide().ToString();
         m_TextPhase.text = "フェイズ：" + BattleMgr.instance.GetPhaseType().ToString();

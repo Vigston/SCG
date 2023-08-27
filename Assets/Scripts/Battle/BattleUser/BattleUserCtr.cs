@@ -27,6 +27,15 @@ public class BattleUserCtr : MonoBehaviour
         
     }
 
+    // 指定側のユーザーのカードエリア選択思考処理を開始する
+    public void SelectThinkCardAreaUserFromSide(Side _side, bool _isNoCardArea)
+    {
+        bool isThinkFlag = true;
+        BattleUser battleUser = BattleUserMgr.instance.GetUser(_side);
+
+        battleUser.StartThinkSelectCardArea(isThinkFlag, _isNoCardArea);
+    }
+
     // インスタンスを作成
     public bool CreateInstance()
     {
