@@ -112,9 +112,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Side: 0
   m_Position: 0
+  m_Status: 0
   m_Kind: 0
   m_AppendKindList: 
   m_IsEnable: 1
   m_IsDraw: 1
   m_EntryTurn: 0
   m_ActionNum: 0
+  m_Military: {fileID: 0}
+  m_Science: {fileID: 0}
+  m_Spy: {fileID: 0}
+  m_Merchant: {fileID: 0}
