@@ -98,6 +98,12 @@ public class BattleUser : MonoBehaviour
             Debug.Log("メインステート処理開始");
         }
 
+        // 操作側
+        Side operateSide = BattleUserMgr.instance.GetOperateUserSide();
+        
+        // 操作側じゃないならはじく
+        if(operateSide != GetSide()) { return; }
+
         // カードエリア選択フラグが立っているなら
         if (m_SelectCardAreaFlag)
         {
@@ -137,10 +143,19 @@ public class BattleUser : MonoBehaviour
                 // カードエリアをクリックしているなら。
                 if (hit.collider.tag == "CardArea")
                 {
+                    // 操作側
+                    Side operateSide = BattleUserMgr.instance.GetOperateUserSide();
                     // カードエリアを取得。
-                    if(hit.transform.gameObject)
+                    GameObject cardAreaObject = hit.transform.gameObject;
+
+                    // 選択したカードエリア設定
+                    if (cardAreaObject)
                     {
-                        m_SelectedCardArea = hit.transform.gameObject.GetComponent<CardArea>();
+                        CardArea cardArea = hit.transform.gameObject.GetComponent<CardArea>();
+
+                        // 操作側じゃないカードエリアを選択しているなら設定しない
+                        if (operateSide != cardArea.GetSide()) { return; }
+                        m_SelectedCardArea = cardArea;
                     }
                 }
             }
