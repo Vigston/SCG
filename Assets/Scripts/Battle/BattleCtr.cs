@@ -1,12 +1,12 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 
 public class BattleCtr : MonoBehaviour
 {
-    // =================•Ï”================
-    // ƒCƒ“ƒXƒ^ƒ“ƒX
+    // =================å¤‰æ•°================
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
     public static BattleCtr instance;
 
     void Awake()
@@ -26,21 +26,21 @@ public class BattleCtr : MonoBehaviour
         
     }
 
-    // =================ŠÖ”================
-    // ƒCƒ“ƒXƒ^ƒ“ƒX‚ğì¬
+    // =================é–¢æ•°================
+    // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ã‚’ä½œæˆ
     public bool CreateInstance()
     {
-        // Šù‚ÉƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬‚³‚ê‚Ä‚¢‚È‚¯‚ê‚Îì¬‚·‚é
+        // æ—¢ã«ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆã•ã‚Œã¦ã„ãªã‘ã‚Œã°ä½œæˆã™ã‚‹
         if (instance == null)
         {
-            // ì¬
+            // ä½œæˆ
             instance = this;
         }
 
-        // ƒCƒ“ƒXƒ^ƒ“ƒX‚ªì¬Ï‚İ‚È‚çI—¹
+        // ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒä½œæˆæ¸ˆã¿ãªã‚‰çµ‚äº†
         if (instance != null) { return true; }
 
-        Debug.LogError("BattleCtr‚ÌƒCƒ“ƒXƒ^ƒ“ƒX‚ª¶¬‚Å‚«‚Ü‚¹‚ñ‚Å‚µ‚½");
+        Debug.LogError("BattleCtrã®ã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹ãŒç”Ÿæˆã§ãã¾ã›ã‚“ã§ã—ãŸ");
         return false;
     }
 }
