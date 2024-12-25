@@ -60,26 +60,18 @@ public class BattleUserMgr : MonoBehaviour
     }
 
     // ---ユーザー---
-    // プレイヤーユーザー設定
-    public void SetPlayerUser(BattleUser playerUser)
+    // プレイヤーユーザー
+    public BattleUser GetSetPlayerUser
     {
-        m_BattleUsers[(int)Side.eSide_Player] = playerUser;
+        get { return m_BattleUsers[(int)Side.eSide_Player]; }
+        set { m_BattleUsers[(int)Side.eSide_Player] = value; }
     }
-    // 敵ユーザー設定
-    public void SetEnemyUser(BattleUser enemyUser)
-    {
-        m_BattleUsers[(int)Side.eSide_Enemy] = enemyUser;
-    }
-    // プレイヤーユーザー取得
-    public BattleUser GetPlayerUser()
-    {
-        return m_BattleUsers[(int)Side.eSide_Player];
-    }
-    // 敵ユーザー取得
-    public BattleUser GetEnemyUser()
-    {
-        return m_BattleUsers[(int)Side.eSide_Enemy];
-    }
+	// 敵ユーザー
+	public BattleUser GetSetEnemyUser
+	{
+		get { return m_BattleUsers[(int)Side.eSide_Enemy]; }
+		set { m_BattleUsers[(int)Side.eSide_Enemy] = value; }
+	}
     // 指定側のユーザー取得
     public BattleUser GetUser(Side side)
     {
@@ -87,23 +79,25 @@ public class BattleUserMgr : MonoBehaviour
     }
 
     // ---操作側---
-    // 操作ユーザー側設定
-    public void SetOperateUserSide(Side _side)
+    // 操作ユーザー側
+    public Side GetSetOperateUserSide
     {
-        m_OperateUserSide = _side;
-    }
-    // 操作ユーザー側取得
-    public Side GetOperateUserSide()
-    {
-        return m_OperateUserSide;
+        get { return m_OperateUserSide; }
+        set { m_OperateUserSide = value; }
     }
     // 操作ユーザー側の切り替え
     public void ChangeOperateUserSide()
     {
-        SetOperateUserSide(Common.GetRevSide(GetOperateUserSide()));
+		GetSetOperateUserSide = Common.GetRevSide(GetSetOperateUserSide);
     }
-    // 操作側のユーザーを取得
-    public BattleUser GetOperateUser()
+    // 操作側のユーザー
+    public BattleUser GetSetOperateUser
+    {
+        get { return m_BattleUsers[(int)m_OperateUserSide]; }
+        set { m_BattleUsers[(int)m_OperateUserSide] = value; }
+    }
+
+	public BattleUser GetOperateUser()
     {
         return m_BattleUsers[(int)m_OperateUserSide];
     }

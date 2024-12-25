@@ -222,7 +222,7 @@ public class BattleCard : MonoBehaviour
     // 登場したターン設定
     public void SetEntryTurn()
     {
-        int turnNum = BattleMgr.instance.GetTurnNum();
+        int turnNum = BattleMgr.instance.GetSetTurnNum;
 
         m_EntryTurn = turnNum;
     }
@@ -234,7 +234,7 @@ public class BattleCard : MonoBehaviour
     // このターンに登場したか
     public bool IsEntryThisTurn()
     {
-        int turnNum = BattleMgr.instance.GetTurnNum();
+        int turnNum = BattleMgr.instance.GetSetTurnNum;
         int entryTurn = GetEntryTurn();
 
         return turnNum == entryTurn;

@@ -72,9 +72,6 @@ public class BattleMgr : MonoBehaviour
     // フェイズオブジェクト
     public GameObject m_PhaseObject;
 
-    // データ通信オブジェクト
-    public PhotonViewData m_PhotonViewData;
-
     private void Awake()
     {
         CreateInstance();
@@ -87,18 +84,14 @@ public class BattleMgr : MonoBehaviour
 		BattleUserCtr.instance.CreatePlayerUser();
         BattleUserCtr.instance.CreateEnemyUser();
 
-		// 通信処理
-		if (PhotonNetwork.IsMasterClient)
-		{
-			// "NetworkedObject"プレパブからネットワークオブジェクトを生成する
-			m_PhotonViewData = PhotonNetwork.Instantiate("PhotonViewData", Vector3.zero, Quaternion.identity).GetComponent<PhotonViewData>();
+		// 先行後攻を決める
+		DecidePrecedingSecond();
 
-			// 先行後攻を決める
-			DecidePrecedingSecond();
-		}
+        // 通信同期
+        NetWorkSync.instance.GameInfoNetworkSync();
 
 		// スタートフェイズから始める
-		SetPhase(PhaseType.ePhaseType_Start);
+		GetSetPhaseType = PhaseType.ePhaseType_Start;
         // フェイズループ処理
         PhaseLoop().Forget();
         // 勝敗更新
@@ -159,10 +152,6 @@ public class BattleMgr : MonoBehaviour
             SetScienceValue(side, scienceValue);
         }
 
-        /////通信同期/////
-        // ターン側
-        m_TurnSide = (Side)m_PhotonViewData.GetSetFirstTurnSide;
-
 		// DebugMgrの更新リクエスト
 		DebugMgr.instance.UpdateRequest();
 
@@ -203,7 +192,7 @@ public class BattleMgr : MonoBehaviour
             // FightMgrの更新リクエスト
             UpdateRequest();
             // 次のフェイズ(ここでは現在のフェイズを代入)
-            PhaseType nextPhase = GetPhaseType();
+            PhaseType nextPhase = GetSetPhaseType;
             // 次のフェイズに移動するフラグ初期化
             m_NextPhaseFlag = false;
 
@@ -237,11 +226,12 @@ public class BattleMgr : MonoBehaviour
             // 次のフェイズが現在と同じならはじく
             if(nextPhase == m_Phase) { continue; }
 
-            // 次のフェイズを設定
-            SetPhase(nextPhase);
+			// 次のフェイズを設定
+			GetSetPhaseType = nextPhase;
 
-
-        }
+			/////通信同期/////
+			NetWorkSync.instance.GameInfoNetworkSync();
+		}
     }
     // スタートフェイズ
     async UniTask<PhaseType> PhaseStart()
@@ -258,7 +248,7 @@ public class BattleMgr : MonoBehaviour
         Destroy(m_PhaseObject.GetComponent<StartPhase>());
 
         // 次のフェイズへ
-        return GetNextPhaseType();
+        return GetSetNextPhaseType;
     }
     // ジョインフェイズ
     async UniTask<PhaseType> PhaseJoin()
@@ -271,7 +261,7 @@ public class BattleMgr : MonoBehaviour
         // フェイズオブジェクト削除
         Destroy(m_PhaseObject.GetComponent<JoinPhase>());
         // 次のフェイズへ
-        return GetNextPhaseType();
+        return GetSetNextPhaseType;
     }
     // メインフェイズ
     async UniTask<PhaseType> PhaseMain()
@@ -284,7 +274,7 @@ public class BattleMgr : MonoBehaviour
         // フェイズオブジェクト削除
         Destroy(m_PhaseObject.GetComponent<MainPhase>());
         // 次のフェイズへ
-        return GetNextPhaseType();
+        return GetSetNextPhaseType;
     }
     // エンドフェイズ
     async UniTask<PhaseType> PhaseEnd()
@@ -300,8 +290,8 @@ public class BattleMgr : MonoBehaviour
         // ターン終了処理
         TurnEnd();
 
-        // 次のフェイズへ
-        return GetNextPhaseType();
+		// 次のフェイズへ
+		return GetSetNextPhaseType;
     }
 
     // 勝敗の更新
@@ -325,11 +315,11 @@ public class BattleMgr : MonoBehaviour
         // 勝敗を設定
         if (isWin)
         {
-            m_BattleResult = BattleResult.eBattleResult_Win;
+			GetSetBattleResult = BattleResult.eBattleResult_Win;
         }
         else if (isLose)
         {
-            m_BattleResult = BattleResult.eBattleResult_Lose;
+			GetSetBattleResult = BattleResult.eBattleResult_Lose;
         }
     }
 
@@ -360,10 +350,11 @@ public class BattleMgr : MonoBehaviour
 
         return isLose;
     }
-    // 勝敗を取得
-    public BattleResult GetBattleResult()
+    // 勝敗
+    public BattleResult GetSetBattleResult
     {
-        return m_BattleResult;
+        get { return m_BattleResult; }
+        set { m_BattleResult = value; }
     }
 
     // ターンエンドフラグの設定
@@ -392,7 +383,7 @@ public class BattleMgr : MonoBehaviour
     public void TurnEnd()
     {
         // 現在のターンを逆にする
-        SetTurnSide(Common.GetRevSide(m_TurnSide));
+        GetSetTurnSide = Common.GetRevSide(m_TurnSide);
 
         // ターン終了リクエスト初期化
         m_TurnEndFlag = false;
@@ -420,7 +411,7 @@ public class BattleMgr : MonoBehaviour
         else
         {
             // 操作側をプレイヤーにする
-            BattleUserMgr.instance.SetOperateUserSide(Side.eSide_Player);
+            BattleUserMgr.instance.GetSetOperateUserSide = Side.eSide_Player;
         }
 
         Debug.Log($"'{m_TurnSide}'ターンに進む");
@@ -443,16 +434,12 @@ public class BattleMgr : MonoBehaviour
     }
 
 	// -----側-----
-	// ターン側を設定
-	public void SetTurnSide(Side _side)
-    {
-        m_TurnSide = _side;
-    }
-    // ターン側を取得
-    public Side GetTurnSide()
-    {
-        return m_TurnSide;
-    }
+	// ターン側のGetSetメソッド
+	public Side GetSetTurnSide
+	{
+		get { return m_TurnSide; }
+		set { m_TurnSide = value; }
+	}
     // 側を取得(indexから)
     public Side GetSide(int _index)
     {
@@ -487,7 +474,12 @@ public class BattleMgr : MonoBehaviour
         return (int)Side.eSide_Max;
     }
 
-    // ターン数取得
+    // ターン数
+    public int GetSetTurnNum
+    {
+        get { return m_TurnNum; }
+        set { m_TurnNum = value; }
+    }
     public int GetTurnNum()
     {
         return m_TurnNum;
@@ -496,68 +488,57 @@ public class BattleMgr : MonoBehaviour
     // 自分のターンか
     public bool IsMyTurn()
     {
-        Side turnSide = GetTurnSide();
-        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
-
-        return turnSide == userSide;
+        return GetSetTurnSide == BattleUserMgr.instance.GetSetOperateUserSide;
     }
 
 	// 先行後攻を決める
 	public void DecidePrecedingSecond()
 	{
-        // 最初のターン側
-        Side firstTurnSide = Side.eSide_None;
-
-        // 1～100までの乱数取得
-        int rnd = Random.Range(1, 101);
-
-        // 乱数値が0以下か100より大きければ異常値のためアサートを流してマスタークライアントを先行にする
-        if( rnd <= 0 || rnd > 100 )
+        if(PhotonNetwork.IsMasterClient)
         {
-            Debug.LogWarning($"先行後攻を決める際に乱数の異常値を検知：['{rnd}']");
+			// 最初のターン側
+			Side firstTurnSide = Side.eSide_None;
+
+			// 1～100までの乱数取得
+			int rnd = Random.Range(1, 101);
+
+			// 乱数値が0以下か100より大きければ異常値のためアサートを流してマスタークライアントを先行にする
+			if (rnd <= 0 || rnd > 100)
+			{
+				Debug.LogWarning($"先行後攻を決める際に乱数の異常値を検知：['{rnd}']");
 
 
-        }
+			}
 
-        // 先行処理(1～50)
-        if(rnd <= 50)
-        {
-			// ターン側を自分として設定
-			firstTurnSide = Side.eSide_Player;
+			// 先行処理(1～50)
+			if (rnd <= 50)
+			{
+				// ターン側を自分として設定
+				firstTurnSide = Side.eSide_Player;
+			}
+			// 後攻処理(51～100)
+			else
+			{
+				// ターン側を相手として設定
+				firstTurnSide = Side.eSide_Enemy;
+			}
+
+			// ターン側設定
+			GetSetTurnSide = firstTurnSide;
 		}
-        // 後攻処理(51～100)
-        else
-        {
-            // ターン側を相手として設定
-            firstTurnSide = Side.eSide_Enemy;
-		}
-
-        // ターン側設定
-		SetTurnSide(firstTurnSide);
-
-        // 通信同期処理
-		m_PhotonViewData.GetSetFirstTurnSide = (int)firstTurnSide;
 	}
 
 	// -------フェイズ------
-	// フェイズ設定。
-	public void SetPhase(PhaseType _phase)
+	public PhaseType GetSetPhaseType
     {
-        m_Phase = _phase;
+        get { return m_Phase; }
+        set { m_Phase = value; }
     }
-    public void SetNextPhase(PhaseType _nextPhase)
-    {
-        m_NextPhase = _nextPhase;
-    }
-    // フェイズ取得。
-    public PhaseType GetPhaseType()
-    {
-        return m_Phase;
-    }
-    public PhaseType GetNextPhaseType()
-    {
-        return m_NextPhase;
-    }
+	public PhaseType GetSetNextPhaseType
+	{
+		get { return m_NextPhase; }
+		set { m_NextPhase = value; }
+	}
     // 指定フェイズのオブジェクトを取得する
     public GameObject GetPhaseObject()
     {
@@ -581,7 +562,7 @@ public class BattleMgr : MonoBehaviour
     // 次のフェイズとフラグを設定
     public void SetNextPhaseAndFlag(PhaseType _nextPhase)
     {
-        SetNextPhase(_nextPhase);
+		GetSetNextPhaseType = _nextPhase;
         SetNextPhaseFlag();
     }
     // ---国民---

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
+using Photon.Pun;
 
 public class BattleUserCtr : MonoBehaviour
 {
@@ -71,10 +72,11 @@ public class BattleUserCtr : MonoBehaviour
         if(battleUser == null) { return; }
 
         // バトルユーザー設定
-        battleUser.SetSide(Side.eSide_Player);
+        battleUser.GetSetSide = Side.eSide_Player;
+        battleUser.GetSetNetWorkActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
 
-        // BattleUserMgrに設定
-        BattleUserMgr.instance.SetPlayerUser(battleUser);
+		// BattleUserMgrに設定
+		BattleUserMgr.instance.GetSetPlayerUser = battleUser;
     }
 
     // 敵ユーザー作成
@@ -95,9 +97,13 @@ public class BattleUserCtr : MonoBehaviour
         if (battleUser == null) { return; }
 
         // バトルユーザー設定
-        battleUser.SetSide(Side.eSide_Enemy);
+        battleUser.GetSetSide = Side.eSide_Enemy;
+		// プレイヤーのActorNumberを基に敵のActorNumberを設定
+		int playerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+		int enemyActorNumber = (playerActorNumber == 1) ? 2 : 1;
+		battleUser.GetSetNetWorkActorNumber = enemyActorNumber;
 
-        // BattleUserMgrに設定
-        BattleUserMgr.instance.SetEnemyUser(battleUser);
+		// BattleUserMgrに設定
+		BattleUserMgr.instance.GetSetEnemyUser = battleUser;
     }
 }

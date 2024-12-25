@@ -57,7 +57,7 @@ public class BattleCardCtr : MonoBehaviour
         GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン側
-        Side turnSide = BattleMgr.instance.GetTurnSide();
+        Side turnSide = BattleMgr.instance.GetSetTurnSide;
         // カードに設定する側
         Side cardSide = turnSide;
 
@@ -105,7 +105,7 @@ public class BattleCardCtr : MonoBehaviour
         GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン
-        Side turnSide = BattleMgr.instance.GetTurnSide();
+        Side turnSide = BattleMgr.instance.GetSetTurnSide;
         // カードに設定する側
         Side cardSide = turnSide;
 

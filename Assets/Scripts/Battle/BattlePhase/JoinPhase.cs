@@ -77,7 +77,7 @@ public class JoinPhase : MonoBehaviour
             Debug.Log("初期化ステート処理開始");
 
             // ターン側を取得
-            m_TurnSide = BattleMgr.instance.GetTurnSide();
+            m_TurnSide = BattleMgr.instance.GetSetTurnSide;
 
             // 参加する場を選択へ
             SetNextStateAndFlag(State.eState_SelectField);

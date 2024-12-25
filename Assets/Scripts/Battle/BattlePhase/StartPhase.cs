@@ -82,7 +82,7 @@ public class StartPhase : MonoBehaviour
 
             // Gold追加処理
             // ユーザー側
-            Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+            Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
             // 場にいる商人数
             int merchantNum = BattleCardMgr.instance.GetCardNumFromAppendKind(userSide, BattleCard.JobKind.eAppendKind_Merchant);
             // 追加されるGold

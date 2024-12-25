@@ -64,7 +64,7 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                 if (Common.IsMyTurnAndMyCard(battleCard))
                 {
                     Military military = battleCard.GetMilitary();
-                    Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+                    Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
 
                     // 軍事カードじゃないならはじく
                     if(military == null) { return; }
@@ -88,7 +88,7 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
     public bool IsArmament()
     {
         // ユーザー側
-        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+        Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
         // ゴールド数
         int GoldValue = BattleMgr.instance.GetGoldValue(userSide);
 

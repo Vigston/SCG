@@ -55,7 +55,7 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                     // 自分のターンなら
                     if(BattleMgr.instance.IsMyTurn())
                     {
-                        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+                        Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
 
                         BattleArea battleArea = hitObj.GetComponent<BattleArea>();
 

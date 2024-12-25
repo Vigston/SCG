@@ -73,8 +73,9 @@ public class EndPhase : MonoBehaviour
         if (m_StateValue == 1)
         {
             Debug.Log("終了ステート処理開始");
-            // スタートフェイズに移動。
-            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
+
+			// スタートフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
             Debug.Log("終了ステート処理終了");
         }
     }

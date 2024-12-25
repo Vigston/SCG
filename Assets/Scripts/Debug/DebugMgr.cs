@@ -67,11 +67,11 @@ public class DebugMgr : MonoBehaviour
 
         // ↓更新処理↓
         // バトル情報
-        m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetOperateUserSide().ToString();
-        m_TextTurnNum.text = "ターン数：" + BattleMgr.instance.GetTurnNum();
-        m_TextTurnSide.text = "ターン側：" + BattleMgr.instance.GetTurnSide().ToString();
-        m_TextPhase.text = "フェイズ：" + BattleMgr.instance.GetPhaseType().ToString();
-        m_TextBattleResult.text = "勝敗：" + BattleMgr.instance.GetBattleResult().ToString();
+        m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetSetOperateUserSide.ToString();
+        m_TextTurnNum.text = "ターン数：" + BattleMgr.instance.GetSetTurnNum;
+        m_TextTurnSide.text = "ターン側：" + BattleMgr.instance.GetSetTurnSide.ToString();
+        m_TextPhase.text = "フェイズ：" + BattleMgr.instance.GetSetPhaseType.ToString();
+        m_TextBattleResult.text = "勝敗：" + BattleMgr.instance.GetSetBattleResult.ToString();
 
         // プレイヤー情報
         m_TextGoldValue_P.text = "Gold：" + BattleMgr.instance.GetGoldValue(Side.eSide_Player).ToString();

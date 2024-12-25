@@ -53,7 +53,7 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
             // ターゲットがカードの場合
             if(targetCard != null)
             {
-                Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+                Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
                 // 対象カードが自分のカードなら
                 if (targetCard.GetSide() == userSide)
                 {

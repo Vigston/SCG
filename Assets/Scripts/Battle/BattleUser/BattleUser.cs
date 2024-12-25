@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 
 public class BattleUser : MonoBehaviour
 {
@@ -22,8 +23,11 @@ public class BattleUser : MonoBehaviour
     // 現在のステート
     [SerializeField, ReadOnly]
     State m_State;
-    // 次のステート
-    State m_NextState;
+	// ネットワーク固有番号
+	[SerializeField, ReadOnly]
+	int m_NetWorkActorNumber;
+	// 次のステート
+	State m_NextState;
     // ステートごとの実行回数
     int m_StateValue = 0;
 
@@ -47,8 +51,8 @@ public class BattleUser : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 初期化ステートから始める
-        SetState(State.eState_Init);
+		// 初期化ステートから始める
+		GetSetState = State.eState_Init;
         // ステートループ処理
         StateLoop().Forget();
     }
@@ -72,7 +76,7 @@ public class BattleUser : MonoBehaviour
                 End();
                 break;
             default:
-                Debug.Log("登録されていないステートです。");
+                Debug.LogWarning($"登録されていないステートです。{GetSetState}");
                 break;
         }
     }
@@ -82,12 +86,12 @@ public class BattleUser : MonoBehaviour
     {
         if (m_StateValue == 1)
         {
-            Debug.Log("初期化ステート処理開始");
+            Debug.Log($"[{ GetSetSide }]初期化ステート処理開始");
         }
         
         // メイン処理へ
         SetNextStateAndFlag(State.eState_Main);
-        Debug.Log("初期化ステート処理終了");
+        Debug.Log($"[{ GetSetSide }]初期化ステート処理終了");
     }
 
     // メイン処理
@@ -95,21 +99,21 @@ public class BattleUser : MonoBehaviour
     {
         if(m_StateValue == 1)
         {
-            Debug.Log("メインステート処理開始");
+            Debug.Log($"[{GetSetSide}]メインステート処理開始");
         }
 
         // 操作側
-        Side operateSide = BattleUserMgr.instance.GetOperateUserSide();
+        Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
         
         // 操作側じゃないならはじく
-        if(operateSide != GetSide()) { return; }
+        if(operateSide != GetSetSide) { return; }
 
         // カードエリア選択フラグが立っているなら
         if (m_SelectCardAreaFlag)
         {
             // カードエリア選択フラグへ
             SetNextStateAndFlag(State.eState_ThinkSelectCardArea);
-            Debug.Log("メインステート処理終了");
+            Debug.Log($"[{GetSetSide}]メインステート処理終了");
             return;
         }
 
@@ -118,7 +122,7 @@ public class BattleUser : MonoBehaviour
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
-            Debug.Log("メインステート処理終了");
+            Debug.Log($"[{GetSetSide}]メインステート処理終了");
             return;
         }
     }
@@ -130,7 +134,7 @@ public class BattleUser : MonoBehaviour
         {
             // 選択したカードエリアを初期化。
             m_SelectedCardArea = null;
-            Debug.Log("思考ステート処理開始");
+            Debug.Log($"[{GetSetSide}]思考ステート処理開始");
         }
 
         // 左クリックをしたら。
@@ -144,7 +148,7 @@ public class BattleUser : MonoBehaviour
                 if (hit.collider.tag == "CardArea")
                 {
                     // 操作側
-                    Side operateSide = BattleUserMgr.instance.GetOperateUserSide();
+                    Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
                     // カードエリアを取得。
                     GameObject cardAreaObject = hit.transform.gameObject;
 
@@ -169,7 +173,7 @@ public class BattleUser : MonoBehaviour
 
             // メイン処理へ
             SetNextStateAndFlag(State.eState_Main);
-            Debug.Log("思考ステート処理終了");
+            Debug.Log($"[{GetSetSide}]思考ステート処理終了");
             return;
         }
     }
@@ -179,60 +183,60 @@ public class BattleUser : MonoBehaviour
     {
         if (m_StateValue == 1)
         {
-            Debug.Log("終了ステート処理開始");
+            Debug.Log($"[{GetSetSide}]終了ステート処理開始");
             // メインフェイズに移動。
             BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-            Debug.Log("終了ステート処理終了");
+            Debug.Log($"[{GetSetSide}]終了ステート処理終了");
         }
     }
 
     // --システム--
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop起動");
+        Debug.Log($"[{GetSetSide}]StateLoop起動");
         while (true)
         {
             // ステート更新処理
-            Debug.Log("ステート更新！！");
-            // 次のステート更新(今のステートに設定)
-            SetNextState(m_State);
-            // 次のステート
-            State nextState = GetNextState();
+            Debug.Log($"[{GetSetSide}]ステート更新！！");
+			// 次のステート更新(今のステートに設定)
+			GetSetNextState = m_State;
+			// 次のステート
+			State nextState = GetSetNextState;
             // 次のステートに移動するフラグ初期化
             m_NextStateFlag = false;
 
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("初期化ステート");
+                    Debug.Log($"[{GetSetSide}]初期化ステート");
                     nextState = await StateInit();
-                    Debug.Log("次のステートへ");
+                    Debug.Log($"[{GetSetSide}]次のステートへ：{GetSetNextState}");
                     break;
                 case State.eState_Main:
-                    Debug.Log("メインステート");
+                    Debug.Log($"[{GetSetSide}]メインステート");
                     nextState = await StateMain();
-                    Debug.Log("次のステートへ");
+                    Debug.Log($"[{GetSetSide}]次のステートへ：{GetSetNextState}");
                     break;
                 case State.eState_ThinkSelectCardArea:
-                    Debug.Log("思考ステート");
+                    Debug.Log($"[{GetSetSide}]思考ステート");
                     nextState = await StateThinkSelectCardField();
-                    Debug.Log("次のステートへ");
+                    Debug.Log($"[{GetSetSide}]次のステートへ：{GetSetNextState}");
                     break;
                 case State.eState_End:
-                    Debug.Log("終了ステート");
+                    Debug.Log($"[{GetSetSide}]終了ステート");
                     nextState = await StateEnd();
-                    Debug.Log("次のステートへ");
+                    Debug.Log($"[{GetSetSide}]次のステートへ：{GetSetNextState}");
                     break;
                 default:
-                    Debug.Log("StateLoopに記載されていないフェイズに遷移しようとしています");
+                    Debug.Log($"[{GetSetSide}]StateLoopに記載されていないフェイズに遷移しようとしています");
                     break;
             }
 
             // 次のステートが現在と同じならはじく
             if (nextState == m_State) { continue; }
 
-            // 次のステートを設定
-            SetState(nextState);
+			// 次のステートを設定
+			GetSetState = nextState;
         }
     }
     // 初期化
@@ -240,21 +244,21 @@ public class BattleUser : MonoBehaviour
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
-        return GetNextState();
+        return GetSetNextState;
     }
     // メイン処理
     async UniTask<State> StateMain()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
-        return GetNextState();
+        return GetSetNextState;
     }
     // 思考処理
     async UniTask<State> StateThinkSelectCardField()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
-        return GetNextState();
+        return GetSetNextState;
     }
     // 終了
     async UniTask<State> StateEnd()
@@ -262,39 +266,28 @@ public class BattleUser : MonoBehaviour
         await UniTask.WaitUntil(() => IsNextStateFlag());
 
         // 次のステートへ
-        return GetNextState();
+        return GetSetNextState;
     }
 
     // --側--
-    // 側設定
-    public void SetSide(Side _side)
+    public Side GetSetSide
     {
-        m_Side = _side;
-    }
-    // 側取得
-    public Side GetSide()
-    {
-        return m_Side;
+        get { return m_Side; }
+        set { m_Side = value; }
     }
 
     // --ステート--
-    // ステート設定
-    public void SetState(State _state)
+    // ステート
+    public State GetSetState
     {
-        m_State = _state;
+        get { return m_State; }
+        set { m_State = value; }
     }
-    public void SetNextState(State _nextState)
+    // 次のステート
+    public State GetSetNextState
     {
-        m_NextState = _nextState;
-    }
-    // ステート取得
-    public State GetState()
-    {
-        return m_State;
-    }
-    public State GetNextState()
-    {
-        return m_NextState;
+        get { return m_NextState; }
+        set { m_NextState = value; }
     }
     // 指定のステートか
     public bool IsState(State _state)
@@ -327,12 +320,19 @@ public class BattleUser : MonoBehaviour
     // 次のステートとフラグを設定
     public void SetNextStateAndFlag(State _nextState)
     {
-        SetNextState(_nextState);
+        GetSetNextState = _nextState;
         SetNextStateFlag();
     }
 
-    // カードエリア選択開始
-    public void StartThinkSelectCardArea(bool _selectFlag ,bool _isNoCardArea)
+    // --ネットワーク固有番号--
+    public int GetSetNetWorkActorNumber
+    {
+        get { return m_NetWorkActorNumber; }
+        set { m_NetWorkActorNumber = value; }
+    }
+
+	// カードエリア選択開始
+	public void StartThinkSelectCardArea(bool _selectFlag ,bool _isNoCardArea)
     {
         m_SelectCardAreaFlag = _selectFlag;
         m_SelectIsNoCardArea = _isNoCardArea;

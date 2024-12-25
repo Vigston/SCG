@@ -96,8 +96,8 @@ public static class Common
     {
         if(battleCard == null) { return false; }
 
-        Side turnSide = BattleMgr.instance.GetTurnSide();
-        Side userSide = BattleUserMgr.instance.GetOperateUserSide();
+        Side turnSide = BattleMgr.instance.GetSetTurnSide;
+        Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
         Side cardSide = battleCard.GetSide();
 
         return turnSide == userSide && cardSide == userSide;
