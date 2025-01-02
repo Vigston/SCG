@@ -27,8 +27,20 @@ public class OnlineManager : MonoBehaviourPunCallbacks
 
     public void QuickMatch()
     {
-        PhotonNetwork.JoinRandomRoom();
-    }
+        if(PhotonNetwork.IsConnected == false)
+        {
+            Debug.LogError("クライアントがサーバーに接続されていないのでクイックマッチを行えませんでした。");
+            return;
+        }
+
+		if (PhotonNetwork.InLobby == false)
+		{
+			Debug.LogError("クライアントがロビーに接続されていないのでクイックマッチを行えませんでした。");
+            return;
+		}
+
+		PhotonNetwork.JoinRandomRoom();
+	}
 
     // サーバーに接続した時。
     public override void OnConnectedToMaster()

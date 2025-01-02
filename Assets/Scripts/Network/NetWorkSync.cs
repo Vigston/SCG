@@ -4,6 +4,7 @@ using UnityEngine;
 using battleTypes;
 using Photon.Realtime;
 using static BattleMgr;
+using UnityEngine.Rendering;
 
 // ネットワーク通信同期オブジェクト
 public class NetWorkSync : MonoBehaviourPunCallbacks
@@ -45,15 +46,8 @@ public class NetWorkSync : MonoBehaviourPunCallbacks
 	// ゲーム情報の通信同期処理(※重いので多用厳禁※)
 	public bool GameInfoNetworkSync()
 	{
-		// マスタークライアント以外は処理を行わない。
-		if (PhotonNetwork.IsMasterClient == false) { return false; }
-
-		// 切断されていたら通信同期失敗としてはじく。
-		if (PhotonNetwork.NetworkClientState == ClientState.Disconnected)
-		{
-			Debug.LogError($"通信が切断されているので通信同期を行えませんでした。[NetworkClientState：{PhotonNetwork.NetworkClientState}]");
-			return false;
-		}
+		// 通信同期の実行条件を満たしていないなら行わない
+		if(IsExeNetworkSync() == false) { return false; }
 
 		/////通信同期/////
 		// ターン数
@@ -65,10 +59,41 @@ public class NetWorkSync : MonoBehaviourPunCallbacks
 		// 勝敗
 		photonView.RPC("SetSyncBattleResult", RpcTarget.Others, BattleMgr.instance.GetSetBattleResult);
 		// 操作側
-		//photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateUserSide);
+		photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateUserSide);
 
 		Debug.Log($"通信同期が終了しました：ActorNumber[{PhotonNetwork.LocalPlayer.ActorNumber}]");
 		// 正常に終了している
+		return true;
+	}
+
+	// 通信同期の実行条件を満たしているか
+	public bool IsExeNetworkSync()
+	{
+		// 操作ユーザー
+		BattleUser operateUser = BattleUserMgr.instance.GetSetOperateUser;
+
+		// 通信接続ができていないならはじく。
+		if(PhotonNetwork.IsConnected == false)
+		{
+			Debug.Log($"通信接続が正常に行われていないので通信同期を行いません。通信接続状況：{PhotonNetwork.IsConnected}");
+			return false;
+		}
+
+		// 操作側のクライアントじゃないならはじく。
+		if (operateUser.GetSetNetWorkActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+		{
+			Debug.Log($"操作側のクライアントじゃないので通信同期を行いません。操作側ActorNumber：{operateUser.GetSetNetWorkActorNumber}｜ローカルActorNumber：{PhotonNetwork.LocalPlayer.ActorNumber}");
+			return false;
+		}
+
+		// 切断されていたら通信同期失敗としてはじく。
+		if (PhotonNetwork.NetworkClientState == ClientState.Disconnected)
+		{
+			Debug.LogError($"通信が切断されているので通信同期を行えませんでした。[NetworkClientState：{PhotonNetwork.NetworkClientState}]");
+			return false;
+		}
+
+		// 通信同期可能
 		return true;
 	}
 
@@ -76,32 +101,36 @@ public class NetWorkSync : MonoBehaviourPunCallbacks
 	[PunRPC]
 	public void SetSyncTurnNum(int turnNum)
 	{
+		Debug.Log($"通信同期(SetSyncTurnNum)：{turnNum}");
 		BattleMgr.instance.GetSetTurnNum = turnNum;
 	}
 	// 相手側にターン側の同期を行う
 	[PunRPC]
-	public void SetSyncTurnSide(Side turnSide)
+	public void SetSyncTurnSide(int turnSide)
 	{
-		BattleMgr.instance.GetSetTurnSide = Common.GetRevSide(turnSide);
+		Debug.Log($"通信同期(SetSyncTurnSide)：{turnSide}");
+		BattleMgr.instance.GetSetTurnSide = Common.GetRevSide((Side)turnSide);
 	}
 	// 相手側にフェイズの同期を行う
 	[PunRPC]
-	public void SetSyncPhaseType(PhaseType phaseType)
+	public void SetSyncPhaseType(int phaseType)
 	{
-		BattleMgr.instance.GetSetPhaseType = phaseType;
+		Debug.Log($"通信同期(SetSyncPhaseType)：{phaseType}");
+		BattleMgr.instance.GetSetPhaseType = (PhaseType)phaseType;
 	}
 	// 相手側に勝敗の同期を行う
 	[PunRPC]
-	public void SetSyncBattleResult(BattleResult battleResult)
+	public void SetSyncBattleResult(int battleResult)
 	{
-		BattleMgr.instance.GetSetBattleResult = battleResult;
+		Debug.Log($"通信同期(SetSyncBattleResult)：{battleResult}");
+		BattleMgr.instance.GetSetBattleResult = (BattleResult)battleResult;
 	}
-	/*
+	
 	// 相手側に操作側プレイヤーの同期を行う
 	[PunRPC]
-	public void SetSyncOperateUserSide(Side operateUserSide)
+	public void SetSyncOperateUserSide(int operateUserSide)
 	{
-		BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateUserSide);
+		Debug.Log($"通信同期(SetSyncOperateUserSide)：{operateUserSide}");
+		BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide((Side)operateUserSide);
 	}
-	*/
 }

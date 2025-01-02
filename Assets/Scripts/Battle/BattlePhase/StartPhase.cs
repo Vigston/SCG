@@ -11,6 +11,7 @@ public class StartPhase : MonoBehaviour
     {
         eState_Init,
         eState_Starting,
+        eState_NetworkSync,
         eState_End,
     }
 
@@ -53,7 +54,10 @@ public class StartPhase : MonoBehaviour
             case State.eState_Starting:
                 Starting();
                 break;
-            case State.eState_End:
+			case State.eState_NetworkSync:
+				NetworkSync();
+				break;
+			case State.eState_End:
                 End();
                 break;
             default:
@@ -91,13 +95,28 @@ public class StartPhase : MonoBehaviour
             // Gold追加
             BattleMgr.instance.AddGoldValue(userSide, addGoldValue);
 
-            // 終了へ
-            SetNextStateAndFlag(State.eState_End);
+            // 通信同期へ
+            SetNextStateAndFlag(State.eState_NetworkSync);
             Debug.Log("開始時ステート処理終了");
         }
     }
-    // 終了
-    void End()
+    // 通信同期
+    void NetworkSync()
+    {
+		if (m_StateValue == 1)
+		{
+			Debug.Log("通信同期ステート処理開始");
+
+			/////通信同期/////
+			NetWorkSync.instance.GameInfoNetworkSync();
+
+			// 終了へ
+			SetNextStateAndFlag(State.eState_End);
+			Debug.Log("通信同期ステート処理終了");
+		}
+	}
+	// 終了
+	void End()
     {
         if(m_StateValue == 1)
         {
@@ -135,7 +154,12 @@ public class StartPhase : MonoBehaviour
                     nextState = await StateStarting();
                     Debug.Log("次のステートへ");
                     break;
-                case State.eState_End:
+				case State.eState_NetworkSync:
+					Debug.Log("通信同期ステート");
+					nextState = await StateNetworkSync();
+					Debug.Log("次のステートへ");
+					break;
+				case State.eState_End:
                     Debug.Log("終了ステート");
                     nextState = await StateEnd();
                     Debug.Log("次のステートへ");
@@ -166,8 +190,15 @@ public class StartPhase : MonoBehaviour
         // 次のステートへ
         return GetNextState();
     }
-    // 終了
-    async UniTask<State> StateEnd()
+	// 通信同期
+	async UniTask<State> StateNetworkSync()
+	{
+		await UniTask.WaitUntil(() => IsNextStateFlag());
+		// 次のステートへ
+		return GetNextState();
+	}
+	// 終了
+	async UniTask<State> StateEnd()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
 

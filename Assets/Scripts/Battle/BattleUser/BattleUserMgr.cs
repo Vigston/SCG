@@ -96,9 +96,4 @@ public class BattleUserMgr : MonoBehaviour
         get { return m_BattleUsers[(int)m_OperateUserSide]; }
         set { m_BattleUsers[(int)m_OperateUserSide] = value; }
     }
-
-	public BattleUser GetOperateUser()
-    {
-        return m_BattleUsers[(int)m_OperateUserSide];
-    }
 }

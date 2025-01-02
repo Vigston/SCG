@@ -87,9 +87,6 @@ public class BattleMgr : MonoBehaviour
 		// 先行後攻を決める
 		DecidePrecedingSecond();
 
-        // 通信同期
-        NetWorkSync.instance.GameInfoNetworkSync();
-
 		// スタートフェイズから始める
 		GetSetPhaseType = PhaseType.ePhaseType_Start;
         // フェイズループ処理
@@ -382,11 +379,14 @@ public class BattleMgr : MonoBehaviour
     // ターン終了
     public void TurnEnd()
     {
-        // 現在のターンを逆にする
-        GetSetTurnSide = Common.GetRevSide(m_TurnSide);
+        // 現在のターンと操作側を逆にする
+        Side turnSide = GetSetTurnSide;
+        Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+		GetSetTurnSide = Common.GetRevSide(turnSide);
+        BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
 
-        // ターン終了リクエスト初期化
-        m_TurnEndFlag = false;
+		// ターン終了リクエスト初期化
+		m_TurnEndFlag = false;
 
         // 追加種類付与カウント初期化
         InitAddAppendKindCount();
@@ -463,11 +463,6 @@ public class BattleMgr : MonoBehaviour
 
         return Side.eSide_None;
     }
-    // 指定側のIndexを取得
-    public int GetSideIndex(Side _side)
-    {
-        return (int)_side;
-    }
     // 側の最大数を取得
     public int GetSideMax()
     {
@@ -494,7 +489,7 @@ public class BattleMgr : MonoBehaviour
 	// 先行後攻を決める
 	public void DecidePrecedingSecond()
 	{
-        if(PhotonNetwork.IsMasterClient)
+        if(NetWorkSync.instance.IsExeNetworkSync())
         {
 			// 最初のターン側
 			Side firstTurnSide = Side.eSide_None;
@@ -506,8 +501,6 @@ public class BattleMgr : MonoBehaviour
 			if (rnd <= 0 || rnd > 100)
 			{
 				Debug.LogWarning($"先行後攻を決める際に乱数の異常値を検知：['{rnd}']");
-
-
 			}
 
 			// 先行処理(1～50)
@@ -525,6 +518,10 @@ public class BattleMgr : MonoBehaviour
 
 			// ターン側設定
 			GetSetTurnSide = firstTurnSide;
+            // 操作側設定
+            BattleUserMgr.instance.GetSetOperateUserSide = firstTurnSide;
+
+            Debug.Log($"DecidePrecedingSecond()｜乱数値：{rnd}、最初のターン側：{firstTurnSide}");
 		}
 	}
 
