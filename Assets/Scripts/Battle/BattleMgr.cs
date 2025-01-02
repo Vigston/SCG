@@ -489,7 +489,7 @@ public class BattleMgr : MonoBehaviour
 	// 先行後攻を決める
 	public void DecidePrecedingSecond()
 	{
-        if(NetWorkSync.instance.IsExeNetworkSync())
+        if(PhotonNetwork.IsMasterClient == true)
         {
 			// 最初のターン側
 			Side firstTurnSide = Side.eSide_None;
@@ -521,7 +521,11 @@ public class BattleMgr : MonoBehaviour
             // 操作側設定
             BattleUserMgr.instance.GetSetOperateUserSide = firstTurnSide;
 
-            Debug.Log($"DecidePrecedingSecond()｜乱数値：{rnd}、最初のターン側：{firstTurnSide}");
+            // マスタークライアント以外にターン側と操作側を渡す
+            NetWorkSync.instance.photonView.RPC("SetSyncTurnSide", RpcTarget.Others, GetSetTurnSide);
+			NetWorkSync.instance.photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateUserSide);
+
+			Debug.Log($"DecidePrecedingSecond()｜乱数値：{rnd}、最初のターン側：{firstTurnSide}");
 		}
 	}
 

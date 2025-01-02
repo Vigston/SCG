@@ -157,8 +157,8 @@ public class BattleUser : MonoBehaviour
                     {
                         CardArea cardArea = hit.transform.gameObject.GetComponent<CardArea>();
 
-                        // 操作側じゃないカードエリアを選択しているなら設定しない
-                        if (operateSide != cardArea.GetSide()) { return; }
+                        // 自分が操作側じゃないならカードエリアの選択を行わない
+                        if (operateSide != ) { return; }
                         m_SelectedCardArea = cardArea;
                     }
                 }
