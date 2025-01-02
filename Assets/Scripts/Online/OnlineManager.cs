@@ -33,12 +33,6 @@ public class OnlineManager : MonoBehaviourPunCallbacks
             return;
         }
 
-		if (PhotonNetwork.InLobby == false)
-		{
-			Debug.LogError("クライアントがロビーに接続されていないのでクイックマッチを行えませんでした。");
-            return;
-		}
-
 		PhotonNetwork.JoinRandomRoom();
 	}
 
