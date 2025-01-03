@@ -62,10 +62,10 @@ public class BattleCardCtr : MonoBehaviour
         Side cardSide = turnSide;
 
         // 値設定
-        battleCard.SetSide(cardSide);
-        battleCard.SetPosiiton(_pos);
-        battleCard.SetStatus(BattleCard.Status.eStatus_Fatigue);
-        battleCard.SetKind(_kind);
+        battleCard.GetSetSide       =   cardSide;
+        battleCard.GetSetPosition   =   _pos;
+        battleCard.GetSetStatus     =   BattleCard.Status.eStatus_Fatigue;
+        battleCard.GetSetKind       =   _kind;
         battleCard.SetEnable(isEnable);
         battleCard.SetEntryTurn();
 
@@ -110,10 +110,10 @@ public class BattleCardCtr : MonoBehaviour
         Side cardSide = turnSide;
 
         // 値設定
-        battleCard.SetSide(cardSide);
-        battleCard.SetPosiiton(_cardArea.GetPosition());
-        battleCard.SetStatus(BattleCard.Status.eStatus_Fatigue);
-        battleCard.SetKind(_kind);
+        battleCard.GetSetSide       =   cardSide;
+        battleCard.GetSetPosition   =   _cardArea.GetPosition();
+        battleCard.GetSetStatus     =   BattleCard.Status.eStatus_Fatigue;
+        battleCard.GetSetKind       =   _kind;
         battleCard.SetEnable(isEnable);
         battleCard.SetEntryTurn();
 
@@ -135,8 +135,8 @@ public class BattleCardCtr : MonoBehaviour
     // 指定カードの破棄
     public void RemoveBattleCard(BattleCard _battleCard)
     {
-        Side cardSide = _battleCard.GetSide();
-        Position cardPos = _battleCard.GetPosition();
+        Side cardSide     = _battleCard.GetSetSide;
+        Position cardPos  = _battleCard.GetSetPosition;
         // 指定カードがいるカードエリア
         CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(cardSide, cardPos);
 

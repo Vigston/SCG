@@ -91,7 +91,7 @@ public class BattleCardMgr : MonoBehaviour
             foreach(BattleCard areaCard in areaCardList)
             {
                 // 指定種類じゃないならはじく
-                if(areaCard.GetKind() != _kind) { continue; }
+                if(areaCard.GetSetKind != _kind) { continue; }
 
                 // 追加
                 searchCardList.Add(areaCard);

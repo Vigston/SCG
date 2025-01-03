@@ -98,7 +98,7 @@ public static class Common
 
         Side turnSide = BattleMgr.instance.GetSetTurnSide;
         Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
-        Side cardSide = battleCard.GetSide();
+        Side cardSide = battleCard.GetSetSide;
 
         return turnSide == userSide && cardSide == userSide;
     }

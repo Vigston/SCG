@@ -108,37 +108,22 @@ public class BattleCard : MonoBehaviour
 
     ////////////////関数///////////////////////
     // ---側---
-    // 側設定
-    public void SetSide(Side _side)
+    public Side GetSetSide
     {
-        m_Side = _side;
-    }
-    // 側取得
-    public Side GetSide()
-    {
-        return m_Side;
+        get { return m_Side; }
+        set { m_Side = value; }
     }
     // ---位置---
-    // 位置設定
-    public void SetPosiiton(Position _posiiton)
+    public Position GetSetPosition
     {
-        m_Position = _posiiton;
-    }
-    // 位置取得
-    public Position GetPosition()
-    {
-        return m_Position;
+        get { return m_Position; }
+        set { m_Position = value; }
     }
     // ---ステータス---
-    // ステータス設定
-    public void SetStatus(Status _status)
+    public Status GetSetStatus
     {
-        m_Status = _status;
-    }
-    // ステータス取得
-    public Status GetStatus()
-    {
-        return m_Status;
+        get { return m_Status; }
+        set { m_Status = value; }
     }
     // 指定のステータスか
     public bool IsStatus(Status _status)
@@ -147,20 +132,15 @@ public class BattleCard : MonoBehaviour
     }
 
     // ---種類---
-    // 種類設定
-    public void SetKind(Kind _kind)
+    public Kind GetSetKind
     {
-        m_Kind = _kind;
-    }
-    // 種類取得
-    public Kind GetKind()
-    {
-        return m_Kind;
+        get { return m_Kind; }
+        set { m_Kind = value; }
     }
     // 付与種類取得
-    public JobKind GetAppendKind(int index)
+    public JobKind GetAppendKind(int _index)
     {
-        return m_AppendKindList[index];
+        return m_AppendKindList[_index];
     }
     // 付与種類追加
     public void AddAppendKind(JobKind _jobKind)

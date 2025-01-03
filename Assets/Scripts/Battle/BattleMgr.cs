@@ -398,7 +398,7 @@ public class BattleMgr : MonoBehaviour
             battleCard.InitTurnInfo();
 
             // ステータスを通常に設定する
-            battleCard.SetStatus(BattleCard.Status.eStatus_Normal);
+            battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
         }
 
         // デバッグモードなら
