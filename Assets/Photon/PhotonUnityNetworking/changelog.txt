@@ -208,7 +208,7 @@ v2.22 (07. September 2020)
 Changed: Default observe option for PhotonView is Unreliable On Change.
 Fixed: PhotonView.Get wouldn't work if object was disabled. This fixes that.
 Fixed: PhotonView.Get was using GetComponentInParent which will fail to find the PV if an object is disabled. Custom GetParentComponent solves that problem.
-Fixed: Code using the WebSocketSharp library. It's only for non-WebGL builds and needs to be put inside the conditional code of WebSocket.cs.
+Fixed: Code using the WebSocketSharp library. It's only for non-WebGL builds and needs to be put inSide the conditional code of WebSocket.cs.
 Changed: Export settings for websocket-sharp.dll. It should export to any platform (if needed) except for console, web and Windows Store. Each such platform has a more specific solution.
 Added: AmOwner property to cached ownership values.
 Added: SetControllerInternal method for use with advanced SNS ownership handling. Not used currently by Pun2.
@@ -354,7 +354,7 @@ Fixed: NullReferenceException when trying to log an error for a received RPC wit
 Changed: Calling an RPC method with a null or empty method name will not be executed and error will be logged.
 Fixed: Callbacks deregistration and PlayersPerTeam clearing in PunTeams which caused KeyNotFoundException in some cases.
 Fixed: NullReferenceException in SupportLogger.TrackValues in Unity Editor after compilation by making sure only one instance of SupportLogger is in the scene and SupportLogger.TrackValues is properly stopped when the application stops or client disconnects.
-Changed: TypedLobby refactored to reflect the proper definition of the default lobby: a lobby that has a null or empty name, the provided type is ignored in this case and will be considered default type.
+Changed: TypedLobby refactored to reflect the proper definition of the default lobby: a lobby that has a null or empty name, the provided type is ignored in this case and will be conSidered default type.
 Changed: RPC methods not found error logs explictily state that RPC methods search does not include static methods which are not supported as RPC methods.
 Updated: SceneSettings Inspector improved and SceneAsset field added to make reference to scenes easier.
 Updated: Code comments for documentation.
@@ -426,7 +426,7 @@ Chat
 v2.10 (26. April 2019)
 Fixed: Unity 2019 compatibility. Removed warnings about obsolete APIs. Code clean up to remove compiler warnings in Unity 2019.
 Fixed: PhotonTransformView does not interpolate between the first streamed data and subsequent to avoid the initial drift between the player's original position and the current position.
-Changed: GetGameList operation is not sent when filter is null or empty. This resulted in a server-side error and now GetGameList logs this case and returns false.
+Changed: GetGameList operation is not sent when filter is null or empty. This resulted in a server-Side error and now GetGameList logs this case and returns false.
 Changed: IsConnectedAndReady is now also false for ClientState.DisconnectingFromGameserver, DisconnectingFromMasterserver and DisconnectingFromNameServer.
 Changed: InLobby property is now checking the State == JoinedLobby, which is analog to InRoom.
 Changed: InRoom property getter checks if CurrentRoom is not null.
@@ -448,7 +448,7 @@ Internal: SetLevelInPropsIfSynced() is now called in NewSceneLoaded() under the 
 Fixed: SetLevelInPropsIfSynced() now checks if the new value is not in the props yet and if so, it will set the property right away.
 Fixed: When using LoadLevel(), this will set the new sceneId as property right away (unless it didn't change). This should avoid delays on other clients loading the same scene.
 Changed: The condition when a async load is canceled. If at all, it only cancels a PUN-initiated loading, if the new sceneId does not refer to the scene in the properties.
-Fixed: PunCockpit script. Using the left side of the lobby panel, it now uses the default lobby (no name, type = default) for CreateRoom and JoinRandom. If you JoinLobby in one client and CreateRoom in another, the created room will also show up in the list (bottom right).
+Fixed: PunCockpit script. Using the left Side of the lobby panel, it now uses the default lobby (no name, type = default) for CreateRoom and JoinRandom. If you JoinLobby in one client and CreateRoom in another, the created room will also show up in the list (bottom right).
 
 v2.8.1 (21. March 2019)
 Fixed: Problem with assembly definition and WebSockets usage.
@@ -471,7 +471,7 @@ Fixed: PhotonNetwork.KeepAliveInBackground now sets the ConnectionHandler.KeepAl
 Fixed: A crash problem on Nintendo Switch. Setting a Thread.Name caused a crash in some Unity exports. We work around this by simply not naming internal threads.
 Updated: Photon3Unity3d.dll library to 4.1.2.9, rev4985.
 Photon Chat:
-    Added: Client API for Max Subscribers and Publish Subscribers features inside public channels.
+    Added: Client API for Max Subscribers and Publish Subscribers features inSide public channels.
 
 v2.6 (25th January 2019)
 Fixed: Offline custom properties are now set even if ExpectedProperties is set, as there is only one source for setting properties when in offline mode.
@@ -493,7 +493,7 @@ Added: Callback OnDisconnected() to connection-exception handling for "Exception
 Added: Note in reference doc, that "Exception" for receive is typical if you connect a local Photon on Windows but the server isn't running/available.
 Fixed: SetInterestGroup() for Offline mode. If offline, it can simply skip the call to OpChangeGroups and avoid some log spamming.
 Added: ServerSettings now let you open the dashboard directly for each types of ids, and let you open the region-allowlist editor as well.
-Fixed: PhotonEditorUtils.IsPrefab() is fixed for 2018.3 onwards, it now takes in consideration both assets and prefab editing stage when checking.
+Fixed: PhotonEditorUtils.IsPrefab() is fixed for 2018.3 onwards, it now takes in conSideration both assets and prefab editing stage when checking.
 Changed: Setting PhotonNetwork.PrefabPool to null now logs a warning and default to the DefaultPool class.
 Fixed: Problems with "Best Region" selection on Nintendo Switch. Best Region now works, even if all available Photon Cloud regions need to be pinged.
 Internal: PingMono class now keeps one Socket instance until discarded.
@@ -505,7 +505,7 @@ Changed: RPC() to re-use the event-content Hashtable (and clear it instead of re
 Updated: Photon3Unity3d.dll library to rev4954.
 
 v2.5 (20th November 2018)
-Fixed: The RoomOption CleanupCacheOnLeave is now correctly set per room (if set for creation of the room). This bug caused a server-side cleanup of Instantiate-events, buffered RPCs and other buffered events, despite a different setting in the options. This messed with a game's state, if you wanted to keep networked objects when players leave.
+Fixed: The RoomOption CleanupCacheOnLeave is now correctly set per room (if set for creation of the room). This bug caused a server-Side cleanup of Instantiate-events, buffered RPCs and other buffered events, despite a different setting in the options. This messed with a game's state, if you wanted to keep networked objects when players leave.
 Fixed: Regression during PhotoView cleanup leading to loss of viewId in OnDisable and OnDestroy calls. Now OnDisable and OnDestroy can access the viewID. Pooling the game object will set the new viewID before OnEnable is called.
 Fixed: Asteroids Demo. The cached room list now gets cleared correctly when the client joins a room / leaves the lobby.
 Added: The component "PhotonTransformViewClassic", which provides all the options (and implementation) from PUN Classic (1.xy). Use this if you want to use the options that were previously available. This component is deliberately not used by default.
@@ -514,10 +514,10 @@ Changed: PUN now suppresses the compiler warning "649" on newer versions of Unit
 Changed: The Realtime API no longer sends the actor properties on a rejoin. The values are known to the server and should not be updated. Set new values after rejoining the room, if that's needed.
 Fixed: Support for 2018.3 and newer prefab workflow to not show/deal the viewId field when editing a prefab.
 Fixed: ViewID assignment algorithm when reaching the max view ID value.
-Fixed: Removed harmless "duplicate"-warnig inside the DemoHub context. Now eventSystem is only created if needed.
+Fixed: Removed harmless "duplicate"-warnig inSide the DemoHub context. Now eventSystem is only created if needed.
 
 v2.4 (24th October 2018)
-Fixed: Duplicated Instantiation Events when using PhotonNetwork.ReconnectAndRejoin: when a client rejoins a room, his server-side cached Instantiation Events get duplicated, resulting in duplicated objects. This has been fixed.
+Fixed: Duplicated Instantiation Events when using PhotonNetwork.ReconnectAndRejoin: when a client rejoins a room, his server-Side cached Instantiation Events get duplicated, resulting in duplicated objects. This has been fixed.
 Changed: When Unity exports with Runtime 4.x and Mono, PUN and Chat now use a new, async socket class to work around issues with Socket.Receive blocking indefinitely (and timing out). This is now available for UDP and TCP. IL2CPP is not using this.
 Note: We changed the "productname" internally from PhotonUnityNetworking to PUN2, to avoid a problem when building UWP apps with the AssemblyDefinitions in place. In that case, two .dbg files were created and put into the generated solution. This does not affect projects which import PUN (without the ProjectSettings file) but you should keep this in mind.
 Updated: The Photon3Unity3d.dll to v4.1.2.4 with some fixes and improvements. See release_history.txt.

@@ -93,6 +93,7 @@ public class BattleMgr : MonoBehaviour
         PhaseLoop().Forget();
         // アクション実行処理
         ActionMgr.instance.ExecuteActions().Forget();
+
 		// 勝敗更新
 		BattleResultUpdate().Forget();
 
@@ -131,24 +132,24 @@ public class BattleMgr : MonoBehaviour
         // ↓更新処理↓
         for (int i = 0; i < (int)Side.eSide_Max; i++)
         {
-            Side side = (Side)i;
+            Side Side = (Side)i;
 
             // 国民カード数計算
-            int peopleNum = BattleCardMgr.instance.GetCardNumFromKind(side, BattleCard.Kind.eKind_People);
-            SetPeopleCardNum(side, peopleNum);
+            int peopleNum = BattleCardMgr.instance.GetCardNumFromKind(Side, BattleCard.Kind.eKind_People);
+            SetPeopleCardNum(Side, peopleNum);
             // 研究カード数計算
-            int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Science);
-            SetScienceCardNum(side, scienceNum);
+            int scienceNum = BattleCardMgr.instance.GetCardNumFromAppendKind(Side, BattleCard.JobKind.eAppendKind_Science);
+            SetScienceCardNum(Side, scienceNum);
             // 軍事カード数計算
-            int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Military);
-            SetMilitaryCardNum(side, militaryNum);
+            int militaryNum = BattleCardMgr.instance.GetCardNumFromAppendKind(Side, BattleCard.JobKind.eAppendKind_Military);
+            SetMilitaryCardNum(Side, militaryNum);
             // スパイカード数計算
-            int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(side, BattleCard.JobKind.eAppendKind_Spy);
-            SetSpyCardNum(side, spyNum);
+            int spyNum = BattleCardMgr.instance.GetCardNumFromAppendKind(Side, BattleCard.JobKind.eAppendKind_Spy);
+            SetSpyCardNum(Side, spyNum);
 
             // 研究値計算
-            int scienceValue = MathScienceValue(side);
-            SetScienceValue(side, scienceValue);
+            int scienceValue = MathScienceValue(Side);
+            SetScienceValue(Side, scienceValue);
         }
 
 		// DebugMgrの更新リクエスト
@@ -557,59 +558,59 @@ public class BattleMgr : MonoBehaviour
     }
     // ---国民---
     // 国民カード数設定
-    public void SetPeopleCardNum(Side _side, int _value)
+    public void SetPeopleCardNum(Side _Side, int _value)
     {
-        m_PeopleCardNum[(int)_side] = _value;
+        m_PeopleCardNum[(int)_Side] = _value;
     }
     // 国民カード数取得
-    public int GetPeopleCardNum(Side _side)
+    public int GetPeopleCardNum(Side _Side)
     {
-        return m_PeopleCardNum[(int)_side];
+        return m_PeopleCardNum[(int)_Side];
     }
     // 国民カード数追加
-    public void AddPeopleCardNum(Side _side, int _value)
+    public void AddPeopleCardNum(Side _Side, int _value)
     {
-        m_PeopleCardNum[(int)_side] += _value;
+        m_PeopleCardNum[(int)_Side] += _value;
     }
 
     // ---研究---
     // 研究カード数設定
-    public void SetScienceCardNum(Side _side, int _value)
+    public void SetScienceCardNum(Side _Side, int _value)
     {
-        m_ScienceCardNum[(int)_side] = _value;
+        m_ScienceCardNum[(int)_Side] = _value;
     }
     // 研究カード数取得
-    public int GetScienceCardNum(Side _side)
+    public int GetScienceCardNum(Side _Side)
     {
-        return m_ScienceCardNum[(int)_side];
+        return m_ScienceCardNum[(int)_Side];
     }
     // 研究カード数追加
-    public void AddScienceCardNum(Side _side, int _value)
+    public void AddScienceCardNum(Side _Side, int _value)
     {
-        m_ScienceCardNum[(int)_side] += _value;
+        m_ScienceCardNum[(int)_Side] += _value;
     }
 
     // 研究値設定
-    public void SetScienceValue(Side _side, int _value)
+    public void SetScienceValue(Side _Side, int _value)
     {
-        m_ScienceValue[(int)_side] = _value;
+        m_ScienceValue[(int)_Side] = _value;
     }
     // 研究値取得
-    public int GetScienceValue(Side _side)
+    public int GetScienceValue(Side _Side)
     {
-        return m_ScienceValue[(int)_side];
+        return m_ScienceValue[(int)_Side];
     }
     // 研究値追加
-    public void AddScienceValue(Side _side, int _value)
+    public void AddScienceValue(Side _Side, int _value)
     {
-        m_ScienceValue[(int)_side] += _value;
+        m_ScienceValue[(int)_Side] += _value;
     }
     // 研究値計算
-    public int MathScienceValue(Side side)
+    public int MathScienceValue(Side Side)
     {
         List<BattleCard> cardList = new List<BattleCard>();
 
-        var scienceCardList = BattleCardMgr.instance.GetCardListFromAppendKind(side, BattleCard.JobKind.eAppendKind_Science);
+        var scienceCardList = BattleCardMgr.instance.GetCardListFromAppendKind(Side, BattleCard.JobKind.eAppendKind_Science);
 
         foreach(var battleCard in scienceCardList)
         {
@@ -625,64 +626,64 @@ public class BattleMgr : MonoBehaviour
 
     // ---Gold---
     // Gold数設定
-    public void SetGoldValue(Side _side, int _value)
+    public void SetGoldValue(Side _Side, int _value)
     {
-        m_GoldValue[(int)_side] = _value;
+        m_GoldValue[(int)_Side] = _value;
     }
     // Gold数取得
-    public int GetGoldValue(Side _side)
+    public int GetGoldValue(Side _Side)
     {
-        return m_GoldValue[(int)_side];
+        return m_GoldValue[(int)_Side];
     }
     // Gold数追加
-    public void AddGoldValue(Side _side, int _value)
+    public void AddGoldValue(Side _Side, int _value)
     {
-        m_GoldValue[(int)_side] += _value;
+        m_GoldValue[(int)_Side] += _value;
     }
     // Gold数減らす
-    public void ReduceGoldValue(Side _side, int _value)
+    public void ReduceGoldValue(Side _Side, int _value)
     {
-        m_GoldValue[(int)_side] -= _value;
+        m_GoldValue[(int)_Side] -= _value;
 
         // 0より小さくなる場合には0とする
-        if(m_GoldValue[(int)_side] < 0)
+        if(m_GoldValue[(int)_Side] < 0)
         {
-            m_GoldValue[(int)_side] = 0;
+            m_GoldValue[(int)_Side] = 0;
         }
     }
 
     // ---軍事---
     // 軍事カード数設定
-    public void SetMilitaryCardNum(Side _side, int _value)
+    public void SetMilitaryCardNum(Side _Side, int _value)
     {
-        m_MilitaryCardNum[(int)_side] = _value;
+        m_MilitaryCardNum[(int)_Side] = _value;
     }
     // 軍事カード数取得
-    public int GetMilitaryCardNum(Side _side)
+    public int GetMilitaryCardNum(Side _Side)
     {
-        return m_MilitaryCardNum[(int)_side];
+        return m_MilitaryCardNum[(int)_Side];
     }
     // 軍事カード数追加
-    public void AddMilitaryCardNum(Side _side, int _value)
+    public void AddMilitaryCardNum(Side _Side, int _value)
     {
-        m_MilitaryCardNum[(int)_side] += _value;
+        m_MilitaryCardNum[(int)_Side] += _value;
     }
 
     // ---スパイ---
     // スパイカード数設定
-    public void SetSpyCardNum(Side _side, int _value)
+    public void SetSpyCardNum(Side _Side, int _value)
     {
-        m_SpyCardNum[(int)_side] = _value;
+        m_SpyCardNum[(int)_Side] = _value;
     }
     // スパイカード数取得
-    public int GetSpyCardNum(Side _side)
+    public int GetSpyCardNum(Side _Side)
     {
-        return m_SpyCardNum[(int)_side];
+        return m_SpyCardNum[(int)_Side];
     }
     // スパイカード数追加
-    public void AddSpyCardNum(Side _side, int _value)
+    public void AddSpyCardNum(Side _Side, int _value)
     {
-        m_SpyCardNum[(int)_side] += _value;
+        m_SpyCardNum[(int)_Side] += _value;
     }
 
     // 追加種類付与フラグ設定

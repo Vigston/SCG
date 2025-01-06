@@ -54,7 +54,7 @@ Version 4.1.7.3 (07. December 2023 - rev7252)
     No notable changes.
 
 Version 4.1.7.2 (20. September 2023 - rev7218)
-    Fixed: DisconnectTimeout is no longer capped. You can set any value client side. Server side timeouts can only be set for Self Hosted or Enterprise Server.
+    Fixed: DisconnectTimeout is no longer capped. You can set any value client Side. Server Side timeouts can only be set for Self Hosted or Enterprise Server.
 
 Version 4.1.7.1 (06. September 2023 - rev7148)
     Fixed: Internal state changes to report UDP based Client Timeouts to the server.
@@ -66,7 +66,7 @@ Version 4.1.7.0 (18. August 2023 - rev7111)
 
 Version 4.1.6.26 (09. August 2023 - rev7076)
     Fixed: PhotonClientWebSocket.Send() waits up to 5ms after sending async to allow the message being written to the network layer.
-    Fixed: PhotonClientWebSocket.Send() now provides a distinct return code if the WebSocket did not yet finish sending the data. In that case, the memory which was used for it, is not returned to the pooling. This can cause allocations but fixes cases where messages were modified after they were considered sent.
+    Fixed: PhotonClientWebSocket.Send() now provides a distinct return code if the WebSocket did not yet finish sending the data. In that case, the memory which was used for it, is not returned to the pooling. This can cause allocations but fixes cases where messages were modified after they were conSidered sent.
     Changed: PhotonClientWebSocket connecting to the server is cancelled after 7 second max (was: 5).
     Changed: PhotonClientWebSocket AsyncConnectAndReceive will log to the debug callback instead of using Console.Writeline().
     Changed: PhotonClientWebSocket error handling for readTask.Wait().
@@ -329,7 +329,7 @@ Version 4.1.4.4 (29. June 2020 - rev5625)
 
 Version 4.1.4.3 (24. June 2020 - rev5622)
     Added: PhotonPeer.UseByteArraySlicePoolForEvents and PhotonPeer.ByteArraySlicePool to avoid memory garbage when events consist only of a byte-array. See comments / doc.
-    Added: Class NonAllocDictionary<K,V> as replacement for the suboptimal implementation in Mono. Some of our code relies on Dictionaries and can be optimized with this. Note: This is neither documented well yet and considered "beta" until we got feedback on some use cases.
+    Added: Class NonAllocDictionary<K,V> as replacement for the suboptimal implementation in Mono. Some of our code relies on Dictionaries and can be optimized with this. Note: This is neither documented well yet and conSidered "beta" until we got feedback on some use cases.
     Added: PhotonPeer.TrafficRecorder and ITrafficRecorder. This can be used to capture traffic on UDP connections.
     Changed: IPhotonSocket.ConnectAddress is now a local field. Before, it accessed the peer which might already connect to another server.
     Changed: Debug log for DNS resolution (INFO level). This includes a count of IPs that were returned.
@@ -516,14 +516,14 @@ Chat:
     Added: Unsequenced delivery for messages (reliable and unreliable). This way, operations and resulting responses and events can be sent as unsequenced, which is good for use cases like streaming voice, input and such.
     Internal: The Photon library now re-uses memory for messages and commands. This avoids garbage collection in Unity, which can be a performance problem.
     Changed: There is a new method to send operations: PhotonPeer.SendOperation. It uses the SendOptions struct to define the delivery mode, encryption, etc. This replaces the obsolete OpCustom().
-    Added: Optionally, the Serialization Protocol v1.8 can now be used. Consider it a pre-release/test version for which we could use feedback. Set PhotonPeer.SerializationProtocolType.
+    Added: Optionally, the Serialization Protocol v1.8 can now be used. ConSider it a pre-release/test version for which we could use feedback. Set PhotonPeer.SerializationProtocolType.
     Internal: Replaced foreach with while in SerializeParameterTable, SerializeHashTable and SerializeDictionaryElements in SerializationProtocol v1.6.
     Internal: Changed EnetPeer to have a CommandQueue. Instead of queueing ExecuteCommand(cmd) delegates, we now queue the commands. This is leaner.
     Internal: The SendOptions.DeliveryMode enum's order changed.
     Added: PeerBase.MessageBufferPool, MessageBufferPoolGet() and MessageBufferPoolPut(StreamBuffer buff) as a simple memory pool implementation.
     Added: PhotonPeer.MessageBufferPoolTrim() to give an option to limit the amount of memory buffered.
     Added: PhotonPeer.MessageBufferPoolGet() as a (brute force) way to externally debug the memory buffer. This is temporary. Don't rely on this.
-    Added: For TCP, a client-side timeout. This is based on checking timestampOfLastReceive in the DispatchIncomingCommands method (timeouts only get called when you dispatch).
+    Added: For TCP, a client-Side timeout. This is based on checking timestampOfLastReceive in the DispatchIncomingCommands method (timeouts only get called when you dispatch).
     Fixed: The TCP implementation only checks for a TimeoutDisconnect, while in ConnectionStateValue.Connected. Otherwise, no timeout can happen.
     Internal: Renamed various values for more fitting names.
     Internal: Added special handling of Arrays of int and byte to DeserializeArray() in Protocol 1.6, using DeserializeByteArray and DeserializeIntArray respectively.
@@ -535,7 +535,7 @@ LoadBalancing:
     Added: LoadBalancingClient.UseAlternativeUdpPorts. This way, UDP may use ports of the Steam Multiplayer port-range by simply replacing existing port strings in addresses.
     Changed: RaiseEvent now has an overload, that uses RaiseEventOptions and SendOptions. The old variant is obsolete but will still work.
     Changed: CheckUserOnJoin is now set by default. The RoomOptions.CheckUserOnJoin got removed.
-    Added: Client-side checks and limits for OpFindFriends.
+    Added: Client-Side checks and limits for OpFindFriends.
     Added: Optional parameter sendAuthCookie to OpLeaveRoom. The app can control what's passed from Photon to a server via WebHook.
     Changes: The room list for lobbies is no longer part of the LoadBalancingClient. Instead, implement the callback for the changed room list.
     Added: AppSettings, a base class to host AppId and some settings for a title. This will help make it available across products. Right now, the LoadBalancingClient is not using it yet.
@@ -602,10 +602,10 @@ WebSocket:
 
 *** Version 4.1.1.12 (24. May 2017 - rev4086)
     Fixed: Peer.timeLastSendOutgoing was set in SendAcksOnly and ReceiveIncomingCommands. This should not happen. In PUN, this led to an issue with the fallback thread, which could not keep the connection.
-    Fixed: DNS resolution in the UDP socket is no longer inside a lock. Even if it takes longer (without network), the socket can now be closed before it's even opened properly, avoiding a freeze.
+    Fixed: DNS resolution in the UDP socket is no longer inSide a lock. Even if it takes longer (without network), the socket can now be closed before it's even opened properly, avoiding a freeze.
     Fixed: UWP clients can set a SocketImplementationConfig. This opens up the use of WebSockets or any IPhotonSocket implementation in UWP, too.
     Internal: Acknowledgements are no longer created as "commands" and serialized on send. Instead, they are directly written to a byte[] buffer, which is using less memory.
-    Added: PhotonPeer.EnableServerTracing to enable UDP Datagram Tracing on server side. We might ask you to use this when debugging connection issues. Otherwise, don't use this, as you can't access the server's logs anyways.
+    Added: PhotonPeer.EnableServerTracing to enable UDP Datagram Tracing on server Side. We might ask you to use this when debugging connection issues. Otherwise, don't use this, as you can't access the server's logs anyways.
 
 *** Version 4.1.1.11 (13. April 2017 - rev3922)
     Fixed: Bug of v4.1.1.10, which caused disconnects after a short time.
@@ -763,9 +763,9 @@ Unity SDK:
 
 *** Version 4.0.5.0 (3. December 2015 - rev3144)
     Changed: Signature of SetCustomProperties methods. All overloads now include a final, optional "webForward" parameter. This enables you to update a WebHook when properties change. This is intended for turnbased games, not for high-frequency updates - use with care.
-    Internal: Added more debug output to error messages from the socket usage. This should now always include the ServerAddress to make things easier to debug server-side, if needed.
+    Internal: Added more debug output to error messages from the socket usage. This should now always include the ServerAddress to make things easier to debug server-Side, if needed.
     Added: Serveral new ErrorCode values, which will be used by v4RC5 and newer servers. See ErrorCode.JoinFailed***, HttpLimitReached and ExternalHttpCallFailed.
-    Fixed: LoadBalancing API now reads the correct "NickName" key from the server's authentication response. So far, it was reading a key that is never used. Note: This means you can set a user's NickName server-side to override the client's nickname.
+    Fixed: LoadBalancing API now reads the correct "NickName" key from the server's authentication response. So far, it was reading a key that is never used. Note: This means you can set a user's NickName server-Side to override the client's nickname.
 Chat
     Added: A MessageLimit field for ChatClient and ChatChannel to limit the number of messages the client keeps locally. It might be useful to limit memory usage in long running chats. Set ChatClient.MessageLimit to apply the limit to any channel subscribed afterwards or apply a limit individually.
 
@@ -803,7 +803,7 @@ Chat
     Removed: LitePeer class and complete "Lite" namespace. It's highly recommended to use the LoadBalancing API (LoadBalancingClient, etc). The (few) operations that were defined in Lite are no longer required really.
     Refactored: Some "base" enumerations that were provided by the Lite peer. They are now in LoadBalancingPeer.
     Added: support for RoomOptions.Plugins. Which we need now since we support multiple plugins per plugin dll - for testing purposes for instance.
-    Fixed: The wrapper classes for the native sockets now do a Sleep(15) when there's nothing to receive. This reduces CPU load considerably.
+    Fixed: The wrapper classes for the native sockets now do a Sleep(15) when there's nothing to receive. This reduces CPU load conSiderably.
     Fixed: Unity library SocketWebTcp class for websocket support. It requires a coroutine on a new GameObject which is now marked as DontDestroyOnLoad(go) and survives scene loading.
     Fixed: The Windows 8 SDKs now include the release assemblies. This makes sure you can submit your app to the Windows Store.
     Added: ConnectionProtocol WebSocket and WebSocketSecure. It's simply a different protocol, compared to UDP and TCP, so it should be separated.
@@ -928,7 +928,7 @@ LoadBalancing:
     Removed: LoadBalancingPeer.OpSetCustomPropertiesOfActor and OpSetPropertyOfRoom which were too special to be so low level. Could be implemented to LBClient.
 Turnbased:
     Fixed: OpJoinRandomRoom and OpCreateRoom which didn't reset the ActorNr to claim when entering the room. Depending on previous actions, some calls of those methods did fail when the actorNumber wasn't available.
-    Changed: OperationCode.Rpc is now called OperationCode.WebRpc. It's simply much cleaner (considering PUN has RPCs as well but in a different context).
+    Changed: OperationCode.Rpc is now called OperationCode.WebRpc. It's simply much cleaner (conSidering PUN has RPCs as well but in a different context).
     Changed: WebRpcResponse reading to be able to handle additional data.
     Added: Parameter webForward to: OpSetCustomPropertiesOfRoom and OpSetPropertiesOfRoom. The "old" overloads of these methods are still there, too. If webForward is true, the properties are sent to the WebHooks.
 Chat:
@@ -942,7 +942,7 @@ Chat:
 
 *** Version 3.2.2.6 (13. May - rev2575)
     Fixed: Windows Store and Windows Phone libraries now only send the bytes they should send. This means we have to copy the payload from the "complete package buffer" in order to send it.
-    Fixed: SocketTcp now handles all exceptions during reading. Still, abort-by-server is treated as ServerDisconnect. Everything else as client side disconnect. This fix is especially for iOS exports from Unity. The iOS Power-button will immediately cut any connection. The Home-button allows us to keep the connection if we return the app to focus within a few seconds.
+    Fixed: SocketTcp now handles all exceptions during reading. Still, abort-by-server is treated as ServerDisconnect. Everything else as client Side disconnect. This fix is especially for iOS exports from Unity. The iOS Power-button will immediately cut any connection. The Home-button allows us to keep the connection if we return the app to focus within a few seconds.
     Fixed: TPeer.StopConnection() now clears the incoming queue when it disconnects. This avoids getting any more (already received) commands.
     Changed: TPeer.Disconnect() now uses StopConnection instead of implementing the same code again.
 
@@ -995,8 +995,8 @@ Turnbased:
     Added: SocketImplementation property to set a class as socket implementation (Unity. sets native implementation or c# socket at compile time)
     Changed: Win 8 RT and Phone now use fewer separate classes and files. Instead, more files from the (regular) DotNet client are used. RT and Phone are now part of the trunk folder in our SVN.
     Added: TrafficStats.TimestampOfLastAck and .TimestampOfLastReliableCommand
-    Changed: Handling of server-side shutdown (a form of TCP disconnect) is now handled specifically as server-side-disconnect (was: generic receive exception)
-    Added: If a UDP connection times out in a client, it sends a special flag in it's disconnect command (to the server). This enables us to detect which side is triggering timeouts more often (and we can improve things).
+    Changed: Handling of server-Side shutdown (a form of TCP disconnect) is now handled specifically as server-Side-disconnect (was: generic receive exception)
+    Added: If a UDP connection times out in a client, it sends a special flag in it's disconnect command (to the server). This enables us to detect which Side is triggering timeouts more often (and we can improve things).
 LoadBalancing API
     Fixed: issue where we called a virtual member from a constructor (http://confluence.jetbrains.com/display/ReSharper/Virtual+method+call+in+constructor)
     Changed: LocalPlayer is now a property which checks null and returns a new Player (via virtual CreatePlayer) on demand.
@@ -1091,7 +1091,7 @@ LoadBalancing API
 *** Version 3.0.1.18 (11.02.2013 - rev1998)
     Added: Optional per package CRC checksums to filter out compromised packages (avoiding more issues, compared to reading bad values).
     Added: PhotonPeer .CrcEnabled and .PacketLossByCrc to handle CRC and get the count of affected (incoming) packages.
-    Note: Checking packages with CRC will take some computation time. Consider this an option to detect if/why someone's connection is bad. It's likely not good to be enabled by default.
+    Note: Checking packages with CRC will take some computation time. ConSider this an option to detect if/why someone's connection is bad. It's likely not good to be enabled by default.
 Windows 8 RT & Windows 8 Phone:
     Fixed: Serialization of foat and double values. These caused exceptions when used in object-arrays.
 
@@ -1149,7 +1149,7 @@ Windows 8 RT:
     Added: Demo "Phong", which is a simplified, basic multiplayer game. It's focus is to show how to sync data, not to make it super smooth and error free. Let us know any issues but bear with us as it isn't fully featured.
 
 *** Version 3.0.1.13 (26.09.2012 - rev1731)
-    Fixed: Internals of method DispatchIncomingCommands() for UDP. In some cases this removed commands from a dictionary inside a foreach loop (which causes an Exception due to changing the dictionary)
+    Fixed: Internals of method DispatchIncomingCommands() for UDP. In some cases this removed commands from a dictionary inSide a foreach loop (which causes an Exception due to changing the dictionary)
     Added: Support for Dictionary<,>[]. This is not a very lean way to send data (especially when using <object,object>) but if needed, it now works
     Changed: Replaced several foreach loops with for loops (it doesn't change usage but in Unity exports to iOS, foreach uses more memory than for)
     Added: Doc for public methods in Protocol class (they are useful to quickly write values into an existing byte-array)
@@ -1225,7 +1225,7 @@ Internal:
     Changed: no longer using BinaryReader streams anywhere (this should improve speed and reduce mem usage)
     Changed: PeerBase accordingly
     Changed: Unit test MyType de/serialization now supports null-references (as 1 byte being 0)
-    Changed: Protocol.SerializeOperationRequest is now used in the same way, no matter if request is "top level" or inside some other datatype
+    Changed: Protocol.SerializeOperationRequest is now used in the same way, no matter if request is "top level" or inSide some other datatype
     Changed: the peer bases accordingly to use only one SerializeMemStream and lock it
     Changed: how encryption fits in to the new serialization (it is a special case, as only the operation bytes get encrypted)
     Added: Protocol.SerializeParameterTable() as requests, events and responses all use the same way to write their parameters
@@ -1299,7 +1299,7 @@ Internal:
 - Added: default appId for Loadblanacing demos: "<insert your appid here>"
 
 *** Version 3.0.0.10
-- Added: When UDP StartConnection (internal method) fails, callbacks to OnStatusChanged(StatusCode.Disconnect) are now done additionally to the SecurityExceptionOnConnect and ExceptionOnConnect calls. This happens direcly inside PhotonPeer.Connect()!
+- Added: When UDP StartConnection (internal method) fails, callbacks to OnStatusChanged(StatusCode.Disconnect) are now done additionally to the SecurityExceptionOnConnect and ExceptionOnConnect calls. This happens direcly inSide PhotonPeer.Connect()!
 - Changed: When Unity UDP implementation fails to connect due to missing DNS resolution, it now also calls OnStatusChanged(StatusCode.ExceptionOnConnect)
 - Removed: StatusCode.Exception_Connect value (obsolete, replaced by ExceptionOnConnect, same value)
 - Fixed: Http connections (DotNet & Unity) now skip results while in disconnected state
@@ -1384,7 +1384,7 @@ Internal:
 - Added: Support to de/serialize Dictionary<T1,T2>. If the types are more specific than object, the serialization writes the type-code only once (lean byte usage in protocol)
 - Added: Support to de/serialize null. Enables you to send a null value, e.g. in a Hashtable
 - Added: ReceiverGroup enum to select a range of players that get an event via Operation Raise Event
-- Added: Event Caching. Any event sent via RaiseEvent can now be buffered on the server side and is "repeated" when a new player is joining a room. This is similar to Properties but lets you categorize your info better and works just like regular events, too.
+- Added: Event Caching. Any event sent via RaiseEvent can now be buffered on the server Side and is "repeated" when a new player is joining a room. This is similar to Properties but lets you categorize your info better and works just like regular events, too.
 - Added: EventCaching enum to select if an event is to be cached and how it's cached: either "not at all" (default), replacing anything cached so far (fast) or "merge" (which will add new and replace old keys with new values). Optionally, a event can be raise with option "remove".
 - Added: new overload of OpRaiseEvent() with the two new parameters noted above
 - Added: Support for custom de/serializer methods. By writing 2 methods to convert a object into a byte-array (and back from that), Photon now supports any custom object type (standard datatypes are still supported out of the box)
@@ -1527,17 +1527,17 @@ Siverlight:
 - Changed: Peers with TCP as protocol will clear the outgoing queue when disconnect() is called (while connected. see fix above)
 - Updated: Silverlight Realtime Demo slightly
 - Added: PhotonPeer.Listener property to give subclasses access to the IPhotonPeerListener (set in constructor). Can be useful to call Listener.DebugReturn()
-- Added: LitePeer-Source.cs to demo-realtime. This is the source of a LitePeer and could be used as sample to create custom operations on the client side
+- Added: LitePeer-Source.cs to demo-realtime. This is the source of a LitePeer and could be used as sample to create custom operations on the client Side
 
 *** Version 5.9.0
 - Release: of changes in 5.7.6 and 5.7.5
 
 *** Version 5.7.6
 - Fixed: a debug output line for TCP connections which did not heed the debug-level.
-- Changed: PhotonPeer uses less locking internally and will handle incoming data in the game thread (inside DispatchIncomingCommands() or Service()).
+- Changed: PhotonPeer uses less locking internally and will handle incoming data in the game thread (inSide DispatchIncomingCommands() or Service()).
 - Changed: Internally, all commands are put into a (locked) queue which is processed within DispatchIncomingCommands(). Your dispatch interval affects local lag but not the PhotonPeer.RoundTripTime value.
-- Note: Don't use a peer from multiple threads! It's not thread safe. All callbacks to IPhotonPeerListener methods are happening in your game thread (again: inside DispatchIncomingCommands()).
-- Changed: removed locks inside the callbacks (according to above change).
+- Note: Don't use a peer from multiple threads! It's not thread safe. All callbacks to IPhotonPeerListener methods are happening in your game thread (again: inSide DispatchIncomingCommands()).
+- Changed: removed locks inSide the callbacks (according to above change).
 - Changed: DNS resolution is now done in Connect() unless you provide a valid IP address (if IPAddress.Parse(address) is successful, the IP is used directly).
 - Fixed: PhotonPeer.Connect() should fail if the IP is unknown or unavailable. Exception: using a localhost might succeed but fail when we try to receive anything.
 - Updated: Game.cs now initialized the timing intervals. This avoids issues if the client system is having a negative TickCount.
@@ -1642,7 +1642,7 @@ Siverlight:
 - Added: missing documentation in Unity3d SDK
 
 *** Version 5.4.0
-- Change: The timespan until a sent and unacknowledged reliable command is considered lost, is now calculated by
+- Change: The timespan until a sent and unacknowledged reliable command is conSidered lost, is now calculated by
           current roundTripTime + 4 * roundTripTimeVariance
           The result of this calculation is doubled with every following resend. The maximum number of retries can still be defined by calling SetSentCountAllowance.
 - Change: Removed TimeAllowanceInt
@@ -1653,7 +1653,7 @@ Siverlight:
 - Added: property NPeer.IncomingReliableCommands, which returns the count of reliable commands currently queued
 - Added: callback on NCommand.CT_DISCONNECT to inform the NPeerListener about a disconnect from server (see above)
 - Added: disconnect command will be sent by server in case of timeout, connection-limitations or other issues
-- Added: NPeer ReturnCode.DisconnectByServer is called on server-side disconnect (see description)
+- Added: NPeer ReturnCode.DisconnectByServer is called on server-Side disconnect (see description)
 - Added: call to StopConnection() on disconnect (by server)
 - Added: NPeer.PeerID property to get ENet's peerID (useful while debugging)
 - Internal: SupportClass.WriteIntToByteArray() to ease writing ints to byte[]
@@ -1738,7 +1738,7 @@ Siverlight:
 - Change: debug level NPeer.DebugOut is now a NPeer.DebugLevel enum and will include all lower levels in output, default: DebugLevel.ERROR
 - Fixed: size of realtime demo board
 - Change: NPeer constructor now always throws an exception if listener is null
-- Change: EventAction() parameter eventCode is now of type sbyte (was int), which corresponds to type of RaiseEvent (and server-side used type)
+- Change: EventAction() parameter eventCode is now of type sbyte (was int), which corresponds to type of RaiseEvent (and server-Side used type)
 - Internal: NPeer.opRaiseEvent() now treats eventCode as parameter of operation RaiseEvent (as changed in latest RT server)
 - Change: NPeer has its own listener (INPeerListener) and several (better named) structs for the constants used with NPeer / realtime
 - Added: LiteOpKey and LiteOpKey.ActorNumber to have a constant for the only OP key of interest
@@ -1765,7 +1765,7 @@ Siverlight:
 - Internal: constant "DEBUG_- InternalS" to be used for intern debugging output
 
 *** Version 5.0.0
-- New: hasBadwords() as OP and return. Server side check of strings for badwords
+- New: hasBadwords() as OP and return. Server Side check of strings for badwords
 
 *** Version 5.0.0 RC3
 - Internal: changed constant values: EV_KEY_PROPERTIES = "Data", EV_KEY_REVISION = "Rev"

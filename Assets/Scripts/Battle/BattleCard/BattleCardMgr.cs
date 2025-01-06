@@ -72,7 +72,7 @@ public class BattleCardMgr : MonoBehaviour
     }
 
     // 指定基本種類カードを全て取得
-    public List<BattleCard> GetCardListFromKind(Side _side, BattleCard.Kind _kind)
+    public List<BattleCard> GetCardListFromKind(Side _Side, BattleCard.Kind _kind)
     {
         List<BattleCard> searchCardList = new List<BattleCard>();
         for(int i = 0; i < (int)Position.ePosition_Max; i++)
@@ -80,7 +80,7 @@ public class BattleCardMgr : MonoBehaviour
             Position pos = (Position)i;
 
             // カードエリア
-            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, pos);
+            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_Side, pos);
 
             List<BattleCard> areaCardList = cardArea.GetCardList();
 
@@ -101,7 +101,7 @@ public class BattleCardMgr : MonoBehaviour
         return searchCardList;
     }
     // 指定追加種類カードを全て取得
-    public List<BattleCard> GetCardListFromAppendKind(Side _side, BattleCard.JobKind _appendKind)
+    public List<BattleCard> GetCardListFromAppendKind(Side _Side, BattleCard.JobKind _appendKind)
     {
         List<BattleCard> searchCardList = new List<BattleCard>();
         for (int i = 0; i < (int)Position.ePosition_Max; i++)
@@ -109,7 +109,7 @@ public class BattleCardMgr : MonoBehaviour
             Position pos = (Position)i;
 
             // カードエリア
-            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_side, pos);
+            CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_Side, pos);
 
             List<BattleCard> areaCardList = cardArea.GetCardList();
 
@@ -130,15 +130,15 @@ public class BattleCardMgr : MonoBehaviour
         return searchCardList;
     }
     // 指定基本種類カード数を取得
-    public int GetCardNumFromKind(Side _side, BattleCard.Kind _kind)
+    public int GetCardNumFromKind(Side _Side, BattleCard.Kind _kind)
     {
-        List<BattleCard> battleCardList = GetCardListFromKind(_side, _kind);
+        List<BattleCard> battleCardList = GetCardListFromKind(_Side, _kind);
         return battleCardList.Count;
     }
     // 指定追加種類カード数を取得
-    public int GetCardNumFromAppendKind(Side _side, BattleCard.JobKind _appendKind)
+    public int GetCardNumFromAppendKind(Side _Side, BattleCard.JobKind _appendKind)
     {
-        List<BattleCard> battleCardList = GetCardListFromAppendKind(_side, _appendKind);
+        List<BattleCard> battleCardList = GetCardListFromAppendKind(_Side, _appendKind);
 
         return battleCardList.Count;
     }

@@ -9,9 +9,12 @@ public class ActionMgr : MonoBehaviour
 	// インスタンス
 	public static ActionMgr instance;
 
-	private Queue<Action> actionQueue = new Queue<Action>();
+	private Queue<IAction> actionQueue = new Queue<IAction>();
 	private CancellationTokenSource cancellationTokenSource;
 	private bool isExecuting = false;
+
+	// イベント
+	public event Action<IAction> OnActionCompleted;
 
 	private void Awake()
 	{
@@ -35,11 +38,20 @@ public class ActionMgr : MonoBehaviour
 		Debug.LogError("ActionMgrのインスタンスが生成できませんでした");
 		return false;
 	}
-	
+
 	// アクション追加
-	public void AddAction(Action _action)
+	public void AddAction(IAction _action)
 	{
 		actionQueue.Enqueue(_action);
+
+		// アクションが追加されるたびに完了通知を監視
+		OnActionCompleted += OnActionCompleted;
+	}
+
+	// 指定のアクションが終了しているか
+	public bool IsCompletedAction(IAction _action)
+	{
+		return !actionQueue.Contains(_action);
 	}
 
 	// 全てのアクションをキャンセル
@@ -65,6 +77,9 @@ public class ActionMgr : MonoBehaviour
 			try
 			{
 				await action.Execute(cancellationTokenSource.Token);
+
+				// アクションが完了したらここで通知
+				OnActionCompleted?.Invoke(action); // アクション完了の通知
 			}
 			catch (OperationCanceledException)
 			{

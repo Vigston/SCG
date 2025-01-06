@@ -35,7 +35,7 @@ namespace TMPro.Examples
 
             m_textMeshPro.alignment = TextAlignmentOptions.Center;
 
-            //m_textMeshPro.anchorDampening = true; // Has been deprecated but under consideration for re-implementation.
+            //m_textMeshPro.anchorDampening = true; // Has been deprecated but under conSideration for re-implementation.
             //m_textMeshPro.enableAutoSizing = true;
 
             //m_textMeshPro.characterSpacing = 0.2f;

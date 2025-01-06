@@ -378,7 +378,7 @@
         </member>
         <member name="T:ExitGames.Client.Photon.IPhotonPeerListener">
             <summary>
-            Callback interface for the Photon client side. Must be provided to a new PhotonPeer in its constructor.
+            Callback interface for the Photon client Side. Must be provided to a new PhotonPeer in its constructor.
             </summary>
             <remarks>
             These methods are used by your PhotonPeer instance to keep your app updated. Read each method's
@@ -447,12 +447,12 @@
              Each event carries a Code plus optional content in its Parameters.
              Your application should identify which content to expect by the event's Code.
             
-             Events can be defined and modified server-side.
+             Events can be defined and modified server-Side.
             
              If you use the LoadBalancing api as basis, several events like EvJoin and EvLeave are pre-defined.
              The LoadBalancing api provides the EventCode and ParameterCode classes for pre-defined events.
             
-             Photon also allows you to come up with custom events on the fly, purely client-side.
+             Photon also allows you to come up with custom events on the fly, purely client-Side.
              To do so, use OpRaiseEvent.<para></para>
             
              Events are incoming messages and as such buffered in the peer.
@@ -783,7 +783,7 @@
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.Unwrap``1(System.Object)">
             <summary>
             If object is a StructWrapper, the value will be extracted. If not, the object will be cast to T.
-            Wrapper is returned to the wrapper pool if applicable, so it is not considered safe to Unwrap multiple times, as the wrapper may be recycled.
+            Wrapper is returned to the wrapper pool if applicable, so it is not conSidered safe to Unwrap multiple times, as the wrapper may be recycled.
             </summary>
         </member>
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.Get``1(System.Object)">
@@ -795,13 +795,13 @@
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.Unwrap``1(ExitGames.Client.Photon.Hashtable,System.Object)">
             <summary>
             If object is a StructWrapper, the value will be extracted. If not, the object will be cast to T.
-            Wrapper is returned to the wrapper pool if applicable, so it is not considered safe to Unwrap multiple times, as the wrapper may be recycled.
+            Wrapper is returned to the wrapper pool if applicable, so it is not conSidered safe to Unwrap multiple times, as the wrapper may be recycled.
             </summary>
         </member>
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.TryUnwrapValue``1(ExitGames.Client.Photon.Hashtable,System.Byte,``0@)">
             <summary>
             If object is a StructWrapper, the value will be extracted. If not, the object will be cast to T.
-            Wrapper is returned to the wrapper pool if applicable, so it is not considered safe to Unwrap multiple times, as the wrapper may be recycled.
+            Wrapper is returned to the wrapper pool if applicable, so it is not conSidered safe to Unwrap multiple times, as the wrapper may be recycled.
             </summary>
         </member>
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.TryGetValue``1(ExitGames.Client.Photon.Hashtable,System.Byte,``0@)">
@@ -817,13 +817,13 @@
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.TryUnwrapValue``1(ExitGames.Client.Photon.Hashtable,System.Object,``0@)">
             <summary>
             If object is a StructWrapper, the value will be extracted. If not, the object will be cast to T.
-            Wrapper is returned to the wrapper pool if applicable, so it is not considered safe to Unwrap multiple times, as the wrapper may be recycled.
+            Wrapper is returned to the wrapper pool if applicable, so it is not conSidered safe to Unwrap multiple times, as the wrapper may be recycled.
             </summary>
         </member>
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.Unwrap``1(ExitGames.Client.Photon.Hashtable,System.Byte)">
             <summary>
             If object is a StructWrapper, the value will be extracted. If not, the object will be cast to T.
-            Wrapper is returned to the wrapper pool if applicable, so it is not considered safe to Unwrap multiple times, as the wrapper may be recycled.
+            Wrapper is returned to the wrapper pool if applicable, so it is not conSidered safe to Unwrap multiple times, as the wrapper may be recycled.
             </summary>
         </member>
         <member name="M:ExitGames.Client.Photon.StructWrapping.StructWrapperUtility.Get``1(ExitGames.Client.Photon.Hashtable,System.Byte)">
@@ -958,7 +958,7 @@
         </member>
         <member name="M:ExitGames.Client.Photon.PeerBase.WriteInitRequest">
             <summary>
-            Writes and "Init Request", which initializes the connection / application used server-side.
+            Writes and "Init Request", which initializes the connection / application used server-Side.
             </summary>
             <remarks>Uses this.ServerAddress, this.AppId, this.PhotonToken and CustomInitData and some more values.</remarks>
             <returns>Bytes of the init request.</returns>
@@ -1289,11 +1289,11 @@
         <member name="F:ExitGames.Client.Photon.PhotonPeer.SendWindowSize">
              <summary>Defines how far ahead the client can go sending commands (on UDP connections), compared to the acknowledged sequence number.</summary>
              <remarks>
-             This avoids spamming the receiver and puts focus on resending commands that are older and are needed on the receiver side to dispatch commands.
+             This avoids spamming the receiver and puts focus on resending commands that are older and are needed on the receiver Side to dispatch commands.
             
              When acks arrive, the SendWindow will move forward and newer commands get sent.
              This indirectly affects unreliable commands as they are by default sent in creation order.
-             It queues more on the client side than on the server.
+             It queues more on the client Side than on the server.
              </remarks>
         </member>
         <member name="P:ExitGames.Client.Photon.PhotonPeer.BytesIn">
@@ -1419,7 +1419,7 @@
              </summary>
              <remarks>
              While turned on, the client and server will add a CRC checksum to every sent package.
-             The checksum enables both sides to detect and ignore packages that were corrupted during transfer.
+             The checksum enables both Sides to detect and ignore packages that were corrupted during transfer.
              Corrupted packages have the same impact as lost packages: They require a re-send, adding a delay
              and could lead to timeouts.
             
@@ -1450,7 +1450,7 @@
         </member>
         <member name="F:ExitGames.Client.Photon.PhotonPeer.SentCountAllowance">
              <summary>
-             Number of send retries before a peer is considered lost/disconnected. Default: 7.
+             Number of send retries before a peer is conSidered lost/disconnected. Default: 7.
              </summary>
              <remarks>
              The initial timeout countdown of a command is calculated by the current roundTripTime + 4 * roundTripTimeVariance.
@@ -1706,7 +1706,7 @@
         <member name="M:ExitGames.Client.Photon.PhotonPeer.VitalStatsToString(System.Boolean)">
             <summary>
             Returns a string of the most interesting connection statistics.
-            When you have issues on the client side, these might contain hints about the issue's cause.
+            When you have issues on the client Side, these might contain hints about the issue's cause.
             </summary>
             <param name="all">If true, Incoming and Outgoing low-level stats are included in the string.</param>
             <returns>Stats as string.</returns>
@@ -1821,7 +1821,7 @@
         </member>
         <member name="M:ExitGames.Client.Photon.PhotonPeer.StopThread">
             <summary>
-            This method immediately closes a connection (pure client side) and ends related listening Threads.
+            This method immediately closes a connection (pure client Side) and ends related listening Threads.
             </summary>
             <remarks>
             Unlike Disconnect, this method will simply stop to listen to the server. Udp connections will timeout.

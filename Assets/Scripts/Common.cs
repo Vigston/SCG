@@ -75,15 +75,15 @@ public static class Common
     }
 
     // 逆の側を取得
-    public static Side GetRevSide(Side _side)
+    public static Side GetRevSide(Side _Side)
     {
         // プレイヤー
-        if(_side == Side.eSide_Player)
+        if(_Side == Side.eSide_Player)
         {
             return Side.eSide_Enemy;
         }
         // 敵
-        else if(_side == Side.eSide_Enemy)
+        else if(_Side == Side.eSide_Enemy)
         {
             return Side.eSide_Player;
         }

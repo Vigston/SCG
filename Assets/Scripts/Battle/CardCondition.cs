@@ -12,13 +12,13 @@ public class CardCondition : MonoBehaviour
 	private List<BattleCard> m_CondCardList;
 
 	// カード条件設定
-	public void SetCondCardList(Side _side, List<BattleCard> _cardList)
+	public void SetCondCardList(Side _Side, List<BattleCard> _cardList)
 	{
 		// 初期化
 		m_CondCardList.Clear();
 
 		// 設定
-		m_CondSide = _side;
+		m_CondSide = _Side;
 
 		// 条件に合ったカードリストを作成
 		foreach (var card in _cardList)

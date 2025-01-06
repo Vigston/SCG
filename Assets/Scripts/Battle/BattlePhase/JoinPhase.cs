@@ -101,20 +101,37 @@ public class JoinPhase : MonoBehaviour
             return;
         }
 
-        if (m_StateValue == 1)
-        {
-            // 選択処理開始。
-            BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide);
-        }
+		//if (m_StateValue == 1)
+		//{
+		//    // 選択処理開始。
+		//    BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide);
+		//}
 
-        // 選択思考が終わっているなら次へ
-        if (!BattleUserMgr.instance.IsThinkCardAreaSelectFromSide(m_TurnSide))
+		//// 選択思考が終わっているなら次へ
+		//if (!BattleUserMgr.instance.IsThinkCardAreaSelectFromSide(m_TurnSide))
+		//{
+		//    // 国民カード追加へ
+		//    SetNextStateAndFlag(State.eState_JoinPeople);
+		//    return;
+		//}
+
+		// アクション生成
+		var action = new JoinPeopleGameAction();
+
+		if (m_StateValue == 1)
         {
-            // 国民カード追加へ
-            SetNextStateAndFlag(State.eState_JoinPeople);
-            return;
-        }
-    }
+			Debug.Log("JoinPeopleGameActionをアクションとして追加！！");
+			ActionMgr.instance.AddAction(action);
+		}
+
+        // アクションが終了しているなら
+        if(ActionMgr.instance.IsCompletedAction(action))
+        {
+            Debug.Log("JoinPeopleGameActionは終了しました！！");
+			// 終了へ
+			SetNextStateAndFlag(State.eState_End);
+		}
+	}
     // 国民カード追加
     void JoinPeople()
     {

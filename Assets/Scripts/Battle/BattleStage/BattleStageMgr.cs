@@ -109,7 +109,7 @@ public class BattleStageMgr : MonoBehaviour
     }
 
     // 指定側のカードエリアリストを取得
-    public List<CardArea> GetCardAreaListFromSide(Side _side)
+    public List<CardArea> GetCardAreaListFromSide(Side _Side)
     {
         // 指定側のカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
@@ -117,7 +117,7 @@ public class BattleStageMgr : MonoBehaviour
         foreach(CardArea cardArea in m_CardAreaList)
         {
             // 側が指定されているものと違うならはじく
-            if(cardArea.GetSide() != _side) { continue; }
+            if(cardArea.GetSide() != _Side) { continue; }
 
             // 指定された側のエリアを追加
             cardAreaList.Add(cardArea);
@@ -163,7 +163,7 @@ public class BattleStageMgr : MonoBehaviour
     }
 
     // 指定側のカードが入っていないカードリストエリアを取得
-    public List<CardArea> GetCardAreaFromSideEmptyCard(Side _side)
+    public List<CardArea> GetCardAreaFromSideEmptyCard(Side _Side)
     {
         // カードが入ってないカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
@@ -171,7 +171,7 @@ public class BattleStageMgr : MonoBehaviour
         foreach (CardArea cardArea in m_CardAreaList)
         {
             // 側が指定されているものと違うならはじく
-            if (cardArea.GetSide() != _side) { continue; }
+            if (cardArea.GetSide() != _Side) { continue; }
             // カードが入っているならはじく
             if (!cardArea.IsCardEmpty()) { continue; }
 
@@ -183,9 +183,9 @@ public class BattleStageMgr : MonoBehaviour
     }
 
     // 指定位置のカードエリアを取得
-    public CardArea GetCardAreaFromPos(Side _side, Position _pos)
+    public CardArea GetCardAreaFromPos(Side _Side, Position _pos)
     {
-        CardArea cardArea = m_CardAreaList.Find(x => x.GetSide() == _side && x.GetPosition() == _pos);
+        CardArea cardArea = m_CardAreaList.Find(x => x.GetSide() == _Side && x.GetPosition() == _pos);
 
         return cardArea;
     }

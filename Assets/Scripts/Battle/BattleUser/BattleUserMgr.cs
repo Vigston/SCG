@@ -52,9 +52,9 @@ public class BattleUserMgr : MonoBehaviour
     // ===関数===
     // ---思考---
     // 指定側のユーザーがカードエリア選択思考を行っているか
-    public bool IsThinkCardAreaSelectFromSide(Side _side)
+    public bool IsThinkCardAreaSelectFromSide(Side _Side)
     {
-        BattleUser battleUser = GetUser(_side);
+        BattleUser battleUser = GetUser(_Side);
 
         return battleUser.IsSelectCardAreaFlag();
     }
@@ -73,9 +73,9 @@ public class BattleUserMgr : MonoBehaviour
 		set { m_BattleUsers[(int)Side.eSide_Enemy] = value; }
 	}
     // 指定側のユーザー取得
-    public BattleUser GetUser(Side side)
+    public BattleUser GetUser(Side Side)
     {
-        return m_BattleUsers[(int)side];
+        return m_BattleUsers[(int)Side];
     }
 
     // ---操作側---

@@ -23,9 +23,9 @@ public class CardArea : MonoBehaviour
     }
     // ---側---
     // 側設定
-    public void SetSide(Side _side)
+    public void SetSide(Side _Side)
     {
-        m_Side = _side;
+        m_Side = _Side;
     }
     // 側取得
     public Side GetSide()

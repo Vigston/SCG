@@ -60,7 +60,7 @@ public class BattleStageCtr : MonoBehaviour
             // 基準座標
             Vector3 baseVec = new Vector3();
 
-            Side side = BattleMgr.instance.GetSide(i);
+            Side Side = BattleMgr.instance.GetSide(i);
 
             BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
 
@@ -82,7 +82,7 @@ public class BattleStageCtr : MonoBehaviour
             baseVec.x += Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * 2;
 
             // プレイヤー側
-            if (side == Side.eSide_Player)
+            if (Side == Side.eSide_Player)
             {
                 Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(PlayerArea)[0];
                 Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(PlayerArea)[6];
@@ -90,7 +90,7 @@ public class BattleStageCtr : MonoBehaviour
                 baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
             }
             // 敵側
-            else if (side == Side.eSide_Enemy)
+            else if (Side == Side.eSide_Enemy)
             {
                 Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(EnemyArea)[0];
                 Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(EnemyArea)[6];
@@ -102,7 +102,7 @@ public class BattleStageCtr : MonoBehaviour
             float CardHeightSize = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
 
             // プレイヤー側のエリア作成
-            if (side == Side.eSide_Player)
+            if (Side == Side.eSide_Player)
             {
                 // 縦列の分回す
                 for (int j = 0; j < heightNum; j++)
@@ -121,7 +121,7 @@ public class BattleStageCtr : MonoBehaviour
 
                         // カードエリアの情報設定
                         CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                        cardArea.SetSide(side);
+                        cardArea.SetSide(Side);
                         cardArea.SetPosiiton((Position)((j * widthNum) + k));
 
                         BattleStageMgr.instance.AddCardArea(cardArea);
@@ -130,7 +130,7 @@ public class BattleStageCtr : MonoBehaviour
             }
 
             // 敵側のエリア作成
-            if (side == Side.eSide_Enemy)
+            if (Side == Side.eSide_Enemy)
             {
                 // 縦列の分回す
                 for (int j = 0; j < heightNum; j++)
@@ -151,7 +151,7 @@ public class BattleStageCtr : MonoBehaviour
 
                         // カードエリアの情報設定
                         CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                        cardArea.SetSide(side);
+                        cardArea.SetSide(Side);
                         cardArea.SetPosiiton((Position)(((jrev) * widthNum) + krev));
 
                         BattleStageMgr.instance.AddCardArea(cardArea);
