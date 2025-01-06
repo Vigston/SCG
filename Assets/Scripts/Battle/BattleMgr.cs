@@ -91,8 +91,10 @@ public class BattleMgr : MonoBehaviour
 		GetSetPhaseType = PhaseType.ePhaseType_Start;
         // フェイズループ処理
         PhaseLoop().Forget();
-        // 勝敗更新
-        BattleResultUpdate().Forget();
+        // アクション実行処理
+        ActionMgr.instance.ExecuteActions().Forget();
+		// 勝敗更新
+		BattleResultUpdate().Forget();
 
         // BattleMgrの更新リクエスト
         UpdateRequest();
@@ -399,19 +401,6 @@ public class BattleMgr : MonoBehaviour
 
             // ステータスを通常に設定する
             battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
-        }
-
-        // デバッグモードなら
-        if(DebugMgr.instance.IsDebugMode())
-        {
-            // 操作側切り替え
-            BattleUserMgr.instance.ChangeOperateUserSide();
-        }
-        // デバッグモードじゃないなら
-        else
-        {
-            // 操作側をプレイヤーにする
-            BattleUserMgr.instance.GetSetOperateUserSide = Side.eSide_Player;
         }
 
         Debug.Log($"'{m_TurnSide}'ターンに進む");

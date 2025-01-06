@@ -42,8 +42,6 @@ public class BattleUser : MonoBehaviour
 
     // カードエリア選択フラグ
     bool m_SelectCardAreaFlag = false;
-    // カードがいないエリアを選択するフラグ
-    bool m_SelectIsNoCardArea = false;
 
     // ユーザー終了フラグ
     bool m_UserEndFlag = false;
@@ -158,7 +156,7 @@ public class BattleUser : MonoBehaviour
                         CardArea cardArea = hit.transform.gameObject.GetComponent<CardArea>();
 
                         // 自分が操作側じゃないならカードエリアの選択を行わない
-                        if (operateSide != ) { return; }
+                        //if (operateSide != ) { return; }
                         m_SelectedCardArea = cardArea;
                     }
                 }
@@ -332,10 +330,9 @@ public class BattleUser : MonoBehaviour
     }
 
 	// カードエリア選択開始
-	public void StartThinkSelectCardArea(bool _selectFlag ,bool _isNoCardArea)
+	public void StartThinkSelectCardArea(bool _selectFlag)
     {
         m_SelectCardAreaFlag = _selectFlag;
-        m_SelectIsNoCardArea = _isNoCardArea;
     }
 
     // カードエリア選択フラグが立っているか。

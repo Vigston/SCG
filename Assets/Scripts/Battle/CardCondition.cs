@@ -4,12 +4,10 @@ using UnityEngine;
 
 public class CardCondition : MonoBehaviour
 {
+	// 側
 	[SerializeField]
 	private Side m_CondSide;
-	// カードリスト
-	[SerializeField]
-	private List<BattleCard> m_CardList;
-
+	// 条件カードリスト
 	[SerializeField]
 	private List<BattleCard> m_CondCardList;
 

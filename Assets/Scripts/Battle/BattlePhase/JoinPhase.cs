@@ -104,8 +104,7 @@ public class JoinPhase : MonoBehaviour
         if (m_StateValue == 1)
         {
             // 選択処理開始。
-            bool isNoCardArea = true;
-            BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide, isNoCardArea);
+            BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide);
         }
 
         // 選択思考が終わっているなら次へ
