@@ -85,7 +85,7 @@ public class JoinPhase : MonoBehaviour
         }
     }
     // 参加する場を選択
-    void SelectField()
+    async void SelectField()
     {
         if (m_StateValue == 1)
         {
@@ -115,19 +115,17 @@ public class JoinPhase : MonoBehaviour
 		//    return;
 		//}
 
-		// アクション生成
-		var action = new JoinPeopleGameAction();
-
 		if (m_StateValue == 1)
         {
 			Debug.Log("JoinPeopleGameActionをアクションとして追加！！");
-			ActionMgr.instance.AddAction(action);
+			// アクション生成
+			ActionMgr.instance.AddAction(new JoinPeopleGameAction());
 		}
 
         // アクションが終了しているなら
-        if(ActionMgr.instance.IsCompletedAction(action))
+        if (ActionMgr.instance.IsCompletedAction(new JoinPeopleGameAction()))
         {
-            Debug.Log("JoinPeopleGameActionは終了しました！！");
+			Debug.Log("JoinPeopleGameActionは終了しました！！");
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
 		}

@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -9,12 +10,13 @@ public class ActionMgr : MonoBehaviour
 	// インスタンス
 	public static ActionMgr instance;
 
-	private Queue<IAction> actionQueue = new Queue<IAction>();
-	private CancellationTokenSource cancellationTokenSource;
 	private bool isExecuting = false;
 
-	// イベント
-	public event Action<IAction> OnActionCompleted;
+	public Queue<IAction> actionQueue = new Queue<IAction>();
+	private CancellationTokenSource cancellationTokenSource;
+
+	// 直前に処理を行ったアクションを保持(IsCompletedActionで終了を検知したら削除)
+	private IAction bufferAction;
 
 	private void Awake()
 	{
@@ -45,13 +47,13 @@ public class ActionMgr : MonoBehaviour
 		actionQueue.Enqueue(_action);
 
 		// アクションが追加されるたびに完了通知を監視
-		OnActionCompleted += OnActionCompleted;
+		_action.OnActionCompleted += OnActionCompleted;
 	}
 
-	// 指定のアクションが終了しているか
+	// 指定のアクションが終了しているか(終了しているならここでキューから削除)
 	public bool IsCompletedAction(IAction _action)
 	{
-		return !actionQueue.Contains(_action);
+		return _action.IsCompleted;
 	}
 
 	// 全てのアクションをキャンセル
@@ -65,21 +67,30 @@ public class ActionMgr : MonoBehaviour
 
 	public async UniTask ExecuteActions()
 	{
+		Debug.Log("ExecuteActions実行開始");
 		if (isExecuting) return;
 
 		isExecuting = true;
 		cancellationTokenSource = new CancellationTokenSource();
 
-		while (actionQueue.Count > 0)
+		while (true)
 		{
+			// アクションがキューに存在していなければ、処理を一旦待機
+			if (actionQueue.Count <= 0)
+			{
+				// キューにアクションがない場合、1フレーム待機してから次を確認
+				await UniTask.Yield();
+				continue;
+			}
+
 			var action = actionQueue.Dequeue();
 
 			try
 			{
+				Debug.Log($"action.Execute：{action}");
 				await action.Execute(cancellationTokenSource.Token);
 
-				// アクションが完了したらここで通知
-				OnActionCompleted?.Invoke(action); // アクション完了の通知
+				bufferAction = action;
 			}
 			catch (OperationCanceledException)
 			{
@@ -88,8 +99,15 @@ public class ActionMgr : MonoBehaviour
 			}
 		}
 
-		isExecuting = false;
 		cancellationTokenSource.Dispose();
 		cancellationTokenSource = null;
+
+		Debug.Log("ExecuteActions実行終了");
+	}
+
+	// アクション完了時の処理
+	private void OnActionCompleted(IAction _action)
+	{
+		Debug.Log($"アクション完了：{_action}");
 	}
 }

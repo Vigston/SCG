@@ -5,9 +5,15 @@ using System;
 
 public interface IAction
 {
+	// イベント
+	public event Action<IAction> OnActionCompleted;
+
 	// アクション実行処理
 	UniTask Execute(CancellationToken _cancellationToken);
 
 	// アクション完了時の処理
-	void OnActionCompleted(IAction _action);
+	void End(IAction _action);
+
+	// アクションの完了状態
+	bool IsCompleted { get; }
 }
