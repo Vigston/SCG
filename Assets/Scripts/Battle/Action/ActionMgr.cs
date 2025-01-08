@@ -16,7 +16,7 @@ public class ActionMgr : MonoBehaviour
 	private CancellationTokenSource cancellationTokenSource;
 
 	// 直前に処理を行ったアクションを保持(IsCompletedActionで終了を検知したら削除)
-	private IAction bufferAction;
+	public Queue<IAction> bufferActionQueue = new Queue<IAction>();
 
 	private void Awake()
 	{
@@ -53,7 +53,19 @@ public class ActionMgr : MonoBehaviour
 	// 指定のアクションが終了しているか(終了しているならここでキューから削除)
 	public bool IsCompletedAction(IAction _action)
 	{
-		return _action.IsCompleted;
+		IAction bufferAction = null;
+
+		if (bufferActionQueue.Contains(_action))
+		{
+			bufferAction = bufferActionQueue.Dequeue();
+		}
+
+		if(bufferAction == null)
+		{
+			return false;
+		}
+
+		return bufferAction == _action;
 	}
 
 	// 全てのアクションをキャンセル
@@ -90,7 +102,7 @@ public class ActionMgr : MonoBehaviour
 				Debug.Log($"action.Execute：{action}");
 				await action.Execute(cancellationTokenSource.Token);
 
-				bufferAction = action;
+				bufferActionQueue.Enqueue(action);
 			}
 			catch (OperationCanceledException)
 			{

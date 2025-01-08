@@ -28,9 +28,11 @@ public class JoinPhase : MonoBehaviour
     // ステートごとの実行回数
     int m_StateValue = 0;
 
-    // ===フラグ===
-    // ステートの更新フラグ
-    bool m_NextStateFlag = false;
+    private JoinPeopleGameAction m_JoinPeopleGameAction;
+
+	// ===フラグ===
+	// ステートの更新フラグ
+	bool m_NextStateFlag = false;
 
     private void Awake()
     {
@@ -118,12 +120,15 @@ public class JoinPhase : MonoBehaviour
 		if (m_StateValue == 1)
         {
 			Debug.Log("JoinPeopleGameActionをアクションとして追加！！");
+
+            m_JoinPeopleGameAction = new JoinPeopleGameAction();
+
 			// アクション生成
-			ActionMgr.instance.AddAction(new JoinPeopleGameAction());
+			ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
 		}
 
         // アクションが終了しているなら
-        if (ActionMgr.instance.IsCompletedAction(new JoinPeopleGameAction()))
+        if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
         {
 			Debug.Log("JoinPeopleGameActionは終了しました！！");
 			// 終了へ
