@@ -68,36 +68,22 @@ public class JoinPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("初期化ステート処理開始");
-
-			// 国民を参加させるアクションへ
-			SetNextStateAndFlag(State.eState_JoinPeopleGameAction);
-            Debug.Log("初期化ステート処理終了");
-        }
-    }
-    // 参加する場を選択
-    void JoinPeopleGameAction()
+		// 国民を参加させるアクションへ
+		SetNextStateAndFlag(State.eState_JoinPeopleGameAction);
+	}
+	// 国民を参加させるアクション
+	void JoinPeopleGameAction()
     {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("場選択ステート処理開始");
-        }
-
         // 場に空きがないなら終了へ
         if (BattleStageMgr.instance.GetCardAreaNumFromEmptyCard() <= 0)
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
-            Debug.Log("場選択ステート処理終了");
             return;
         }
 
 		if (m_StateValue == 1)
         {
-			Debug.Log("JoinPeopleGameActionをアクションとして追加！！");
-
 			// JoinPeopleGameActionを生成
 			m_JoinPeopleGameAction = new JoinPeopleGameAction();
             // ターン側を設定
@@ -109,7 +95,6 @@ public class JoinPhase : MonoBehaviour
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
         {
-			Debug.Log("JoinPeopleGameActionは終了しました！！");
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
 		}
@@ -120,21 +105,17 @@ public class JoinPhase : MonoBehaviour
     {
         if (m_StateValue == 1)
         {
-            Debug.Log("終了ステート処理開始");
             // メインフェイズに移動。
             BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-            Debug.Log("終了ステート処理終了");
         }
     }
 
     // --システム--
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop起動");
         while (true)
         {
             // ステート更新処理
-            Debug.Log("ステート更新！！");
             // 次のステート更新(今のステートに設定)
             SetNextState(m_State);
             // 次のステート
@@ -145,19 +126,13 @@ public class JoinPhase : MonoBehaviour
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("初期化ステート");
                     nextState = await StateInit();
-                    Debug.Log("次のステートへ");
                     break;
                 case State.eState_JoinPeopleGameAction:
-                    Debug.Log("場選択ステート");
                     nextState = await StateJoinPeopleGameAction();
-                    Debug.Log("次のステートへ");
                     break;
                 case State.eState_End:
-                    Debug.Log("終了ステート");
                     nextState = await StateEnd();
-                    Debug.Log("次のステートへ");
                     break;
                 default:
                     Debug.Log("StateLoopに記載されていないフェイズに遷移しようとしています");

@@ -42,17 +42,14 @@ public class JoinPeopleGameAction : IGameAction
 	// 実行処理
 	public async UniTask Execute(CancellationToken _cancellationToken)
 	{
-		Debug.Log("JoinPeopleGameActionの実行処理開始");
 		// 初期化ステートから始める
 		GetSetState = State.eState_Init;
 		// ステートループ処理
 		StateLoop().Forget();
 		StateUpdate().Forget();
 
-		// 5秒間待機(キャンセル可)
+		// アクションの処理が終わるまで待機
 		await UniTask.WaitUntil(() => IsCompleted);
-
-		Debug.Log("JoinPeopleGameActionの実行処理終了");
 	}
 
 	// --システム--
@@ -89,8 +86,6 @@ public class JoinPeopleGameAction : IGameAction
 	{
 		if (m_StateValue == 1)
 		{
-			Debug.Log("初期化ステート処理開始");
-
 			// 操作側
 			Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
 
@@ -105,9 +100,6 @@ public class JoinPeopleGameAction : IGameAction
 			{
 
 			}
-
-			
-			Debug.Log("初期化ステート処理終了");
 		}
 	}
 	// 参加する場を選択
@@ -115,7 +107,6 @@ public class JoinPeopleGameAction : IGameAction
 	{
 		if (m_StateValue == 1)
 		{
-			Debug.Log("場選択ステート処理開始");
 			// 選択したカードエリアを初期化。
 			m_SelectedCardArea = null;
 		}
@@ -125,7 +116,6 @@ public class JoinPeopleGameAction : IGameAction
 		{
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
-			Debug.Log("場選択ステート処理終了");
 			return;
 		}
 
@@ -154,6 +144,9 @@ public class JoinPeopleGameAction : IGameAction
 
 						// 自分が操作側じゃないならカードエリアの選択を行わない
 						if (operateSide != Side.eSide_Player) { return; }
+						// 既にカードが存在しているならここは選択できない
+						if (!cardArea.IsCardEmpty()) { return; }
+
 						m_SelectedCardArea = cardArea;
 					}
 				}
@@ -173,13 +166,11 @@ public class JoinPeopleGameAction : IGameAction
 	{
 		if (m_StateValue == 1)
 		{
-			Debug.Log("国民追加ステート処理開始");
 			// 追加するカードエリア
 			CardArea joinArea = m_SelectedCardArea;
 
 			if (joinArea != null)
 			{
-				Debug.Log($"{joinArea.GetSide()}の{joinArea.GetPosition()}に国民カードを追加");
 				bool isSpy = BattleMgr.instance.IsNextJoinSpyFlag();
 				// 国民カード追加
 				BattleCardCtr.instance.CreateBattleCard(joinArea, BattleCard.Kind.eKind_People, isSpy);
@@ -193,7 +184,6 @@ public class JoinPeopleGameAction : IGameAction
 		}
 		// 終了へ
 		SetNextStateAndFlag(State.eState_End);
-		Debug.Log("国民追加ステート処理終了");
 	}
 
 	// 終了
@@ -210,11 +200,9 @@ public class JoinPeopleGameAction : IGameAction
 
 	async UniTask StateLoop()
 	{
-		Debug.Log("StateLoop起動");
 		while (true)
 		{
 			// ステート更新処理
-			Debug.Log("ステート更新！！");
 			// 次のステート更新(今のステートに設定)
 			GetSetNextState = GetSetState;
 			// 次のステートに移動するフラグ初期化
@@ -223,24 +211,16 @@ public class JoinPeopleGameAction : IGameAction
 			switch (GetSetState)
 			{
 				case State.eState_Init:
-					Debug.Log("初期化ステート");
 					GetSetNextState = await StateInit();
-					Debug.Log("次のステートへ");
 					break;
 				case State.eState_SelectField:
-					Debug.Log("場選択ステート");
 					GetSetNextState = await StateSelectField();
-					Debug.Log("次のステートへ");
 					break;
 				case State.eState_JoinPeople:
-					Debug.Log("国民追加ステート");
 					GetSetNextState = await StateJoinPeople();
-					Debug.Log("次のステートへ");
 					break;
 				case State.eState_End:
-					Debug.Log("終了ステート");
 					GetSetNextState = await StateEnd();
-					Debug.Log("次のステートへ");
 					break;
 				default:
 					Debug.Log("StateLoopに記載されていないフェイズに遷移しようとしています");

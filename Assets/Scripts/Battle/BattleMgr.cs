@@ -61,11 +61,6 @@ public class BattleMgr : MonoBehaviour
     // ターンエンドフラグ
     private bool m_TurnEndFlag = false;
 
-    // 追加種類付与フラグ
-    private bool m_AddAppendKindFlag = false;
-    private const int m_AddAppendKindLimitedCount = 1;
-    private int m_AddAppendKindCount = 0;
-
     // 次のターンに追加される国民カードにスパイを付与するフラグ
     private bool m_NextJoinSpyFlag = false;
 
@@ -367,7 +362,7 @@ public class BattleMgr : MonoBehaviour
         // メインフェイズじゃないならはじく
         if (mainPhase == null) { return; }
         // メインステートじゃなければはじく
-        if(mainPhase.GetState() != MainPhase.State.eState_Main) { return; }
+        if(mainPhase.GetSetState != MainPhase.State.eState_Main) { return; }
 
         // ターンエンドフラグを立てる
         m_TurnEndFlag = true;
@@ -386,13 +381,14 @@ public class BattleMgr : MonoBehaviour
         Side turnSide = GetSetTurnSide;
         Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
 		GetSetTurnSide = Common.GetRevSide(turnSide);
-        BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
+
+        if(!DebugMgr.instance.IsDebugMode())
+        {
+			BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
+		}
 
 		// ターン終了リクエスト初期化
 		m_TurnEndFlag = false;
-
-        // 追加種類付与カウント初期化
-        InitAddAppendKindCount();
 
         // カードのターン情報初期化
         foreach(BattleCard battleCard in BattleCardMgr.instance.GetCardList())
@@ -405,22 +401,6 @@ public class BattleMgr : MonoBehaviour
         }
 
         Debug.Log($"'{m_TurnSide}'ターンに進む");
-    }
-
-    // 追加種類追加ステートの終了処理
-    public void AppendKindStateEnd()
-    {
-        GameObject phaseObj = GetPhaseObject();
-        // フェイズオブジェクトのnullチェック
-        if (phaseObj == null) { return; }
-        MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
-        // メインフェイズじゃないならはじく
-        if (mainPhase == null) { return; }
-        // 追加種類付与ステートじゃなければはじく
-        if (mainPhase.GetState() != MainPhase.State.eState_GiveJob) { return; }
-
-        // 追加種類付与フラグを初期化
-        SetAddAppendKindFlag(false);
     }
 
 	// -----側-----
@@ -468,12 +448,6 @@ public class BattleMgr : MonoBehaviour
     public int GetTurnNum()
     {
         return m_TurnNum;
-    }
-
-    // 自分のターンか
-    public bool IsMyTurn()
-    {
-        return GetSetTurnSide == BattleUserMgr.instance.GetSetOperateUserSide;
     }
 
 	// 先行後攻を決める
@@ -684,45 +658,6 @@ public class BattleMgr : MonoBehaviour
     public void AddSpyCardNum(Side _Side, int _value)
     {
         m_SpyCardNum[(int)_Side] += _value;
-    }
-
-    // 追加種類付与フラグ設定
-    public void SetAddAppendKindFlag(bool _flag)
-    {
-        m_AddAppendKindFlag = _flag;
-    }
-    // 追加種類付与フラグが立っているか
-    public bool IsAddAppendKindFlag()
-    {
-        return m_AddAppendKindFlag;
-    }
-
-    // 追加種類付与カウント初期化
-    public void InitAddAppendKindCount()
-    {
-        m_AddAppendKindCount = 0;
-    }
-
-    // 追加種類付与カウント
-    public void AddAppendKindCount()
-    {
-        m_AddAppendKindCount++;
-    }
-
-    // 追加種類付与カウント取得
-    public int GetAddAppendKindCount()
-    {
-        return m_AddAppendKindCount;
-    }
-
-    // 追加種類付与を行えるか
-    public bool IsPlayAddAppendKind()
-    {
-        // １ターンの付与上限を超えるので行えない
-        if(m_AddAppendKindCount >= m_AddAppendKindLimitedCount) { return false; }
-
-        // 行える
-        return true;
     }
 
     // 次のターンに追加される国民カードにスパイを付与するフラグを立てる

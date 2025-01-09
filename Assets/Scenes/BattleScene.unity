@@ -952,7 +952,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -429, y: 136.74}
+  m_AnchoredPosition: {x: -429.00006, y: 136.74}
   m_SizeDelta: {x: -857.23, y: -275.69}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &289871778
@@ -1157,7 +1157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9672aa7a67c6eaf4f9306196dfd0bf8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DebugModeFlag: 0
+  m_DebugModeFlag: 1
   m_TextOperateUser: {fileID: 1668772031}
   m_TextTurnNum: {fileID: 95858566}
   m_TextTurnSide: {fileID: 513247334}
@@ -2275,9 +2275,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_giveKind: 3
-  dragObj: {fileID: 0}
-  targetCard: {fileID: 0}
+  m_GiveKind: 0
+  m_DragObj: {fileID: 0}
+  m_TargetCard: {fileID: 0}
+  m_GiveJobDragFlag: 0
 --- !u!1 &738528484
 GameObject:
   m_ObjectHideFlags: 0
@@ -3589,9 +3590,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_giveKind: 0
-  dragObj: {fileID: 0}
-  targetCard: {fileID: 0}
+  m_GiveKind: 0
+  m_DragObj: {fileID: 0}
+  m_TargetCard: {fileID: 0}
+  m_GiveJobDragFlag: 0
 --- !u!1 &1311622401
 GameObject:
   m_ObjectHideFlags: 0
@@ -3872,9 +3874,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_giveKind: 1
-  dragObj: {fileID: 0}
-  targetCard: {fileID: 0}
+  m_GiveKind: 0
+  m_DragObj: {fileID: 0}
+  m_TargetCard: {fileID: 0}
+  m_GiveJobDragFlag: 0
 --- !u!61 &1316189360
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -4224,9 +4227,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_giveKind: 2
-  dragObj: {fileID: 0}
-  targetCard: {fileID: 0}
+  m_GiveKind: 0
+  m_DragObj: {fileID: 0}
+  m_TargetCard: {fileID: 0}
+  m_GiveJobDragFlag: 0
 --- !u!1 &1636290708
 GameObject:
   m_ObjectHideFlags: 0

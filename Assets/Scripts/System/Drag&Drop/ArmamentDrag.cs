@@ -93,7 +93,7 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
         int GoldValue = BattleMgr.instance.GetGoldValue(userSide);
 
         // 自分のターンじゃなければはじく
-        if (!BattleMgr.instance.IsMyTurn()) { return false; }
+        if (!Common.IsMyTurn()) { return false; }
         // メインフェイズじゃなければはじく
         if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
         // 場に軍事カードがいなければはじく

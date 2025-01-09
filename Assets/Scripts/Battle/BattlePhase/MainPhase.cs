@@ -10,7 +10,6 @@ public class MainPhase : MonoBehaviour
     public enum State
     {
         eState_Init,
-        eState_GiveJob,
         eState_Main,
         eState_End,
     }
@@ -36,8 +35,8 @@ public class MainPhase : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // 初期化ステートから始める
-        SetState(State.eState_Init);
+		// 初期化ステートから始める
+		GetSetState = State.eState_Init;
         // ステートループ処理
         StateLoop().Forget();
     }
@@ -50,9 +49,6 @@ public class MainPhase : MonoBehaviour
         {
             case State.eState_Init:
                 Init();
-                break;
-            case State.eState_GiveJob:
-                GiveJob();
                 break;
             case State.eState_Main:
                 Main();
@@ -69,55 +65,17 @@ public class MainPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        if(m_StateValue == 1)
-        {
-            Debug.Log("初期化ステート処理開始");
-        }
-
         // 職業付与へ
-        SetNextStateAndFlag(State.eState_GiveJob);
-        Debug.Log("初期化ステート処理終了");
-    }
-
-    // 職業付与
-    void GiveJob()
-    {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("職業付与ステート処理開始");
-        }
-
-        // 追加種類付与が終わっているなら
-        if (BattleMgr.instance.IsAddAppendKindFlag() == false)
-        {
-            // メインへ
-            SetNextStateAndFlag(State.eState_Main);
-            Debug.Log("職業付与ステート処理終了");
-        }
+        SetNextStateAndFlag(State.eState_Main);
     }
 
     void Main()
     {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("メインステート処理開始");
-        }
-
-        // 追加種類付与フラグが立っているなら
-        if(BattleMgr.instance.IsAddAppendKindFlag())
-        {
-            // 職業付与へ
-            SetNextStateAndFlag(State.eState_GiveJob);
-            Debug.Log("メインステート処理終了");
-            return;
-        }
-
         // ターンエンドフラグが立っているなら終了する。
         if (BattleMgr.instance.IsTurnEndFlag())
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
-            Debug.Log("メインステート処理終了");
             return;
         }
     }
@@ -125,51 +83,31 @@ public class MainPhase : MonoBehaviour
     // 終了
     void End()
     {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("終了ステート処理開始");
-            // エンドフェイズに移動。
-            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
-            Debug.Log("終了ステート処理終了");
-        }
-    }
+		// エンドフェイズに移動。
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+	}
 
     // --システム--
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop起動");
         while (true)
         {
             // ステート更新処理
-            Debug.Log("ステート更新！！");
-            // 次のステート更新(今のステートに設定)
-            SetNextState(m_State);
-            // 次のステート
-            State nextState = GetNextState();
+			// 次のステート更新(今のステートに設定)
+			GetSetNextState = GetSetState;
             // 次のステートに移動するフラグ初期化
             m_NextStateFlag = false;
 
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("初期化ステート");
-                    nextState = await StateInit();
-                    Debug.Log("次のステートへ");
-                    break;
-                case State.eState_GiveJob:
-                    Debug.Log("職業付与ステート");
-                    nextState = await StateGiveJob();
-                    Debug.Log("次のステートへ");
+					GetSetNextState = await StateInit();
                     break;
                 case State.eState_Main:
-                    Debug.Log("メインステート");
-                    nextState = await StateMain();
-                    Debug.Log("次のステートへ");
+					GetSetNextState = await StateMain();
                     break;
                 case State.eState_End:
-                    Debug.Log("終了ステート");
-                    nextState = await StateEnd();
-                    Debug.Log("次のステートへ");
+					GetSetNextState = await StateEnd();
                     break;
                 default:
                     Debug.Log("StateLoopに記載されていないステートに遷移しようとしています");
@@ -177,21 +115,14 @@ public class MainPhase : MonoBehaviour
             }
 
             // 次のステートが現在と同じならはじく
-            if (nextState == m_State) { continue; }
+            if (GetSetNextState == GetSetState) { continue; }
 
-            // 次のステートを設定
-            SetState(nextState);
+			// 次のステートを設定
+			GetSetState = GetSetNextState;
         }
     }
     // 初期化
     async UniTask<State> StateInit()
-    {
-        await UniTask.WaitUntil(() => IsNextStateFlag());
-        // 次のステートへ
-        return GetNextState();
-    }
-    // 職業付与
-    async UniTask<State> StateGiveJob()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
@@ -214,19 +145,15 @@ public class MainPhase : MonoBehaviour
     }
 
     // --ステート--
-    // ステート設定
-    public void SetState(State _state)
+    public State GetSetState
     {
-        m_State = _state;
+        get { return m_State; }
+        set { m_State = value; }
     }
-    public void SetNextState(State _nextState)
+    public State GetSetNextState
     {
-        m_NextState = _nextState;
-    }
-    // ステート取得
-    public State GetState()
-    {
-        return m_State;
+        get { return m_NextState; }
+        set { m_NextState = value; }
     }
     public State GetNextState()
     {
@@ -256,7 +183,7 @@ public class MainPhase : MonoBehaviour
     // 次のステートとフラグを設定
     public void SetNextStateAndFlag(State _nextState)
     {
-        SetNextState(_nextState);
+		GetSetNextState = _nextState;
         SetNextStateFlag();
     }
 }

@@ -2,33 +2,42 @@
 using UnityEngine.EventSystems;
 using battleTypes;
 
-public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDragHandler
+public class GiveJobDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField]
-    private BattleCard.JobKind m_giveKind;
+    private BattleCard.JobKind m_GiveKind;
     [SerializeField]
-    private GameObject dragObj;
-
+    private GameObject m_DragObj;
     [SerializeField]
-    private GameObject targetCard;
+    private GameObject m_TargetCard;
+    [SerializeField]
+    private bool m_GiveJobDragFlag = false;
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // 追加付与が行えるなら
-        if(BattleMgr.instance.IsPlayAddAppendKind())
+        // 現在のフェイズオブジェクト
+        GameObject phaseObj = BattleMgr.instance.GetPhaseObject();
+        // メインフェイズ
+		MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
+
+		// メインフェイズじゃないならはじく
+		if (mainPhase == null)
         {
-            // 追加種類付与フラグを立てる
-            BattleMgr.instance.SetAddAppendKindFlag(true);
+			return;
         }
 
-        // 追加種類付与フラグが立っているなら
-        if (BattleMgr.instance.IsAddAppendKindFlag())
+        // メインステートじゃないならはじく
+        if(mainPhase.GetSetState != MainPhase.State.eState_Main)
         {
-            dragObj = gameObject;
-            targetCard = null;
-            Debug.Log($"{dragObj}を追加種類付与ドラッグしました。");
+            return;
         }
-    }
+
+        /////職業付与処理/////
+        GetSetGiveJobDragFlag = true;
+		m_DragObj = gameObject;
+		m_TargetCard = null;
+		Debug.Log($"{m_DragObj}を追加種類付与ドラッグしました。");
+	}
 
     public void OnDrag(PointerEventData eventData)
     {
@@ -40,7 +49,7 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
         bool isAppendAction = false;
 
         // 追加種類付与フラグが立っているなら
-        if (BattleMgr.instance.IsAddAppendKindFlag())
+        if (GetSetGiveJobDragFlag)
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -50,10 +59,10 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 GameObject hitObj = hit.transform.gameObject;
 
                 // スパイを付与するのは次に相手の場に参加する国民なので例外処理。
-                if (m_giveKind == BattleCard.JobKind.eAppendKind_Spy)
+                if (m_GiveKind == BattleCard.JobKind.eAppendKind_Spy)
                 {
                     // 自分のターンなら
-                    if(BattleMgr.instance.IsMyTurn())
+                    if (Common.IsMyTurn())
                     {
                         Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
 
@@ -78,16 +87,16 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                 {
                     if (hit.collider.tag == "BattleCard")
                     {
-                        targetCard = hitObj;
+                        m_TargetCard = hitObj;
                     }
                 }
             }
 
             // カードにドロップしているなら
-            if (targetCard != null)
+            if (m_TargetCard != null)
             {
                 // カード種類を設定
-                BattleCard battleCard = targetCard.GetComponent<BattleCard>();
+                BattleCard battleCard = m_TargetCard.GetComponent<BattleCard>();
 
                 // 自分のターンで自分のカードなら職業付与できる
                 if (Common.IsMyTurnAndMyCard(battleCard))
@@ -96,7 +105,7 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
                     if (battleCard.GetAppendJobNum(true) <= 0)
                     {
                         // 職業付与
-                        battleCard.AppendJob(m_giveKind);
+                        battleCard.AppendJob(m_GiveKind);
                         // 付与しました
                         isAppendAction = true;
                     }
@@ -104,21 +113,22 @@ public class GiveJobDrag : MonoBehaviour,IDragHandler,IBeginDragHandler,IEndDrag
             }
 
             // 職業付与を行ったなら
-            if(isAppendAction)
+            if (isAppendAction)
             {
                 // BattleMgr更新リクエスト
                 BattleMgr.instance.UpdateRequest();
-                // 追加種類付与カウント
-                BattleMgr.instance.AddAppendKindCount();
             }
 
-            dragObj = null;
+            m_DragObj = null;
 
-            // 追加種類付与フラグを初期化
-            BattleMgr.instance.SetAddAppendKindFlag(false);
-
-            Debug.Log($"追加種類付与ドラッグ終了。");
+			// 追加種類付与フラグを初期化
+			GetSetGiveJobDragFlag = false;
         }
     }
 
+    public bool GetSetGiveJobDragFlag
+    {
+        get { return m_GiveJobDragFlag; }
+        set { m_GiveJobDragFlag = value; }
+    }
 }

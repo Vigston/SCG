@@ -91,15 +91,31 @@ public static class Common
         return Side.eSide_None;
     }
 
-    // 自分のターンで自分のカードか
-    public static bool IsMyTurnAndMyCard(BattleCard battleCard)
+	// 自分のターンか
+	public static bool IsMyTurn()
+	{
+        Side turnSide       = BattleMgr.instance.GetSetTurnSide;
+        Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
+
+		return turnSide == operateSide;
+	}
+
+    // 自分のカードか
+    public static bool IsMyCard(BattleCard _battleCard)
     {
-        if(battleCard == null) { return false; }
+		if (_battleCard == null) { return false; }
 
-        Side turnSide = BattleMgr.instance.GetSetTurnSide;
-        Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
-        Side cardSide = battleCard.GetSetSide;
+		Side cardSide = _battleCard.GetSetSide;
+		Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
 
-        return turnSide == userSide && cardSide == userSide;
-    }
+        return cardSide == operateSide;
+	}
+
+	// 自分のターンで自分のカードか
+	public static bool IsMyTurnAndMyCard(BattleCard _battleCard)
+    {
+        if(_battleCard == null) { return false; }
+
+        return IsMyTurn() == IsMyCard(_battleCard);
+	}
 }
