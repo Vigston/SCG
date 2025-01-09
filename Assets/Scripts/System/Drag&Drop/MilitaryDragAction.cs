@@ -126,28 +126,36 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
     public bool IsMilitalyAction()
     {
         BattleCard battleCard = gameObject.GetComponent<BattleCard>();
-        // バトルカードじゃないならはじく
-        if (battleCard == null) { return false; }
+		Debug.Log("IsMilitalyAction：０");
+		// バトルカードじゃないならはじく
+		if (battleCard == null) { return false; }
+        Debug.Log("IsMilitalyAction：１");
         // 疲労状態ならはじく
         if (battleCard.IsStatus(BattleCard.Status.eStatus_Fatigue)) { return false; }
-        // 行動できないならはじく
-        if (!battleCard.IsAction()) { return false; }
-        // 自分のターンで自分のカードじゃないならはじく
-        if(!Common.IsMyTurnAndMyCard(battleCard)) { return false; }
-        // メインフェイズじゃなければはじく
-        if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
+		Debug.Log("IsMilitalyAction：２");
+		// 行動できないならはじく
+		if (!battleCard.IsAction()) { return false; }
+		Debug.Log("IsMilitalyAction：３");
+		// 自分のターンで自分のカードじゃないならはじく
+		if (!Common.IsMyTurnAndMyCard(battleCard)) { return false; }
+		Debug.Log("IsMilitalyAction：４");
+		// メインフェイズじゃなければはじく
+		if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
+		Debug.Log("IsMilitalyAction：５");
 
-        Military military = battleCard.GetMilitary();
+		Military military = battleCard.GetMilitary();
         // 軍事じゃないならはじく
         if(military == null) { return false; }
-        // 非武装状態ならはじく
-        if (military.IsStatus(Military.Status.eStatus_Unarmed))
+		Debug.Log("IsMilitalyAction：６");
+		// 非武装状態ならはじく
+		if (military.IsStatus(Military.Status.eStatus_Unarmed))
         {
             Debug.Log("非武装状態なので行動出来ません！！");
             return false;
         }
+		Debug.Log("IsMilitalyAction：７");
 
-        // 行動できる
-        return true;
+		// 行動できる
+		return true;
     }
 }

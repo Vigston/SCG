@@ -85,15 +85,15 @@ public class StartPhase : MonoBehaviour
             Debug.Log("開始時ステート処理開始");
 
             // Gold追加処理
-            // ユーザー側
-            Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
+            // ターン側
+            Side turnSide = BattleMgr.instance.GetSetTurnSide;
             // 場にいる商人数
-            int merchantNum = BattleCardMgr.instance.GetCardNumFromAppendKind(userSide, BattleCard.JobKind.eAppendKind_Merchant);
+            int merchantNum = BattleCardMgr.instance.GetCardNumFromAppendKind(turnSide, BattleCard.JobKind.eAppendKind_Merchant);
             // 追加されるGold
             int addGoldValue = merchantNum * Common.BattleConst.ADD_GOLD_EVERY_MERCHANT;
 
             // Gold追加
-            BattleMgr.instance.AddGoldValue(userSide, addGoldValue);
+            BattleMgr.instance.AddGoldValue(turnSide, addGoldValue);
 
             // 通信同期へ
             SetNextStateAndFlag(State.eState_NetworkSync);

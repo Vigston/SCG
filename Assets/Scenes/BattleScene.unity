@@ -994,7 +994,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &289871780
 Canvas:
   m_ObjectHideFlags: 0
@@ -2275,7 +2275,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GiveKind: 0
+  m_GiveKind: 3
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
@@ -2407,7 +2407,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &757137124
 Canvas:
   m_ObjectHideFlags: 0
@@ -3400,7 +3400,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1197328312
 Canvas:
   m_ObjectHideFlags: 0
@@ -3874,7 +3874,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GiveKind: 0
+  m_GiveKind: 1
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
@@ -4068,7 +4068,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1454079441
 Canvas:
   m_ObjectHideFlags: 0
@@ -4227,7 +4227,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bd30fc71a24df74b83839d8394430d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_GiveKind: 0
+  m_GiveKind: 2
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
@@ -4289,7 +4289,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1636290711
 Canvas:
   m_ObjectHideFlags: 0
@@ -4299,7 +4299,7 @@ Canvas:
   m_GameObject: {fileID: 1636290708}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 2
   m_Camera: {fileID: 963194227}
   m_PlaneDistance: 17.5
   m_PixelPerfect: 0
@@ -4320,9 +4320,9 @@ RectTransform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1636290708}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: 0.49744645, y: -0, z: -0, w: 0.86749476}
+  m_LocalPosition: {x: 0, y: 0, z: -7.9108543}
+  m_LocalScale: {x: 0.033678763, y: 0.033678763, z: 0.033678763}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 289871777}
@@ -4336,9 +4336,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0.4, y: 9.606373}
+  m_SizeDelta: {x: 1509.4556, y: 600}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1647492737
 GameObject:
   m_ObjectHideFlags: 0

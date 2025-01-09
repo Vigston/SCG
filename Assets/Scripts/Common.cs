@@ -97,6 +97,12 @@ public static class Common
         Side turnSide       = BattleMgr.instance.GetSetTurnSide;
         Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
 
+        // デバッグ中は相手ターンの操作も行いたいのでこっちの処理で返す
+        if(DebugMgr.instance.IsDebugMode())
+        {
+            return operateSide == Side.eSide_Player;
+		}
+
 		return turnSide == operateSide;
 	}
 
@@ -108,7 +114,13 @@ public static class Common
 		Side cardSide = _battleCard.GetSetSide;
 		Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
 
-        return cardSide == operateSide;
+		// デバッグ中は相手ターンの操作も行いたいのでこっちの処理で返す
+		if (DebugMgr.instance.IsDebugMode())
+		{
+			return operateSide == Side.eSide_Player;
+		}
+
+		return cardSide == operateSide;
 	}
 
 	// 自分のターンで自分のカードか
