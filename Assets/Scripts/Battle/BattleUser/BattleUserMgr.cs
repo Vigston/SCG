@@ -50,15 +50,6 @@ public class BattleUserMgr : MonoBehaviour
     }
 
     // ===関数===
-    // ---思考---
-    // 指定側のユーザーがカードエリア選択思考を行っているか
-    public bool IsThinkCardAreaSelectFromSide(Side _Side)
-    {
-        BattleUser battleUser = GetUser(_Side);
-
-        return battleUser.IsSelectCardAreaFlag();
-    }
-
     // ---ユーザー---
     // プレイヤーユーザー
     public BattleUser GetSetPlayerUser

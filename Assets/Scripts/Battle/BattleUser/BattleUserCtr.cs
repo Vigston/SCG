@@ -16,27 +16,6 @@ public class BattleUserCtr : MonoBehaviour
         CreateInstance();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-
-    // 指定側のユーザーのカードエリア選択思考処理を開始する
-    public void SelectThinkCardAreaUserFromSide(Side _Side)
-    {
-        bool isThinkFlag = true;
-        BattleUser battleUser = BattleUserMgr.instance.GetUser(_Side);
-
-        battleUser.StartThinkSelectCardArea(isThinkFlag);
-    }
-
     // インスタンスを作成
     public bool CreateInstance()
     {

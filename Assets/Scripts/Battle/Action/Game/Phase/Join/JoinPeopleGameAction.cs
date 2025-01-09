@@ -34,6 +34,9 @@ public class JoinPeopleGameAction : IGameAction
 	// イベント
 	public event Action<IAction> OnActionCompleted;
 
+	// 側
+	public Side GetSetActionSide { get; set; }
+	// アクションの完了状態
 	public bool IsCompleted { get; private set; }
 
 	// 実行処理
@@ -47,12 +50,8 @@ public class JoinPeopleGameAction : IGameAction
 		StateUpdate().Forget();
 
 		// 5秒間待機(キャンセル可)
-		await UniTask.Delay(5000, cancellationToken: _cancellationToken);
+		await UniTask.WaitUntil(() => IsCompleted);
 
-		// 実行完了後に完了フラグを立てる
-		IsCompleted = true;
-
-		OnActionCompleted?.Invoke(this); // アクション完了の通知
 		Debug.Log("JoinPeopleGameActionの実行処理終了");
 	}
 
@@ -142,6 +141,9 @@ public class JoinPeopleGameAction : IGameAction
 				{
 					// 操作側
 					Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+
+					// ユーザーを取得(アクション側)
+					BattleUser battleUser = BattleUserMgr.instance.GetUser(GetSetActionSide);
 					// カードエリアを取得。
 					GameObject cardAreaObject = hit.transform.gameObject;
 
@@ -199,8 +201,10 @@ public class JoinPeopleGameAction : IGameAction
 	{
 		if (m_StateValue == 1)
 		{
-			Debug.Log("終了ステート処理開始");
-			Debug.Log("終了ステート処理終了");
+			// 実行完了後に完了フラグを立てる
+			IsCompleted = true;
+			// アクション完了の通知
+			OnActionCompleted?.Invoke(this);
 		}
 	}
 

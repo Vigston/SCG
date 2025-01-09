@@ -12,14 +12,11 @@ public class JoinPhase : MonoBehaviour
     {
         eState_Init,
         eState_Start,
-        eState_SelectField,
-        eState_JoinPeople,
+		eState_JoinPeopleGameAction,
         eState_End,
     }
 
     // ===変数===
-    // ターン側
-    Side m_TurnSide;
     // 現在のステート
     State m_State;
     // 次のステート
@@ -56,11 +53,8 @@ public class JoinPhase : MonoBehaviour
             case State.eState_Init:
                 Init();
                 break;
-            case State.eState_SelectField:
-                SelectField();
-                break;
-            case State.eState_JoinPeople:
-                JoinPeople();
+            case State.eState_JoinPeopleGameAction:
+				JoinPeopleGameAction();
                 break;
             case State.eState_End:
                 End();
@@ -78,16 +72,13 @@ public class JoinPhase : MonoBehaviour
         {
             Debug.Log("初期化ステート処理開始");
 
-            // ターン側を取得
-            m_TurnSide = BattleMgr.instance.GetSetTurnSide;
-
-            // 参加する場を選択へ
-            SetNextStateAndFlag(State.eState_SelectField);
+			// 国民を参加させるアクションへ
+			SetNextStateAndFlag(State.eState_JoinPeopleGameAction);
             Debug.Log("初期化ステート処理終了");
         }
     }
     // 参加する場を選択
-    async void SelectField()
+    void JoinPeopleGameAction()
     {
         if (m_StateValue == 1)
         {
@@ -103,27 +94,15 @@ public class JoinPhase : MonoBehaviour
             return;
         }
 
-		//if (m_StateValue == 1)
-		//{
-		//    // 選択処理開始。
-		//    BattleUserCtr.instance.SelectThinkCardAreaUserFromSide(m_TurnSide);
-		//}
-
-		//// 選択思考が終わっているなら次へ
-		//if (!BattleUserMgr.instance.IsThinkCardAreaSelectFromSide(m_TurnSide))
-		//{
-		//    // 国民カード追加へ
-		//    SetNextStateAndFlag(State.eState_JoinPeople);
-		//    return;
-		//}
-
 		if (m_StateValue == 1)
         {
 			Debug.Log("JoinPeopleGameActionをアクションとして追加！！");
 
-            m_JoinPeopleGameAction = new JoinPeopleGameAction();
-
-			// アクション生成
+			// JoinPeopleGameActionを生成
+			m_JoinPeopleGameAction = new JoinPeopleGameAction();
+            // ターン側を設定
+            m_JoinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
+			// アクション追加
 			ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
 		}
 
@@ -135,37 +114,6 @@ public class JoinPhase : MonoBehaviour
 			SetNextStateAndFlag(State.eState_End);
 		}
 	}
-    // 国民カード追加
-    void JoinPeople()
-    {
-        if (m_StateValue == 1)
-        {
-            Debug.Log("国民追加ステート処理開始");
-
-            // ターン側のユーザーを取得。
-            BattleUser battleUser = BattleUserMgr.instance.GetUser(m_TurnSide);
-
-            // 追加するカードエリア
-            CardArea joinArea = battleUser.GetSelectedCardArea();
-
-            if(joinArea != null)
-            {
-                Debug.Log($"{joinArea.GetSide()}の{joinArea.GetPosition()}に国民カードを追加");
-                bool isSpy = BattleMgr.instance.IsNextJoinSpyFlag();
-                // 国民カード追加
-                BattleCardCtr.instance.CreateBattleCard(joinArea, BattleCard.Kind.eKind_People, isSpy);
-
-                // スパイ追加フラグが立っているなら初期化
-                if(isSpy)
-                {
-                    BattleMgr.instance.SetNextJoinSpyFlag(false);
-                }
-            }
-        }
-        // 終了へ
-        SetNextStateAndFlag(State.eState_End);
-        Debug.Log("国民追加ステート処理終了");
-    }
 
     // 終了
     void End()
@@ -201,14 +149,9 @@ public class JoinPhase : MonoBehaviour
                     nextState = await StateInit();
                     Debug.Log("次のステートへ");
                     break;
-                case State.eState_SelectField:
+                case State.eState_JoinPeopleGameAction:
                     Debug.Log("場選択ステート");
-                    nextState = await StateSelectField();
-                    Debug.Log("次のステートへ");
-                    break;
-                case State.eState_JoinPeople:
-                    Debug.Log("国民追加ステート");
-                    nextState = await StateJoinPeople();
+                    nextState = await StateJoinPeopleGameAction();
                     Debug.Log("次のステートへ");
                     break;
                 case State.eState_End:
@@ -235,15 +178,8 @@ public class JoinPhase : MonoBehaviour
         // 次のステートへ
         return GetNextState();
     }
-    // 参加させる場を選択
-    async UniTask<State> StateSelectField()
-    {
-        await UniTask.WaitUntil(() => IsNextStateFlag());
-        // 次のステートへ
-        return GetNextState();
-    }
-    // 国民カード追加
-    async UniTask<State> StateJoinPeople()
+	// 国民を参加させるアクション
+	async UniTask<State> StateJoinPeopleGameAction()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
         // 次のステートへ
