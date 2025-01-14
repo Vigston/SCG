@@ -95,6 +95,12 @@ public class JoinPeopleGameAction : IGameAction
 				// 参加する場を選択へ
 				SetNextStateAndFlag(State.eState_SelectField);
 			}
+			// デバッグモード中なら参加する場を選択するステートに飛ばす
+			else if(DebugMgr.instance.IsDebugMode())
+			{
+				// 参加する場を選択へ
+				SetNextStateAndFlag(State.eState_SelectField);
+			}
 			// 操作側じゃないなら通信同期へ
 			else
 			{
@@ -142,8 +148,6 @@ public class JoinPeopleGameAction : IGameAction
 					{
 						CardArea cardArea = hit.transform.gameObject.GetComponent<CardArea>();
 
-						// 自分が操作側じゃないならカードエリアの選択を行わない
-						if (operateSide != Side.eSide_Player) { return; }
 						// 既にカードが存在しているならここは選択できない
 						if (!cardArea.IsCardEmpty()) { return; }
 

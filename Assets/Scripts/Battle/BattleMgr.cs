@@ -382,10 +382,7 @@ public class BattleMgr : MonoBehaviour
         Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
 		GetSetTurnSide = Common.GetRevSide(turnSide);
 
-        if(!DebugMgr.instance.IsDebugMode())
-        {
-			BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
-		}
+		BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
 
 		// ターン終了リクエスト初期化
 		m_TurnEndFlag = false;

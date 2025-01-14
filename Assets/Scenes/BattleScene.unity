@@ -1157,7 +1157,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9672aa7a67c6eaf4f9306196dfd0bf8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_DebugModeFlag: 1
+  m_DebugModeFlag: 0
   m_TextOperateUser: {fileID: 1668772031}
   m_TextTurnNum: {fileID: 95858566}
   m_TextTurnSide: {fileID: 513247334}

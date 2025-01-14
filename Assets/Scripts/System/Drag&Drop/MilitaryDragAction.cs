@@ -53,9 +53,8 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
             // ターゲットがカードの場合
             if(targetCard != null)
             {
-                Side userSide = BattleUserMgr.instance.GetSetOperateUserSide;
                 // 対象カードが自分のカードなら
-                if (targetCard.GetSetSide == userSide)
+                if ( Common.IsMyCard(targetCard))
                 {
                     // 対象カードがスパイなら
                     if(targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy))
