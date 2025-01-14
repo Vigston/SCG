@@ -3,17 +3,18 @@ using Cysharp.Threading.Tasks;
 using System.Threading;
 using System;
 using battleTypes;
+using Photon.Pun;
 
 // 国民を参加させるアクション
-public class JoinPeopleGameAction : IGameAction
+public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 {
 	// ===構造体===
 	public enum State
 	{
-		eState_Init,
-		eState_Start,
-		eState_SelectField,
-		eState_JoinPeople,
+		eState_Init,		// 初期化
+		eState_SelectField, // 参加する場を選択
+		eState_JoinPeople,  // 国民カード追加
+		eState_NetWorkSync,	// 通信同期
 		eState_End,
 	}
 
@@ -69,6 +70,9 @@ public class JoinPeopleGameAction : IGameAction
 				case State.eState_JoinPeople:
 					JoinPeople();
 					break;
+				case State.eState_NetWorkSync:
+					NetWorkSync();
+					break;
 				case State.eState_End:
 					End();
 					break;
@@ -101,11 +105,7 @@ public class JoinPeopleGameAction : IGameAction
 				// 参加する場を選択へ
 				SetNextStateAndFlag(State.eState_SelectField);
 			}
-			// 操作側じゃないなら通信同期へ
-			else
-			{
-
-			}
+			// 操作側じゃないなら通信同期が行われるまで待機
 		}
 	}
 	// 参加する場を選択
@@ -186,6 +186,18 @@ public class JoinPeopleGameAction : IGameAction
 				}
 			}
 		}
+		// 終了へ
+		SetNextStateAndFlag(State.eState_End);
+	}
+
+	// 国民カード追加
+	void NetWorkSync()
+	{
+		if (m_StateValue == 1)
+		{
+
+		}
+
 		// 終了へ
 		SetNextStateAndFlag(State.eState_End);
 	}
@@ -301,5 +313,16 @@ public class JoinPeopleGameAction : IGameAction
 	{
 		GetSetNextState = _nextState;
 		SetNextStateFlag();
+	}
+
+	/////Photon/////
+	// 国民カードが追加された際に情報を他クライアントに送信
+	[PunRPC]
+	void OnJoinPeopleCard(int cardAreaViewID)
+	{
+		if (PhotonView.Find(cardAreaViewID) != null)
+		{
+			m_SelectedCardArea = PhotonView.Find(cardAreaViewID).GetComponent<CardArea>();
+		}
 	}
 }

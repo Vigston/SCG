@@ -5,9 +5,10 @@ using battleTypes;
 using Photon.Realtime;
 using static BattleMgr;
 using UnityEngine.Rendering;
+using System.IO;
 
 // ネットワーク通信同期オブジェクト
-public class NetWorkSync : MonoBehaviourPunCallbacks
+public class NetWorkSync : MonoBehaviourPun
 {
 	public enum NetworkSyncStatus
 	{
@@ -54,8 +55,6 @@ public class NetWorkSync : MonoBehaviourPunCallbacks
 		photonView.RPC("SetSyncTurnNum", RpcTarget.Others, BattleMgr.instance.GetSetTurnNum);
 		// ターン側
 		photonView.RPC("SetSyncTurnSide", RpcTarget.Others, BattleMgr.instance.GetSetTurnSide);
-		// フェイズ
-		photonView.RPC("SetSyncPhaseType", RpcTarget.Others, BattleMgr.instance.GetSetPhaseType);
 		// 勝敗
 		photonView.RPC("SetSyncBattleResult", RpcTarget.Others, BattleMgr.instance.GetSetBattleResult);
 		// 操作側

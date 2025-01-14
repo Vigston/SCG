@@ -4,8 +4,9 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using battleTypes;
 using System.Linq;
+using Photon.Pun;
 
-public class JoinPhase : MonoBehaviour
+public class JoinPhase : MonoBehaviourPunCallbacks
 {
     // ===構造体===
     public enum State
@@ -209,8 +210,8 @@ public class JoinPhase : MonoBehaviour
         return m_NextStateFlag;
     }
 
-    // 次のステートとフラグを設定
-    public void SetNextStateAndFlag(State _nextState)
+	// 次のステートとフラグを設定
+	public void SetNextStateAndFlag(State _nextState)
     {
         SetNextState(_nextState);
         SetNextStateFlag();
