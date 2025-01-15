@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using battleTypes;
 using System.Linq;
+using Photon.Pun;
 
 public class BattleStageMgr : MonoBehaviour
 {
@@ -31,9 +32,12 @@ public class BattleStageMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        // カードエリアの作成
-        BattleStageCtr.instance.CreateCardArea();
-    }
+        if (PhotonNetwork.IsMasterClient)
+        {
+			// カードエリアの作成
+			BattleStageCtr.instance.CreateCardArea();
+		}
+	}
 
     // Update is called once per frame
     void Update()

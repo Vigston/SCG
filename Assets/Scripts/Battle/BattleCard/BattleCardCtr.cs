@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
+using Photon.Pun;
 
 public class BattleCardCtr : MonoBehaviour
 {
@@ -10,6 +11,8 @@ public class BattleCardCtr : MonoBehaviour
 
     // カードオブジェクト
     public GameObject cardPrefab;
+    // カードプレハブ名
+    private string cardPrehabName = "Card";
 
     private void Awake()
     {
@@ -54,7 +57,7 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+        GameObject cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン側
         Side turnSide = BattleMgr.instance.GetSetTurnSide;
@@ -102,7 +105,7 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+        GameObject cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
         BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン
         Side turnSide = BattleMgr.instance.GetSetTurnSide;

@@ -94,19 +94,23 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
         // ゴールド数
         int GoldValue = BattleMgr.instance.GetGoldValue(turnSide);
 
-        // 操作側が自分じゃないならはじく
-        if (operateSide != Side.eSide_Player) { return false; }
-        // 自分のターンじゃなければはじく
-        if (!Common.IsMyTurn()) { return false; }
-        // メインフェイズじゃなければはじく
-        if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
-        // 場に軍事カードがいなければはじく
-        if(BattleCardMgr.instance.GetCardNumFromAppendKind(turnSide, BattleCard.JobKind.eAppendKind_Military) <= 0) { return false; }
-        // 武装に必要なゴールドが足らないならはじく
-        if (GoldValue < costGoldValue) { return false; }
+        // デバッグモード中じゃないなら
+        if(!DebugMgr.instance.IsDebugMode())
+        {
+			// 操作側が自分じゃないならはじく
+			if (operateSide != Side.eSide_Player) { return false; }
+			// 自分のターンじゃなければはじく
+			if (!Common.IsMyTurn()) { return false; }
+		}
+		// メインフェイズじゃなければはじく
+		if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
+		// 場に軍事カードがいなければはじく
+		if (BattleCardMgr.instance.GetCardNumFromAppendKind(turnSide, BattleCard.JobKind.eAppendKind_Military) <= 0) { return false; }
+		// 武装に必要なゴールドが足らないならはじく
+		if (GoldValue < costGoldValue) { return false; }
 
 
-        // 行える
-        return true;
+		// 行える
+		return true;
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
+using Photon.Pun;
 
 public class BattleStageCtr : MonoBehaviour
 {
@@ -25,6 +26,9 @@ public class BattleStageCtr : MonoBehaviour
     private float interval_H;
     [SerializeField]
     private float interval_W;
+
+    // カードエリアプレハブ
+    private string m_CardAreaPrehabName = "CardArea";
 
     // カードエリア
     GameObject CardArea;
@@ -117,7 +121,18 @@ public class BattleStageCtr : MonoBehaviour
                         areaPos.y += CardHeightSize;
                         areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
-                        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+                        GameObject cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity);
+
+                        /*
+						if (DebugMgr.instance.IsDebugMode())
+                        {
+							cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+						}
+                        else
+                        {
+							cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity);
+						}
+                        */
 
                         // カードエリアの情報設定
                         CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
@@ -147,7 +162,18 @@ public class BattleStageCtr : MonoBehaviour
                         areaPos.y += CardHeightSize;
                         areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
-                        GameObject cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+                        GameObject cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity); ;
+
+                        /*
+						if (DebugMgr.instance.IsDebugMode())
+						{
+							cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
+						}
+						else
+						{
+							cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity);
+						}
+                        */
 
                         // カードエリアの情報設定
                         CardArea cardArea = cardAreaClone.GetComponent<CardArea>();

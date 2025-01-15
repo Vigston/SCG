@@ -31,6 +31,8 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	// ===フラグ===
 	// ステートの更新フラグ
 	bool m_NextStateFlag = false;
+	// 通信同期フラグ
+	bool m_NetWorkSyncFlag = false;
 
 	// イベント
 	public event Action<IAction> OnActionCompleted;
@@ -105,7 +107,12 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 				// 参加する場を選択へ
 				SetNextStateAndFlag(State.eState_SelectField);
 			}
-			// 操作側じゃないなら通信同期が行われるまで待機
+			// 操作側じゃないなら通信同期へ
+			else
+			{
+				// 通信同期へ
+				SetNextStateAndFlag(State.eState_NetWorkSync);
+			}
 		}
 	}
 	// 参加する場を選択
@@ -193,13 +200,29 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	// 国民カード追加
 	void NetWorkSync()
 	{
+		// 操作側
+		Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+
 		if (m_StateValue == 1)
 		{
+			// 操作側なら
+			if (operateSide == Side.eSide_Player)
+			{
+				int cardAreaViewID = m_SelectedCardArea.GetComponent<PhotonView>().ViewID;
+				bool isSpy = BattleMgr.instance.IsNextJoinSpyFlag();
 
+				m_NetWorkSyncFlag = true;
+
+				photonView.RPC("OnJoinPeopleCard", RpcTarget.Others, cardAreaViewID, isSpy);
+			}
+			// それ以外なら通信同期待ち
 		}
 
-		// 終了へ
-		SetNextStateAndFlag(State.eState_End);
+		if(m_NetWorkSyncFlag)
+		{
+			// 終了へ
+			SetNextStateAndFlag(State.eState_End);
+		}
 	}
 
 	// 終了
@@ -235,6 +258,9 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 				case State.eState_JoinPeople:
 					GetSetNextState = await StateJoinPeople();
 					break;
+				case State.eState_NetWorkSync:
+					GetSetNextState = await StateNetWorkSync();
+					break;
 				case State.eState_End:
 					GetSetNextState = await StateEnd();
 					break;
@@ -267,6 +293,13 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	}
 	// 国民カード追加
 	async UniTask<State> StateJoinPeople()
+	{
+		await UniTask.WaitUntil(() => GetSetNextStateFlag);
+		// 次のステートへ
+		return GetSetNextState;
+	}
+	// 通信同期
+	async UniTask<State> StateNetWorkSync()
 	{
 		await UniTask.WaitUntil(() => GetSetNextStateFlag);
 		// 次のステートへ
@@ -318,11 +351,56 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	/////Photon/////
 	// 国民カードが追加された際に情報を他クライアントに送信
 	[PunRPC]
-	void OnJoinPeopleCard(int cardAreaViewID)
+	void OnJoinPeopleCard(int _cardAreaViewID, bool _isSpy)
 	{
-		if (PhotonView.Find(cardAreaViewID) != null)
+		if (PhotonView.Find(_cardAreaViewID) == null) { return; }
+
+		CardArea cardArea = PhotonView.Find(_cardAreaViewID).GetComponent<CardArea>();
+
+		if (cardArea != null) { return; }
+
+		m_NetWorkSyncFlag = true;
+
+		// 国民カード追加
+		BattleCardCtr.instance.CreateBattleCard(cardArea, BattleCard.Kind.eKind_People, _isSpy);
+	}
+
+	// 通信同期が正常に行われているか確認
+	[PunRPC]
+	bool IsSuccessNetWorkSync(int _cardAreaViewID, bool _NetWorkSyncFlag)
+	{
+		// 1. 指定された ViewID の PhotonView が存在するか確認
+		PhotonView view = PhotonView.Find(_cardAreaViewID);
+		if (view == null)
 		{
-			m_SelectedCardArea = PhotonView.Find(cardAreaViewID).GetComponent<CardArea>();
+			Debug.LogError($"PhotonView with ViewID {_cardAreaViewID} not found.");
+			return false;
 		}
+
+		// 2. 指定された ViewID が CardArea に関連付けられているか確認
+		CardArea cardArea = view.GetComponent<CardArea>();
+		if (cardArea == null)
+		{
+			Debug.LogError($"CardArea not found for ViewID {_cardAreaViewID}.");
+			return false;
+		}
+
+		// 3. お互いの通信同期フラグが立っているか確認
+		if (!m_NetWorkSyncFlag || !_NetWorkSyncFlag)
+		{
+			Debug.LogError("Network sync flag is not set.");
+			return false;
+		}
+
+		// 4. カードエリアにカードが存在するか確認
+		if (cardArea.IsCardEmpty())
+		{
+			Debug.LogError("CardArea is empty. Card sync failed.");
+			return false;
+		}
+
+		// 5. 同期が成功している場合
+		Debug.Log("Network sync successful: Card is present in the specified CardArea.");
+		return true;
 	}
 }
