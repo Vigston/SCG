@@ -82,6 +82,8 @@ public class BattleCardMgr : MonoBehaviour
             // カードエリア
             CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_Side, pos);
 
+            if (cardArea == null) { continue; }
+
             List<BattleCard> areaCardList = cardArea.GetCardList();
 
             // エリアにカードがないなら次のエリア検索へ
@@ -110,6 +112,8 @@ public class BattleCardMgr : MonoBehaviour
 
             // カードエリア
             CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos(_Side, pos);
+
+            if (cardArea == null) { continue; }
 
             List<BattleCard> areaCardList = cardArea.GetCardList();
 
