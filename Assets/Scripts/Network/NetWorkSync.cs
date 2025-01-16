@@ -58,7 +58,7 @@ public class NetWorkSync : MonoBehaviourPun
 		// 勝敗
 		photonView.RPC("SetSyncBattleResult", RpcTarget.Others, BattleMgr.instance.GetSetBattleResult);
 		// 操作側
-		photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateUserSide);
+		photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateSide);
 
 		Debug.Log($"通信同期が終了しました：ActorNumber[{PhotonNetwork.LocalPlayer.ActorNumber}]");
 		// 正常に終了している
@@ -130,6 +130,6 @@ public class NetWorkSync : MonoBehaviourPun
 	public void SetSyncOperateUserSide(int operateUserSide)
 	{
 		Debug.Log($"通信同期(SetSyncOperateUserSide)：{operateUserSide}");
-		BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide((Side)operateUserSide);
+		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide((Side)operateUserSide);
 	}
 }

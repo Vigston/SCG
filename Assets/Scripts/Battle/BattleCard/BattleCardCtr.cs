@@ -57,8 +57,19 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
-        BattleCard battleCard = cardClone.GetComponent<BattleCard>();
+		GameObject cardClone;
+
+		// 通信を行っていてマスタークライアントなら
+		if (PhotonNetwork.IsConnected && PhotonNetwork.IsMasterClient)
+		{
+			cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+		}
+		else
+		{
+			cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+		}
+
+		BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン側
         Side turnSide = BattleMgr.instance.GetSetTurnSide;
         // カードに設定する側
@@ -105,8 +116,19 @@ public class BattleCardCtr : MonoBehaviour
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
-        BattleCard battleCard = cardClone.GetComponent<BattleCard>();
+        GameObject cardClone;
+
+		// 通信を行っていてマスタークライアントなら
+		if (PhotonNetwork.IsConnected && PhotonNetwork.IsMasterClient)
+        {
+			cardClone = PhotonNetwork.Instantiate(cardPrehabName, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+		}
+		else
+		{
+			cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+		}
+
+		BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         // 現在のターン
         Side turnSide = BattleMgr.instance.GetSetTurnSide;
         // カードに設定する側

@@ -71,15 +71,15 @@ public class BattleUserMgr : MonoBehaviour
 
     // ---操作側---
     // 操作ユーザー側
-    public Side GetSetOperateUserSide
+    public Side GetSetOperateSide
     {
         get { return m_OperateUserSide; }
         set { m_OperateUserSide = value; }
     }
     // 操作ユーザー側の切り替え
-    public void ChangeOperateUserSide()
+    public void ChangeOperateSide()
     {
-		GetSetOperateUserSide = Common.GetRevSide(GetSetOperateUserSide);
+		GetSetOperateSide = Common.GetRevSide(GetSetOperateSide);
     }
     // 操作側のユーザー
     public BattleUser GetSetOperateUser
@@ -87,4 +87,9 @@ public class BattleUserMgr : MonoBehaviour
         get { return m_BattleUsers[(int)m_OperateUserSide]; }
         set { m_BattleUsers[(int)m_OperateUserSide] = value; }
     }
+    // 指定の操作側か
+    public bool IsOperateSide(Side _side)
+    {
+        return m_OperateUserSide == _side;
+	}
 }

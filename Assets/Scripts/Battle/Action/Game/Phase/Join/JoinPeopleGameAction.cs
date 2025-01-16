@@ -93,25 +93,31 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 		if (m_StateValue == 1)
 		{
 			// 操作側
-			Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+			Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 
-			// 操作側なら参加する場を選択するステートに飛ばす
-			if (operateSide == Side.eSide_Player)
+			// 通信を行っていて
+			if(PhotonNetwork.IsConnected)
 			{
-				// 参加する場を選択へ
-				SetNextStateAndFlag(State.eState_SelectField);
+				// 自分が操作側なら
+				if (BattleUserMgr.instance.IsOperateSide(Side.eSide_Player))
+				{
+					// 参加する場を選択へ
+					SetNextStateAndFlag(State.eState_SelectField);
+					return;
+				}
+				// 自分が操作側じゃないなら
+				else
+				{
+					// 通信同期へ
+					SetNextStateAndFlag(State.eState_NetWorkSync);
+					return;
+				}
 			}
-			// デバッグモード中なら参加する場を選択するステートに飛ばす
-			else if(DebugMgr.instance.IsDebugMode())
-			{
-				// 参加する場を選択へ
-				SetNextStateAndFlag(State.eState_SelectField);
-			}
-			// 操作側じゃないなら通信同期へ
+			// 通信を行っていないなら
 			else
 			{
-				// 通信同期へ
-				SetNextStateAndFlag(State.eState_NetWorkSync);
+				// 参加する場を選択へ
+				SetNextStateAndFlag(State.eState_SelectField);
 			}
 		}
 	}
@@ -143,7 +149,7 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 				if (hit.collider.tag == "CardArea")
 				{
 					// 操作側
-					Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+					Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 
 					// ユーザーを取得(アクション側)
 					BattleUser battleUser = BattleUserMgr.instance.GetUser(GetSetActionSide);
@@ -201,7 +207,7 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	void NetWorkSync()
 	{
 		// 操作側
-		Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 
 		if (m_StateValue == 1)
 		{
@@ -250,18 +256,23 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 			switch (GetSetState)
 			{
 				case State.eState_Init:
+					Debug.Log("JoinPeopleGameAction：eState_Init");
 					GetSetNextState = await StateInit();
 					break;
 				case State.eState_SelectField:
+					Debug.Log("JoinPeopleGameAction：eState_SelectField");
 					GetSetNextState = await StateSelectField();
 					break;
 				case State.eState_JoinPeople:
+					Debug.Log("JoinPeopleGameAction：eState_JoinPeople");
 					GetSetNextState = await StateJoinPeople();
 					break;
 				case State.eState_NetWorkSync:
+					Debug.Log("JoinPeopleGameAction：eState_NetWorkSync");
 					GetSetNextState = await StateNetWorkSync();
 					break;
 				case State.eState_End:
+					Debug.Log("JoinPeopleGameAction：eState_End");
 					GetSetNextState = await StateEnd();
 					break;
 				default:

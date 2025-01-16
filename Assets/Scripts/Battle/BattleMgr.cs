@@ -200,7 +200,9 @@ public class BattleMgr : MonoBehaviour
                     break;
                 case PhaseType.ePhaseType_Join:
                     Debug.Log("ジョインフェイズ");
-                    nextPhase = await PhaseJoin();
+                    Debug.Log($"nextPhase：{nextPhase}");
+					Debug.Log($"m_NextPhaseFlag：{m_NextPhaseFlag}");
+					nextPhase = await PhaseJoin();
                     Debug.Log("次のフェイズへ");
                     break;
                 case PhaseType.ePhaseType_Main:
@@ -379,10 +381,10 @@ public class BattleMgr : MonoBehaviour
     {
         // 現在のターンと操作側を逆にする
         Side turnSide = GetSetTurnSide;
-        Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+        Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 		GetSetTurnSide = Common.GetRevSide(turnSide);
 
-		BattleUserMgr.instance.GetSetOperateUserSide = Common.GetRevSide(operateSide);
+		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide(operateSide);
 
 		// ターン終了リクエスト初期化
 		m_TurnEndFlag = false;
@@ -480,11 +482,11 @@ public class BattleMgr : MonoBehaviour
 			// ターン側設定
 			GetSetTurnSide = firstTurnSide;
             // 操作側設定
-            BattleUserMgr.instance.GetSetOperateUserSide = firstTurnSide;
+            BattleUserMgr.instance.GetSetOperateSide = firstTurnSide;
 
             // マスタークライアント以外にターン側と操作側を渡す
             NetWorkSync.instance.photonView.RPC("SetSyncTurnSide", RpcTarget.Others, GetSetTurnSide);
-			NetWorkSync.instance.photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateUserSide);
+			NetWorkSync.instance.photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateSide);
 
 			Debug.Log($"DecidePrecedingSecond()｜乱数値：{rnd}、最初のターン側：{firstTurnSide}");
 		}

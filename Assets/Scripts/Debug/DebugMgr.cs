@@ -67,7 +67,7 @@ public class DebugMgr : MonoBehaviour
 
         // ↓更新処理↓
         // バトル情報
-        m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetSetOperateUserSide.ToString();
+        m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetSetOperateSide.ToString();
         m_TextTurnNum.text = "ターン数：" + BattleMgr.instance.GetSetTurnNum;
         m_TextTurnSide.text = "ターン側：" + BattleMgr.instance.GetSetTurnSide.ToString();
         m_TextPhase.text = "フェイズ：" + BattleMgr.instance.GetSetPhaseType.ToString();

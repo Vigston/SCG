@@ -78,6 +78,7 @@ public class JoinPhase : MonoBehaviourPunCallbacks
         // 場に空きがないなら終了へ
         if (BattleStageMgr.instance.GetCardAreaNumFromEmptyCard() <= 0)
         {
+            Debug.Log("JoinPhase：場に空きがないので終了へ");
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
             return;
@@ -127,13 +128,16 @@ public class JoinPhase : MonoBehaviourPunCallbacks
             switch (m_State)
             {
                 case State.eState_Init:
+                    Debug.Log("JoinPhase：eState_Init");
                     nextState = await StateInit();
                     break;
                 case State.eState_JoinPeopleGameAction:
-                    nextState = await StateJoinPeopleGameAction();
+					Debug.Log("JoinPhase：eState_JoinPeopleGameAction");
+					nextState = await StateJoinPeopleGameAction();
                     break;
                 case State.eState_End:
-                    nextState = await StateEnd();
+					Debug.Log("JoinPhase：eState_End");
+					nextState = await StateEnd();
                     break;
                 default:
                     Debug.Log("StateLoopに記載されていないフェイズに遷移しようとしています");

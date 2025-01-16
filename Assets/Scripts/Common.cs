@@ -95,7 +95,7 @@ public static class Common
 	public static bool IsMyTurn()
 	{
         Side turnSide       = BattleMgr.instance.GetSetTurnSide;
-        Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
+        Side operateSide    = BattleUserMgr.instance.GetSetOperateSide;
 
 		return turnSide == operateSide;
 	}
@@ -106,7 +106,7 @@ public static class Common
 		if (_battleCard == null) { return false; }
 
 		Side cardSide = _battleCard.GetSetSide;
-		Side operateSide    = BattleUserMgr.instance.GetSetOperateUserSide;
+		Side operateSide    = BattleUserMgr.instance.GetSetOperateSide;
 
 		return cardSide == operateSide;
 	}

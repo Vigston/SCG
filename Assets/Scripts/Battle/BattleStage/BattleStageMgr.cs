@@ -1,9 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using System;
 using battleTypes;
-using System.Linq;
 using Photon.Pun;
 
 public class BattleStageMgr : MonoBehaviour
@@ -32,11 +29,11 @@ public class BattleStageMgr : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (PhotonNetwork.IsMasterClient)
-        {
-			// カードエリアの作成
-			BattleStageCtr.instance.CreateCardArea();
-		}
+        // 通信を行っていてマスタークライアントじゃないならはじく
+        if(PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient) { return; }
+
+		// カードエリアの作成
+		BattleStageCtr.instance.CreateCardArea();
 	}
 
     // Update is called once per frame

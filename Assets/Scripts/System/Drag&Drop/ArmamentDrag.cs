@@ -88,7 +88,7 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
     public bool IsArmament()
     {
         // 操作側
-        Side operateSide = BattleUserMgr.instance.GetSetOperateUserSide;
+        Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
         // ターン側
         Side turnSide = BattleMgr.instance.GetSetTurnSide;
         // ゴールド数
