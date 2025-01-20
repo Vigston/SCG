@@ -64,6 +64,7 @@ public class BattleStageCtr : MonoBehaviour
             // 基準座標
             Vector3 baseVec = new Vector3();
 
+            // 側
             Side Side = BattleMgr.instance.GetSide(i);
 
             BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
@@ -115,30 +116,16 @@ public class BattleStageCtr : MonoBehaviour
                     for (int k = 0; k < widthNum; k++)
                     {
                         // エリアの表示位置
-                        Vector3 areaPos = baseVec;
+                        Vector3 areaVec = baseVec;
+						// エリア位置
+						Position areaPos = (Position)((j * widthNum) + k);
 
-                        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
-                        areaPos.y += CardHeightSize;
-                        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+						areaVec.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+						areaVec.y += CardHeightSize;
+						areaVec.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
-                        GameObject cardAreaClone;
-
-						// 通信を行っていてマスタークライアントなら
-						if (PhotonNetwork.IsConnected && PhotonNetwork.IsMasterClient)
-                        {
-							cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity);
-						}
-                        else
-                        {
-							cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
-						}
-
-						// カードエリアの情報設定
-						CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                        cardArea.SetSide(Side);
-                        cardArea.SetPosiiton((Position)((j * widthNum) + k));
-
-                        BattleStageMgr.instance.AddCardArea(cardArea);
+                        // カード追加
+		                BattleStageMgr.instance.AddCardArea(areaVec, (int)Side, (int)areaPos);
                     }
                 }
             }
@@ -155,30 +142,16 @@ public class BattleStageCtr : MonoBehaviour
                     {
                         int krev = widthNum - k - 1;
                         // エリアの表示位置
-                        Vector3 areaPos = baseVec;
+                        Vector3 areaVec = baseVec;
+						// エリア位置
+						Position areaPos = (Position)(((jrev) * widthNum) + krev);
 
-                        areaPos.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
-                        areaPos.y += CardHeightSize;
-                        areaPos.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+						areaVec.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
+						areaVec.y += CardHeightSize;
+						areaVec.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
-						GameObject cardAreaClone;
-
-						// 通信を行っていてマスタークライアントなら
-						if (PhotonNetwork.IsConnected && PhotonNetwork.IsMasterClient)
-						{
-							cardAreaClone = PhotonNetwork.Instantiate(m_CardAreaPrehabName, areaPos, Quaternion.identity);
-						}
-						else
-						{
-							cardAreaClone = Instantiate(cardAreaPrefab, areaPos, Quaternion.identity);
-						}
-
-						// カードエリアの情報設定
-						CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
-                        cardArea.SetSide(Side);
-                        cardArea.SetPosiiton((Position)(((jrev) * widthNum) + krev));
-
-                        BattleStageMgr.instance.AddCardArea(cardArea);
+                        // カード追加
+                        BattleStageMgr.instance.AddCardArea(areaVec, (int)Side, (int)areaPos);
                     }
                 }
             }

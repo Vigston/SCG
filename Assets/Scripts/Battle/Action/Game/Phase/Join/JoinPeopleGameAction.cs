@@ -199,11 +199,11 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 				}
 			}
 		}
-		// 終了へ
-		SetNextStateAndFlag(State.eState_End);
+		// 通信同期へ
+		SetNextStateAndFlag(State.eState_NetWorkSync);
 	}
 
-	// 国民カード追加
+	// 通信同期
 	void NetWorkSync()
 	{
 		// 操作側

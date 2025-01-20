@@ -3,7 +3,7 @@ using UnityEngine;
 using battleTypes;
 using Photon.Pun;
 
-public class BattleStageMgr : MonoBehaviour
+public class BattleStageMgr : MonoBehaviourPun
 {
     // =================変数=================
     public static BattleStageMgr instance;
@@ -77,19 +77,32 @@ public class BattleStageMgr : MonoBehaviour
     }
 
     // カードエリアの追加
-    public void AddCardArea(CardArea _cardArea)
+    public void AddCardArea(Vector3 _position, int _side, int _posIndex)
     {
-        // 追加
-        m_CardAreaList.Add(_cardArea);
-    }
-    public void AddCardArea(Position _pos)
+        // 通信同期が行われているなら
+		if (PhotonNetwork.IsConnected)
+		{
+            // マスタークライアントじゃないならはじく
+            if (!PhotonNetwork.IsMasterClient) { return; }
+
+			photonView.RPC("AddCardArea_RPC", RpcTarget.All, _position, _side, _posIndex);
+		}
+		else
+		{
+			// ローカルでの生成（オフライン時）
+			AddCardArea_RPC(_position, _side, _posIndex);
+		}
+	}
+
+	[PunRPC]
+	public void AddCardArea_RPC(Vector3 _position, int _side, int _posIndex)
     {
-        CardArea cardArea = new CardArea();
-        // 値設定
-        cardArea.SetPosiiton(_pos);
-        // 追加
-        m_CardAreaList.Add(cardArea);
-    }
+		GameObject cardAreaClone = Instantiate(BattleStageCtr.instance.cardAreaPrefab, _position, Quaternion.identity);
+		CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
+		cardArea.SetSide((Side)_side);
+		cardArea.SetPosiiton((Position)_posIndex);
+		m_CardAreaList.Add(cardArea);
+	}
 
 
     // 指定カードエリアの削除
