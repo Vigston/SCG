@@ -199,8 +199,17 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 				}
 			}
 		}
-		// 通信同期へ
-		SetNextStateAndFlag(State.eState_NetWorkSync);
+		// 通信を行っているなら
+		if (PhotonNetwork.IsConnected)
+		{
+			// 通信同期へ
+			SetNextStateAndFlag(State.eState_NetWorkSync);
+		}
+		else
+		{
+			// 終了へ
+			SetNextStateAndFlag(State.eState_End);
+		}
 	}
 
 	// 通信同期
@@ -374,44 +383,5 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 
 		// 国民カード追加
 		BattleCardCtr.instance.CreateBattleCard(cardArea, BattleCard.Kind.eKind_People, _isSpy);
-	}
-
-	// 通信同期が正常に行われているか確認
-	[PunRPC]
-	bool IsSuccessNetWorkSync(int _cardAreaViewID, bool _NetWorkSyncFlag)
-	{
-		// 1. 指定された ViewID の PhotonView が存在するか確認
-		PhotonView view = PhotonView.Find(_cardAreaViewID);
-		if (view == null)
-		{
-			Debug.LogError($"PhotonView with ViewID {_cardAreaViewID} not found.");
-			return false;
-		}
-
-		// 2. 指定された ViewID が CardArea に関連付けられているか確認
-		CardArea cardArea = view.GetComponent<CardArea>();
-		if (cardArea == null)
-		{
-			Debug.LogError($"CardArea not found for ViewID {_cardAreaViewID}.");
-			return false;
-		}
-
-		// 3. お互いの通信同期フラグが立っているか確認
-		if (!m_NetWorkSyncFlag || !_NetWorkSyncFlag)
-		{
-			Debug.LogError("Network sync flag is not set.");
-			return false;
-		}
-
-		// 4. カードエリアにカードが存在するか確認
-		if (cardArea.IsCardEmpty())
-		{
-			Debug.LogError("CardArea is empty. Card sync failed.");
-			return false;
-		}
-
-		// 5. 同期が成功している場合
-		Debug.Log("Network sync successful: Card is present in the specified CardArea.");
-		return true;
 	}
 }
