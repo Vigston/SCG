@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -12,11 +11,11 @@ public class ActionMgr : MonoBehaviour
 
 	private bool isExecuting = false;
 
-	public Queue<IAction> actionQueue = new Queue<IAction>();
+	public Queue<GameObject> actionQueue = new Queue<GameObject>();
 	private CancellationTokenSource cancellationTokenSource;
 
 	// 直前に処理を行ったアクションを保持(IsCompletedActionで終了を検知したら削除)
-	public Queue<IAction> bufferActionQueue = new Queue<IAction>();
+	public Queue<GameObject> bufferActionQueue = new Queue<GameObject>();
 
 	private void Awake()
 	{
@@ -42,30 +41,32 @@ public class ActionMgr : MonoBehaviour
 	}
 
 	// アクション追加
-	public void AddAction(IAction _action)
+	public void AddAction(GameObject _actionObject)
 	{
-		actionQueue.Enqueue(_action);
+		if (_actionObject.GetComponent<IAction>() == null)
+		{
+			Debug.LogError("指定されたGameObjectにIActionを実装したコンポーネントがありません。");
+			return;
+		}
+
+		actionQueue.Enqueue(_actionObject);
 
 		// アクションが追加されるたびに完了通知を監視
-		_action.OnActionCompleted += OnActionCompleted;
+		var action = _actionObject.GetComponent<IAction>();
+		action.OnActionCompleted += OnActionCompleted;
 	}
 
 	// 指定のアクションが終了しているか(終了しているならここでキューから削除)
-	public bool IsCompletedAction(IAction _action)
+	public bool IsCompletedAction(GameObject _actionObject)
 	{
-		IAction bufferAction = null;
+		GameObject bufferAction = null;
 
-		if (bufferActionQueue.Contains(_action))
+		if (bufferActionQueue.Contains(_actionObject))
 		{
 			bufferAction = bufferActionQueue.Dequeue();
 		}
 
-		if(bufferAction == null)
-		{
-			return false;
-		}
-
-		return bufferAction == _action;
+		return bufferAction == _actionObject;
 	}
 
 	// 全てのアクションをキャンセル
@@ -95,14 +96,21 @@ public class ActionMgr : MonoBehaviour
 				continue;
 			}
 
-			var action = actionQueue.Dequeue();
+			var actionObject = actionQueue.Dequeue();
+
+			var action = actionObject.GetComponent<IAction>();
+			if (action == null)
+			{
+				Debug.LogError($"GameObjectにIActionコンポーネントがアタッチされていません: {actionObject.name}");
+				continue;
+			}
 
 			try
 			{
-				Debug.Log($"action.Execute：{action}");
+				Debug.Log($"action.Execute：{actionObject.name}");
 				await action.Execute(cancellationTokenSource.Token);
 
-				bufferActionQueue.Enqueue(action);
+				bufferActionQueue.Enqueue(actionObject);
 			}
 			catch (OperationCanceledException)
 			{
