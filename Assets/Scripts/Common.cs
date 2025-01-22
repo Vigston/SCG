@@ -5,10 +5,8 @@ using battleTypes;
 
 public static class Common
 {
-    public const string prefabPath_GameAction = "Prefabs/GameAction"; // 共通のプレハブパス
-
-	// バトルの共通定数
-	public static class BattleConst
+    // バトルの共通定数
+    public static class BattleConst
     {
         public const int ADD_GOLD_EVERY_MERCHANT = 10;
     }

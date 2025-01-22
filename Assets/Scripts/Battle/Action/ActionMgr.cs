@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -11,11 +12,11 @@ public class ActionMgr : MonoBehaviour
 
 	private bool isExecuting = false;
 
-	public Queue<GameObject> actionQueue = new Queue<GameObject>();
+	public Queue<IAction> actionQueue = new Queue<IAction>();
 	private CancellationTokenSource cancellationTokenSource;
 
 	// 直前に処理を行ったアクションを保持(IsCompletedActionで終了を検知したら削除)
-	public Queue<GameObject> bufferActionQueue = new Queue<GameObject>();
+	public Queue<IAction> bufferActionQueue = new Queue<IAction>();
 
 	private void Awake()
 	{
@@ -41,32 +42,30 @@ public class ActionMgr : MonoBehaviour
 	}
 
 	// アクション追加
-	public void AddAction(GameObject _actionObject)
+	public void AddAction(IAction _action)
 	{
-		if (_actionObject.GetComponent<IAction>() == null)
-		{
-			Debug.LogError("指定されたGameObjectにIActionを実装したコンポーネントがありません。");
-			return;
-		}
-
-		actionQueue.Enqueue(_actionObject);
+		actionQueue.Enqueue(_action);
 
 		// アクションが追加されるたびに完了通知を監視
-		var action = _actionObject.GetComponent<IAction>();
-		action.OnActionCompleted += OnActionCompleted;
+		_action.OnActionCompleted += OnActionCompleted;
 	}
 
 	// 指定のアクションが終了しているか(終了しているならここでキューから削除)
-	public bool IsCompletedAction(GameObject _actionObject)
+	public bool IsCompletedAction(IAction _action)
 	{
-		GameObject bufferAction = null;
+		IAction bufferAction = null;
 
-		if (bufferActionQueue.Contains(_actionObject))
+		if (bufferActionQueue.Contains(_action))
 		{
 			bufferAction = bufferActionQueue.Dequeue();
 		}
 
-		return bufferAction == _actionObject;
+		if(bufferAction == null)
+		{
+			return false;
+		}
+
+		return bufferAction == _action;
 	}
 
 	// 全てのアクションをキャンセル
@@ -96,21 +95,14 @@ public class ActionMgr : MonoBehaviour
 				continue;
 			}
 
-			var actionObject = actionQueue.Dequeue();
-
-			var action = actionObject.GetComponent<IAction>();
-			if (action == null)
-			{
-				Debug.LogError($"GameObjectにIActionコンポーネントがアタッチされていません: {actionObject.name}");
-				continue;
-			}
+			var action = actionQueue.Dequeue();
 
 			try
 			{
-				Debug.Log($"action.Execute：{actionObject.name}");
+				Debug.Log($"action.Execute：{action}");
 				await action.Execute(cancellationTokenSource.Token);
 
-				bufferActionQueue.Enqueue(actionObject);
+				bufferActionQueue.Enqueue(action);
 			}
 			catch (OperationCanceledException)
 			{
