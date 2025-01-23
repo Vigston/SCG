@@ -49,6 +49,7 @@ MonoBehaviour:
   - IsSuccessNetWorkSync
   - AddCardArea_RPC
   - AddAction
+  - AddJoinPeopleGameAction
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
