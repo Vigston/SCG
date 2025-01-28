@@ -50,6 +50,8 @@ MonoBehaviour:
   - AddCardArea_RPC
   - AddAction
   - AddJoinPeopleGameAction
+  - SetNextPhaseAndFlag
+  - SetNextPhaseFlag_RPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

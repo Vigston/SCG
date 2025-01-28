@@ -151,9 +151,20 @@ public class JoinPhase : MonoBehaviourPunCallbacks
     {
         if (m_StateValue == 1)
         {
-            // メインフェイズに移動。
-            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-        }
+			if (PhotonNetwork.IsConnected)
+			{
+				if (PhotonNetwork.IsMasterClient)
+				{
+					// メインフェイズに移動。
+					BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_Main);
+				}
+			}
+			else
+			{
+				// メインフェイズに移動。
+				BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+			}
+		}
     }
 
     // --システム--

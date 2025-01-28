@@ -5,7 +5,7 @@ using battleTypes;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
 
-public class BattleMgr : MonoBehaviour
+public class BattleMgr : MonoBehaviourPun
 {
     // =================クラス================
 
@@ -200,8 +200,6 @@ public class BattleMgr : MonoBehaviour
                     break;
                 case PhaseType.ePhaseType_Join:
                     Debug.Log("ジョインフェイズ");
-                    Debug.Log($"nextPhase：{nextPhase}");
-					Debug.Log($"m_NextPhaseFlag：{m_NextPhaseFlag}");
 					nextPhase = await PhaseJoin();
                     Debug.Log("次のフェイズへ");
                     break;
@@ -524,11 +522,18 @@ public class BattleMgr : MonoBehaviour
         return m_NextPhaseFlag;
     }
     // 次のフェイズとフラグを設定
+    [PunRPC]
     public void SetNextPhaseAndFlag(PhaseType _nextPhase)
     {
 		GetSetNextPhaseType = _nextPhase;
         SetNextPhaseFlag();
     }
+    [PunRPC]
+    void SetNextPhaseFlag_RPC(bool _nextPhaseFlag)
+    {
+        m_NextPhaseFlag = _nextPhaseFlag;
+
+	}
     // ---国民---
     // 国民カード数設定
     public void SetPeopleCardNum(Side _Side, int _value)

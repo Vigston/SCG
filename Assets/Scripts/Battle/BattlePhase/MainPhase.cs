@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using battleTypes;
+using Photon.Pun;
 
 public class MainPhase : MonoBehaviour
 {
@@ -83,8 +84,19 @@ public class MainPhase : MonoBehaviour
     // 終了
     void End()
     {
-		// エンドフェイズに移動。
-		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+		if (PhotonNetwork.IsConnected)
+		{
+			if (PhotonNetwork.IsMasterClient)
+			{
+				// エンドフェイズに移動。
+				BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
+			}
+		}
+		else
+		{
+			// エンドフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+		}
 	}
 
     // --システム--

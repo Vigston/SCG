@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using battleTypes;
+using Photon.Pun;
 
 public class StartPhase : MonoBehaviour
 {
@@ -121,8 +122,19 @@ public class StartPhase : MonoBehaviour
         if(m_StateValue == 1)
         {
             Debug.Log("終了ステート処理開始");
-            // ジョインフェイズに移動。
-            BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+			if (PhotonNetwork.IsConnected)
+			{
+				if (PhotonNetwork.IsMasterClient)
+				{
+					// ジョインフェイズに移動。
+					BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_Join);
+				}
+			}
+			else
+			{
+				// ジョインフェイズに移動。
+				BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+			}
             Debug.Log("終了ステート処理終了");
         }
     }
