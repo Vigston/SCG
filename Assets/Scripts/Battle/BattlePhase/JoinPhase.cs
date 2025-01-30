@@ -31,8 +31,6 @@ public class JoinPhase : MonoBehaviourPunCallbacks
 	// ===フラグ===
 	// ステートの更新フラグ
 	bool m_NextStateFlag = false;
-    // JoinPeopleActionのAddフラグ
-    bool m_JoinPeopleActionAddFlag = false;
 
 
 	private void Awake()
@@ -87,56 +85,27 @@ public class JoinPhase : MonoBehaviourPunCallbacks
             return;
         }
 
-		if (m_StateValue == 1)
+        if (m_StateValue == 1)
         {
-			// 通信を行っていて
-			if (PhotonNetwork.IsConnected)
+            // 共通のGameActionプレハブを生成
+            //GameObject prefab = Resources.Load<GameObject>(Common.prefabPath_GameAction);
+
+            if(PhotonNetwork.IsConnected)
             {
-				// マスタークライアントなら
-				if (PhotonNetwork.IsMasterClient)
+                if (PhotonNetwork.IsMasterClient)
                 {
 					m_JoinPeopleGameAction = PhotonNetwork.Instantiate(Common.prefabPath_GameAction, Vector3.zero, Quaternion.identity);
-
-					var actionObjViewID = m_JoinPeopleGameAction.GetComponent<PhotonView>().ViewID;
-
-                    if(photonView == null)
-                    {
-                        Debug.Log("JoinPhaseのphotonViewがNULLです!!");
-                        return;
-					}
-
-					photonView.RPC("AddJoinPeopleGameAction", RpcTarget.All, actionObjViewID);
 				}
-			}
-            else
-            {
-				// 共通のGameActionプレハブを生成
-				GameObject prefab = Resources.Load<GameObject>(Common.prefabPath_GameAction);
-                if(prefab == null)
-                {
-					Debug.Log($"Prefab Path: {Common.prefabPath_GameAction}");
-					Debug.Log("prefab == null");
-                }
-
-				m_JoinPeopleGameAction = Instantiate(prefab, Vector3.zero, Quaternion.identity);
-				if (m_JoinPeopleGameAction == null)
-				{
-					Debug.Log("gameActionObj == null");
-				}
-				// JoinPeopleGameActionをアタッチ
-				m_JoinPeopleGameAction.AddComponent<JoinPeopleGameAction>();
-
-                JoinPeopleGameAction joinPeopleGameAction = m_JoinPeopleGameAction.GetComponent<JoinPeopleGameAction>();
-				// ターン側を設定
-				joinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
-				// アクション追加
-				m_JoinPeopleActionAddFlag = true;
-				ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
             }
-		}
+            
 
-        // アクション追加がされていないならはじく
-        if (m_JoinPeopleActionAddFlag == false) { return; }
+            m_JoinPeopleGameAction.AddComponent<JoinPeopleGameAction>();
+
+            JoinPeopleGameAction joinPeopleGameAction = m_JoinPeopleGameAction.GetComponent<JoinPeopleGameAction>();
+            // ターン側を設定
+            joinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
+            ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
+        }
 
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
@@ -285,13 +254,6 @@ public class JoinPhase : MonoBehaviourPunCallbacks
 			m_JoinPeopleGameAction = PhotonView.Find(_actionObjId)?.gameObject;
 		}
 
-		m_JoinPeopleGameAction.AddComponent<JoinPeopleGameAction>();
-
-		JoinPeopleGameAction joinPeopleGameAction = m_JoinPeopleGameAction.GetComponent<JoinPeopleGameAction>();
-		// ターン側を設定
-		joinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
-		// アクション追加
-		m_JoinPeopleActionAddFlag = true;
-		ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
+		
 	}
 }
