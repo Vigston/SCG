@@ -5,6 +5,7 @@ using Cysharp.Threading.Tasks;
 using battleTypes;
 using System.Linq;
 using Photon.Pun;
+using static Common;
 
 public class JoinPhase : MonoBehaviourPunCallbacks
 {
@@ -87,25 +88,16 @@ public class JoinPhase : MonoBehaviourPunCallbacks
 
         if (m_StateValue == 1)
         {
-            // 共通のGameActionプレハブを生成
-            //GameObject prefab = Resources.Load<GameObject>(Common.prefabPath_GameAction);
+			int viewId = 0;
 
-            if(PhotonNetwork.IsConnected)
+			if (PhotonNetwork.IsMasterClient)
             {
-                if (PhotonNetwork.IsMasterClient)
-                {
-					m_JoinPeopleGameAction = PhotonNetwork.Instantiate(Common.prefabPath_GameAction, Vector3.zero, Quaternion.identity);
-				}
-            }
-            
+				m_JoinPeopleGameAction = PhotonNetwork.Instantiate(PrefabPath.JoinPeopleGameAction, Vector3.zero, Quaternion.identity);
+				viewId = m_JoinPeopleGameAction.GetComponent<PhotonView>().ViewID;
 
-            m_JoinPeopleGameAction.AddComponent<JoinPeopleGameAction>();
-
-            JoinPeopleGameAction joinPeopleGameAction = m_JoinPeopleGameAction.GetComponent<JoinPeopleGameAction>();
-            // ターン側を設定
-            joinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
-            ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
-        }
+				photonView.RPC(nameof(AddJoinPeopleGameAction), RpcTarget.All, viewId);
+			}
+		}
 
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
@@ -248,12 +240,17 @@ public class JoinPhase : MonoBehaviourPunCallbacks
 	[PunRPC]
 	void AddJoinPeopleGameAction(int _actionObjId)
 	{
-		if (PhotonNetwork.IsConnected && !PhotonNetwork.IsMasterClient)
+		if (!PhotonNetwork.IsMasterClient)
         {
 			// ViewID を基に GameObject を取得
 			m_JoinPeopleGameAction = PhotonView.Find(_actionObjId)?.gameObject;
 		}
 
-		
+        if (m_JoinPeopleGameAction == null) return;
+
+		JoinPeopleGameAction joinPeopleGameAction = m_JoinPeopleGameAction.GetComponent<JoinPeopleGameAction>();
+		// ターン側を設定
+		joinPeopleGameAction.GetSetActionSide = BattleMgr.instance.GetSetTurnSide;
+		ActionMgr.instance.AddAction(m_JoinPeopleGameAction);
 	}
 }

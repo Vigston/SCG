@@ -2176,6 +2176,7 @@ GameObject:
   - component: {fileID: 724715957}
   - component: {fileID: 724715960}
   - component: {fileID: 724715959}
+  - component: {fileID: 724715961}
   m_Layer: 6
   m_Name: MerchantCard
   m_TagString: JobCard
@@ -2302,6 +2303,28 @@ MonoBehaviour:
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
+--- !u!114 &724715961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 724715955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 8
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &738528484
 GameObject:
   m_ObjectHideFlags: 0
@@ -3514,6 +3537,7 @@ GameObject:
   - component: {fileID: 1266854372}
   - component: {fileID: 1266854375}
   - component: {fileID: 1266854374}
+  - component: {fileID: 1266854376}
   m_Layer: 6
   m_Name: MilitaryCard
   m_TagString: JobCard
@@ -3640,6 +3664,28 @@ MonoBehaviour:
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
+--- !u!114 &1266854376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1266854370}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 6
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1311622401
 GameObject:
   m_ObjectHideFlags: 0
@@ -3831,7 +3877,7 @@ MonoBehaviour:
   m_SpyCardNum: 0000000000000000
   m_ScienceValue: 0000000000000000
   m_GoldValue: 0000000000000000
-  m_PhaseObject: {fileID: 2005866537}
+  m_PhaseObject: {fileID: 0}
 --- !u!114 &1314775404
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3867,6 +3913,7 @@ GameObject:
   - component: {fileID: 1316189357}
   - component: {fileID: 1316189360}
   - component: {fileID: 1316189359}
+  - component: {fileID: 1316189361}
   m_Layer: 6
   m_Name: ScienceCard
   m_TagString: JobCard
@@ -3993,6 +4040,28 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &1316189361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1316189355}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 4
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1326383937
 GameObject:
   m_ObjectHideFlags: 0
@@ -4174,6 +4243,7 @@ GameObject:
   - component: {fileID: 1634217726}
   - component: {fileID: 1634217729}
   - component: {fileID: 1634217728}
+  - component: {fileID: 1634217730}
   m_Layer: 6
   m_Name: SpyCard
   m_TagString: JobCard
@@ -4300,6 +4370,28 @@ MonoBehaviour:
   m_DragObj: {fileID: 0}
   m_TargetCard: {fileID: 0}
   m_GiveJobDragFlag: 0
+--- !u!114 &1634217730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1634217724}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 7
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &1636290708
 GameObject:
   m_ObjectHideFlags: 0
@@ -5405,60 +5497,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1897743508}
   m_CullTransparentMesh: 1
---- !u!1 &2005866537
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2005866538}
-  - component: {fileID: 2005866539}
-  m_Layer: 0
-  m_Name: BattlePhase
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2005866538
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005866537}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.076028675, y: 6.6220245, z: -6.2700005}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2005866539
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005866537}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ObservedComponentsFoldoutOpen: 1
-  Group: 0
-  prefixField: -1
-  Synchronization: 3
-  OwnershipTransfer: 0
-  observableSearch: 2
-  ObservedComponents: []
-  sceneViewId: 4
-  InstantiationId: 0
-  isRuntimeInstantiated: 0
 --- !u!1 &2008400647
 GameObject:
   m_ObjectHideFlags: 0
@@ -5853,7 +5891,6 @@ SceneRoots:
   - {fileID: 162781929}
   - {fileID: 1636290712}
   - {fileID: 97936608}
-  - {fileID: 2005866538}
   - {fileID: 368165726}
   - {fileID: 1764930606}
   - {fileID: 319162600}

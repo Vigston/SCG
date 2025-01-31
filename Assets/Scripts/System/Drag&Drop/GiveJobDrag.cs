@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using battleTypes;
+using Photon.Pun;
 
-public class GiveJobDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField]
     private BattleCard.JobKind m_GiveKind;
@@ -131,4 +132,15 @@ public class GiveJobDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndD
         get { return m_GiveJobDragFlag; }
         set { m_GiveJobDragFlag = value; }
     }
+
+    [PunRPC]
+    void AppendJob(int _battleCardViewId)
+    {
+		BattleCard battleCard = PhotonView.Find(_battleCardViewId)?.gameObject.GetComponent<BattleCard>();
+
+        if (battleCard == null) return;
+
+		// 職業付与
+		battleCard.AppendJob(m_GiveKind);
+	}
 }

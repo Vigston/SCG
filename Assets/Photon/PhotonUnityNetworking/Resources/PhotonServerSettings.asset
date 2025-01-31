@@ -54,6 +54,8 @@ MonoBehaviour:
   - SetNextPhaseFlag_RPC
   - SetStep
   - ExecuteEndStep
+  - PassReferencePhaseObject
+  - AppendJob
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

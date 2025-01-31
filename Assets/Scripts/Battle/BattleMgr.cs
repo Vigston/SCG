@@ -4,6 +4,7 @@ using UnityEngine;
 using battleTypes;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using static Common;
 
 public class BattleMgr : MonoBehaviourPun
 {
@@ -235,12 +236,20 @@ public class BattleMgr : MonoBehaviourPun
         m_TurnNum++;
 
         // フェイズオブジェクト設定
-        m_PhaseObject.AddComponent<StartPhase>();
+        if(PhotonNetwork.IsMasterClient)
+        {
+			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.StartPhase, Vector3.zero, Quaternion.identity);
+			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
+            photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+        }
 
         await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // フェイズオブジェクト削除
-        Destroy(m_PhaseObject.GetComponent<StartPhase>());
+		// フェイズオブジェクト削除
+		if (PhotonNetwork.IsMasterClient)
+		{
+            PhotonNetwork.Destroy(m_PhaseObject);
+		}
 
         // 次のフェイズへ
         return GetSetNextPhaseType;
@@ -248,42 +257,70 @@ public class BattleMgr : MonoBehaviourPun
     // ジョインフェイズ
     async UniTask<PhaseType> PhaseJoin()
     {
-        // フェイズオブジェクト設定
-        m_PhaseObject.AddComponent<JoinPhase>();
+		// フェイズオブジェクト設定
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.JoinPhase, Vector3.zero, Quaternion.identity);
+			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
+			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+		}
 
-        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // フェイズオブジェクト削除
-        Destroy(m_PhaseObject.GetComponent<JoinPhase>());
-        // 次のフェイズへ
-        return GetSetNextPhaseType;
+		// フェイズオブジェクト削除
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PhotonNetwork.Destroy(m_PhaseObject);
+
+		}
+
+		// 次のフェイズへ
+		return GetSetNextPhaseType;
     }
     // メインフェイズ
     async UniTask<PhaseType> PhaseMain()
     {
-        // フェイズオブジェクト設定
-        m_PhaseObject.AddComponent<MainPhase>();
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.MainPhase, Vector3.zero, Quaternion.identity);
+			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
+			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+		}
 
-        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // フェイズオブジェクト削除
-        Destroy(m_PhaseObject.GetComponent<MainPhase>());
-        // 次のフェイズへ
-        return GetSetNextPhaseType;
+		// フェイズオブジェクト削除
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PhotonNetwork.Destroy(m_PhaseObject);
+
+		}
+		// 次のフェイズへ
+		return GetSetNextPhaseType;
     }
     // エンドフェイズ
     async UniTask<PhaseType> PhaseEnd()
     {
-        // フェイズオブジェクト設定
-        m_PhaseObject.AddComponent<EndPhase>();
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.JoinPhase, Vector3.zero, Quaternion.identity);
+			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
+			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+		}
 
-        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
-        // フェイズオブジェクト削除
-        Destroy(m_PhaseObject.GetComponent<EndPhase>());
+		// フェイズオブジェクト削除
+		if (PhotonNetwork.IsMasterClient)
+		{
+			PhotonNetwork.Destroy(m_PhaseObject);
+		}
 
-        // ターン終了処理
-        TurnEnd();
+		// ターン終了処理
+		TurnEnd();
 
 		// 次のフェイズへ
 		return GetSetNextPhaseType;
@@ -490,7 +527,16 @@ public class BattleMgr : MonoBehaviourPun
 		}
 	}
 
-	// -------フェイズ------
+    // -------フェイズ------
+    [PunRPC]
+    void PassReferencePhaseObject(int _viewId)
+    {
+        // マスタークライアントならはじく
+        if (PhotonNetwork.IsMasterClient) return;
+
+		// ViewID を基に GameObject を取得
+		m_PhaseObject = PhotonView.Find(_viewId)?.gameObject;
+	}
 	public PhaseType GetSetPhaseType
     {
         get { return m_Phase; }

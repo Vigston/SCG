@@ -4,6 +4,7 @@ using System.Threading;
 using System;
 using battleTypes;
 using Photon.Pun;
+using Cysharp.Threading.Tasks.Triggers;
 
 // 国民を参加させるアクション
 public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
@@ -223,12 +224,13 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 			// 操作側なら
 			if (operateSide == Side.eSide_Player)
 			{
-				int cardAreaViewID = m_SelectedCardArea.GetComponent<PhotonView>().ViewID;
+				Side cardAreaSide = m_SelectedCardArea.GetSide();
+				Position cardAreaPos = m_SelectedCardArea.GetPosition();
 				bool isSpy = BattleMgr.instance.IsNextJoinSpyFlag();
 
 				m_NetWorkSyncFlag = true;
 
-				photonView.RPC("OnJoinPeopleCard", RpcTarget.Others, cardAreaViewID, isSpy);
+				photonView.RPC(nameof(OnJoinPeopleCard), RpcTarget.Others, (int)cardAreaSide, (int)cardAreaPos, isSpy);
 			}
 			// それ以外なら通信同期待ち
 		}
@@ -371,13 +373,11 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	/////Photon/////
 	// 国民カードが追加された際に情報を他クライアントに送信
 	[PunRPC]
-	void OnJoinPeopleCard(int _cardAreaViewID, bool _isSpy)
+	void OnJoinPeopleCard(int _cardAreaSide, int _cardAreaPos, bool _isSpy)
 	{
-		if (PhotonView.Find(_cardAreaViewID) == null) { return; }
+		CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_cardAreaSide, (Position)_cardAreaPos);
 
-		CardArea cardArea = PhotonView.Find(_cardAreaViewID).GetComponent<CardArea>();
-
-		if (cardArea != null) { return; }
+		if (cardArea == null) { return; }
 
 		m_NetWorkSyncFlag = true;
 

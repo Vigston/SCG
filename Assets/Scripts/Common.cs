@@ -2,10 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 using battleTypes;
+using System;
 
 public static class Common
 {
-    public const string prefabPath_GameAction = "Prefabs/GameAction"; // 共通のプレハブパス
+    public static class PrefabPath
+    {
+		public static readonly string JoinPeopleGameAction = "Prefabs/JoinPeopleGameAction";
+		public static readonly string StartPhase = "Prefabs/StartPhase";
+		public static readonly string JoinPhase = "Prefabs/JoinPhase";
+		public static readonly string MainPhase = "Prefabs/MainPhase";
+		public static readonly string EndPhase = "Prefabs/EndPhase";
+	}
 
 	// バトルの共通定数
 	public static class BattleConst
