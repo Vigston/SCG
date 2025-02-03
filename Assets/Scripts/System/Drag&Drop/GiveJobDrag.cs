@@ -46,9 +46,6 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        // 職業付与を行ったか
-        bool isAppendAction = false;
-
         // 追加種類付与フラグが立っているなら
         if (GetSetGiveJobDragFlag)
         {
@@ -78,8 +75,6 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
                             {
                                 BattleMgr.instance.SetNextJoinSpyFlag(true);
                                 Debug.Log($"次に参加してくる'{battleArea}'の国民は自分のスパイになる");
-                                // 付与しました
-                                isAppendAction = true;
                             }
                         }
                     }
@@ -105,19 +100,11 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
                     // スパイを除く職業が付与されていないなら
                     if (battleCard.GetAppendJobNum(true) <= 0)
                     {
-                        // 職業付与
-                        battleCard.AppendJob(m_GiveKind);
-                        // 付与しました
-                        isAppendAction = true;
+                        int battleCardViewId = battleCard.photonView.ViewID;
+						// 職業付与
+						photonView.RPC(nameof(AppendJob), RpcTarget.All, battleCardViewId, (int)m_GiveKind);
                     }
                 }
-            }
-
-            // 職業付与を行ったなら
-            if (isAppendAction)
-            {
-                // BattleMgr更新リクエスト
-                BattleMgr.instance.UpdateRequest();
             }
 
             m_DragObj = null;
@@ -134,13 +121,16 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
     }
 
     [PunRPC]
-    void AppendJob(int _battleCardViewId)
+    void AppendJob(int _battleCardViewId, int _jobKind)
     {
 		BattleCard battleCard = PhotonView.Find(_battleCardViewId)?.gameObject.GetComponent<BattleCard>();
 
         if (battleCard == null) return;
 
 		// 職業付与
-		battleCard.AppendJob(m_GiveKind);
+		battleCard.AppendJob((BattleCard.JobKind)_jobKind);
+
+		// BattleMgr更新リクエスト
+		BattleMgr.instance.UpdateRequest();
 	}
 }

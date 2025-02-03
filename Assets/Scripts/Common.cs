@@ -8,6 +8,7 @@ public static class Common
 {
     public static class PrefabPath
     {
+		public static readonly string Card = "Prefabs/Card";
 		public static readonly string JoinPeopleGameAction = "Prefabs/JoinPeopleGameAction";
 		public static readonly string StartPhase = "Prefabs/StartPhase";
 		public static readonly string JoinPhase = "Prefabs/JoinPhase";

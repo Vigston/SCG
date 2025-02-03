@@ -230,7 +230,7 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 
 				m_NetWorkSyncFlag = true;
 
-				photonView.RPC(nameof(OnJoinPeopleCard), RpcTarget.Others, (int)cardAreaSide, (int)cardAreaPos, isSpy);
+				photonView.RPC(nameof(OnJoinPeopleCard), RpcTarget.Others);
 			}
 			// それ以外なら通信同期待ち
 		}
@@ -373,15 +373,8 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 	/////Photon/////
 	// 国民カードが追加された際に情報を他クライアントに送信
 	[PunRPC]
-	void OnJoinPeopleCard(int _cardAreaSide, int _cardAreaPos, bool _isSpy)
+	void OnJoinPeopleCard()
 	{
-		CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_cardAreaSide, (Position)_cardAreaPos);
-
-		if (cardArea == null) { return; }
-
 		m_NetWorkSyncFlag = true;
-
-		// 国民カード追加
-		BattleCardCtr.instance.CreateBattleCard(cardArea, BattleCard.Kind.eKind_People, _isSpy);
 	}
 }

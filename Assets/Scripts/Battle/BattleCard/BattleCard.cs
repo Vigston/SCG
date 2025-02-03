@@ -4,8 +4,9 @@ using UnityEngine;
 using battleTypes;
 using Cysharp.Threading.Tasks;
 using System.Threading;
+using Photon.Pun;
 
-public class BattleCard : MonoBehaviour
+public class BattleCard : MonoBehaviourPun
 {
     // ステータス
     public enum Status
