@@ -393,16 +393,20 @@ public class BattleMgr : MonoBehaviourPun
     public void SetTurnEndFlag()
     {
         GameObject phaseObj = GetPhaseObject();
+        Debug.Log("SetTurnEndFlag：1");
         // フェイズオブジェクトのnullチェック
         if (phaseObj == null) { return; }
-        MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
+		Debug.Log("SetTurnEndFlag：2");
+		MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
         // メインフェイズじゃないならはじく
         if (mainPhase == null) { return; }
-        // メインステートじゃなければはじく
-        if(mainPhase.GetSetState != MainPhase.State.eState_Main) { return; }
+		Debug.Log("SetTurnEndFlag：3");
+		// メインステートじゃなければはじく
+		if (mainPhase.GetSetState != MainPhase.State.eState_Main) { return; }
+		Debug.Log($"SetTurnEndFlag：4[{mainPhase.GetSetState}]");
 
-        // ターンエンドフラグを立てる
-        m_TurnEndFlag = true;
+		// ターンエンドフラグを立てる
+		m_TurnEndFlag = true;
     }
 
     // ターンエンドフラグが立っているか

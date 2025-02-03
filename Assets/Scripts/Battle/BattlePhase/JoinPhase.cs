@@ -7,7 +7,7 @@ using System.Linq;
 using Photon.Pun;
 using static Common;
 
-public class JoinPhase : MonoBehaviourPunCallbacks
+public class JoinPhase : MonoBehaviourPun
 {
     // ===構造体===
     public enum State
@@ -102,6 +102,11 @@ public class JoinPhase : MonoBehaviourPunCallbacks
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
         {
+            if(PhotonNetwork.IsMasterClient)
+            {
+                // アクションオブジェクト削除
+                PhotonNetwork.Destroy(m_JoinPeopleGameAction);
+            }
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
 		}

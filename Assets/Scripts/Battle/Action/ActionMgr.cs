@@ -3,8 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using Photon.Pun;
 
-public class ActionMgr : MonoBehaviour
+public class ActionMgr : MonoBehaviourPun
 {
 	// インスタンス
 	public static ActionMgr instance;

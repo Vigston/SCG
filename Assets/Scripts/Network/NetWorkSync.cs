@@ -101,28 +101,40 @@ public class NetWorkSync : MonoBehaviourPun
 	public void SetSyncTurnNum(int turnNum)
 	{
 		Debug.Log($"通信同期(SetSyncTurnNum)：{turnNum}");
-		BattleMgr.instance.GetSetTurnNum = turnNum;
+		if(BattleMgr.instance.GetSetTurnNum != turnNum)
+		{
+			Debug.Log($"通信同期取れていません(SetSyncTurnNum)：[自分]{BattleMgr.instance.GetSetTurnNum},[相手]{turnNum}");
+		}
 	}
 	// 相手側にターン側の同期を行う
 	[PunRPC]
 	public void SetSyncTurnSide(int turnSide)
 	{
 		Debug.Log($"通信同期(SetSyncTurnSide)：{turnSide}");
-		BattleMgr.instance.GetSetTurnSide = Common.GetRevSide((Side)turnSide);
+		if (BattleMgr.instance.GetSetTurnSide != Common.GetRevSide((Side)turnSide))
+		{
+			Debug.Log($"通信同期取れていません(GetSetTurnSide)：[自分]{BattleMgr.instance.GetSetTurnSide},[相手]{Common.GetRevSide((Side)turnSide)}");
+		}
 	}
 	// 相手側にフェイズの同期を行う
 	[PunRPC]
 	public void SetSyncPhaseType(int phaseType)
 	{
 		Debug.Log($"通信同期(SetSyncPhaseType)：{phaseType}");
-		BattleMgr.instance.GetSetPhaseType = (PhaseType)phaseType;
+		if (BattleMgr.instance.GetSetPhaseType != (PhaseType)phaseType)
+		{
+			Debug.Log($"通信同期取れていません(GetSetPhaseType)：[自分]{BattleMgr.instance.GetSetPhaseType},[相手]{(PhaseType)phaseType}");
+		}
 	}
 	// 相手側に勝敗の同期を行う
 	[PunRPC]
 	public void SetSyncBattleResult(int battleResult)
 	{
 		Debug.Log($"通信同期(SetSyncBattleResult)：{battleResult}");
-		BattleMgr.instance.GetSetBattleResult = (BattleResult)battleResult;
+		if (BattleMgr.instance.GetSetBattleResult != (BattleResult)battleResult)
+		{
+			Debug.Log($"通信同期取れていません(GetSetPhaseType)：[自分]{BattleMgr.instance.GetSetBattleResult},[相手]{(BattleResult)battleResult}");
+		}
 	}
 	
 	// 相手側に操作側プレイヤーの同期を行う
@@ -130,6 +142,9 @@ public class NetWorkSync : MonoBehaviourPun
 	public void SetSyncOperateUserSide(int operateUserSide)
 	{
 		Debug.Log($"通信同期(SetSyncOperateUserSide)：{operateUserSide}");
-		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide((Side)operateUserSide);
+		if (BattleUserMgr.instance.GetSetOperateSide != Common.GetRevSide((Side)operateUserSide))
+		{
+			Debug.Log($"通信同期取れていません(GetSetPhaseType)：[自分]{BattleUserMgr.instance.GetSetOperateSide},[相手]{Common.GetRevSide((Side)operateUserSide)}");
+		}
 	}
 }
