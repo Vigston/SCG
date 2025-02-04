@@ -102,6 +102,14 @@ public static class Common
         return Side.eSide_None;
     }
 
+    // 操作側が自分か
+    public static bool IsMyOperateTurn()
+    {
+		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
+
+        return operateSide == Side.eSide_Player;
+	}
+
 	// 自分のターンか
 	public static bool IsMyTurn()
 	{

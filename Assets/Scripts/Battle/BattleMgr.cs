@@ -421,9 +421,9 @@ public class BattleMgr : MonoBehaviourPun
         // 現在のターンと操作側を逆にする
         Side turnSide = GetSetTurnSide;
         Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
-		GetSetTurnSide = Common.GetRevSide(turnSide);
+		GetSetTurnSide = GetRevSide(turnSide);
 
-		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide(operateSide);
+		BattleUserMgr.instance.GetSetOperateSide = GetRevSide(operateSide);
 
 		// ターン終了リクエスト初期化
 		m_TurnEndFlag = false;

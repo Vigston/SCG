@@ -4,15 +4,16 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using battleTypes;
 using Photon.Pun;
+using static Common;
 
 public class MainPhase : MonoBehaviour
 {
     // ===構造体===
     public enum State
     {
-        eState_Init,
-        eState_Main,
-        eState_End,
+        eState_Init,    // 初期化
+        eState_Main,    // メイン
+        eState_End,     // 終了
     }
 
     // ===変数===
@@ -66,14 +67,24 @@ public class MainPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        // 職業付与へ
-        SetNextStateAndFlag(State.eState_Main);
+		if (m_StateValue == 1)
+		{
+			Debug.Log($"{nameof(MainPhase)}" + "初期化ステート処理開始");
+		}
+
+		// 職業付与へ
+		SetNextStateAndFlag(State.eState_Main);
     }
 
     void Main()
     {
-        // ターンエンドフラグが立っているなら終了する。
-        if (BattleMgr.instance.IsTurnEndFlag())
+		if (m_StateValue == 1)
+		{
+			Debug.Log($"{nameof(MainPhase)}" + "メインステート処理開始");
+		}
+
+		// ターンエンドフラグが立っているなら終了する。
+		if (BattleMgr.instance.IsTurnEndFlag())
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
@@ -84,18 +95,16 @@ public class MainPhase : MonoBehaviour
     // 終了
     void End()
     {
-		if (PhotonNetwork.IsConnected)
+		if (m_StateValue == 1)
 		{
-			if (PhotonNetwork.IsMasterClient)
-			{
-				// エンドフェイズに移動。
-				BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
-			}
+			Debug.Log($"{nameof(MainPhase)}" + "終了ステート処理開始");
 		}
-		else
-		{
+
+		// 操作側なら
+		if (IsMyOperateTurn())
+        {
 			// エンドフェイズに移動。
-			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+			BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
 		}
 	}
 

@@ -10,10 +10,10 @@ public class StartPhase : MonoBehaviour
     // ===構造体===
     public enum State
     {
-        eState_Init,
-        eState_Starting,
-        eState_NetworkSync,
-        eState_End,
+        eState_Init,        // 初期化
+        eState_Starting,    // 開始時
+        eState_NetworkSync, // 通信同期
+        eState_End,         // 終了
     }
 
     // ===変数===
@@ -62,7 +62,7 @@ public class StartPhase : MonoBehaviour
                 End();
                 break;
             default:
-                Debug.Log($"登録されていないステートです：{m_State}");
+                Debug.Log($"{nameof(StartPhase)}" + $"登録されていないステートです：{m_State}");
                 break;
         }
     }
@@ -70,20 +70,20 @@ public class StartPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        if(m_StateValue == 1)
+		if (m_StateValue == 1)
         {
-            Debug.Log("初期化ステート処理開始");
-            // 開始時へ
-            SetNextStateAndFlag(State.eState_Starting);
-            Debug.Log("初期化ステート処理終了");
-        }
-    }
+			Debug.Log($"{nameof(StartPhase)}" + "初期化ステート処理開始");
+		}
+
+		// 開始時へ
+		SetNextStateAndFlag(State.eState_Starting);
+	}
     // 開始時
     void Starting()
     {
         if(m_StateValue == 1)
         {
-            Debug.Log("開始時ステート処理開始");
+            Debug.Log($"{nameof(StartPhase)}" + "開始時ステート処理開始");
 
             // Gold追加処理
             // ターン側
@@ -98,55 +98,51 @@ public class StartPhase : MonoBehaviour
 
             // 通信同期へ
             SetNextStateAndFlag(State.eState_NetworkSync);
-            Debug.Log("開始時ステート処理終了");
         }
     }
     // 通信同期
     void NetworkSync()
     {
 		if (m_StateValue == 1)
-		{
-			Debug.Log("通信同期ステート処理開始");
-
-			/////通信同期/////
-			NetWorkSync.instance.GameInfoNetworkSync();
-
-			// 終了へ
-			SetNextStateAndFlag(State.eState_End);
-			Debug.Log("通信同期ステート処理終了");
+        {
+			Debug.Log($"{nameof(StartPhase)}" + "通信同期ステート処理開始");
 		}
+
+		/////通信同期/////
+		NetWorkSync.instance.GameInfoNetworkSync();
+
+		// 終了へ
+		SetNextStateAndFlag(State.eState_End);
 	}
 	// 終了
 	void End()
     {
-        if(m_StateValue == 1)
+		if (m_StateValue == 1)
         {
-            Debug.Log("終了ステート処理開始");
-			if (PhotonNetwork.IsConnected)
-			{
-				if (PhotonNetwork.IsMasterClient)
-				{
-					// ジョインフェイズに移動。
-					BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_Join);
-				}
-			}
-			else
+			Debug.Log($"{nameof(StartPhase)}" + "終了ステート処理開始");
+		}
+
+		if (PhotonNetwork.IsConnected)
+		{
+			if (PhotonNetwork.IsMasterClient)
 			{
 				// ジョインフェイズに移動。
-				BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+				BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Join);
 			}
-            Debug.Log("終了ステート処理終了");
-        }
-    }
+		}
+		else
+		{
+			// ジョインフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+		}
+	}
 
     // --システム--
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop起動");
         while (true)
         {
             // ステート更新処理
-            Debug.Log("ステート更新！！");
             // 次のステート更新(今のステートに設定)
             SetNextState(m_State);
             // 次のステート
@@ -157,27 +153,19 @@ public class StartPhase : MonoBehaviour
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("初期化ステート");
                     nextState = await StateInit();
-                    Debug.Log("次のステートへ");
                     break;
                 case State.eState_Starting:
-                    Debug.Log("開始時ステート");
                     nextState = await StateStarting();
-                    Debug.Log("次のステートへ");
                     break;
 				case State.eState_NetworkSync:
-					Debug.Log("通信同期ステート");
 					nextState = await StateNetworkSync();
-					Debug.Log("次のステートへ");
 					break;
 				case State.eState_End:
-                    Debug.Log("終了ステート");
                     nextState = await StateEnd();
-                    Debug.Log("次のステートへ");
                     break;
                 default:
-                    Debug.Log("StateLoopに記載されていないステートに遷移しようとしています");
+                    Debug.Log($"{nameof(StartPhase)}" + "StateLoopに記載されていないステートに遷移しようとしています");
                     break;
             }
 

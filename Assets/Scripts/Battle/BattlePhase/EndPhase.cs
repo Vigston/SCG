@@ -54,7 +54,7 @@ public class EndPhase : MonoBehaviour
                 End();
                 break;
             default:
-                Debug.Log("登録されていないステートです。");
+                Debug.Log($"{nameof(EndPhase)}" + $"登録されていないステートです。：{m_State}");
                 break;
         }
     }
@@ -62,10 +62,13 @@ public class EndPhase : MonoBehaviour
     // 初期化
     void Init()
     {
-        Debug.Log("初期化ステート処理開始");
+		if (m_StateValue == 1)
+		{
+			Debug.Log($"{nameof(EndPhase)}" + "初期化ステート処理開始");
+		}
+		
         // 終了へ
         SetNextStateAndFlag(State.eState_End);
-        Debug.Log("初期化ステート処理終了");
     }
 
     // 終了
@@ -73,35 +76,30 @@ public class EndPhase : MonoBehaviour
     {
         if (m_StateValue == 1)
         {
-            Debug.Log("終了ステート処理開始");
+            Debug.Log($"{nameof(EndPhase)}" + "終了ステート処理開始");
 
             if(PhotonNetwork.IsConnected)
             {
                 if(PhotonNetwork.IsMasterClient)
                 {
 					// スタートフェイズに移動。
-					BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_Start);
+					BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Start);
 				}
             }
             else
             {
                 // スタートフェイズに移動。
                 BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
-
 			}
-			
-            Debug.Log("終了ステート処理終了");
         }
     }
 
     // --システム--
     async UniTask StateLoop()
     {
-        Debug.Log("StateLoop起動");
         while (true)
         {
             // ステート更新処理
-            Debug.Log("ステート更新！！");
             // 次のステート更新(今のステートに設定)
             SetNextState(m_State);
             // 次のステート
@@ -112,17 +110,13 @@ public class EndPhase : MonoBehaviour
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("初期化ステート");
                     nextState = await StateInit();
-                    Debug.Log("次のステートへ");
                     break;
                 case State.eState_End:
-                    Debug.Log("終了ステート");
                     nextState = await StateEnd();
-                    Debug.Log("次のステートへ");
                     break;
                 default:
-                    Debug.Log("StateLoopに記載されていないステートに遷移しようとしています");
+                    Debug.Log($"{nameof(EndPhase)}" + "StateLoopに記載されていないステートに遷移しようとしています");
                     break;
             }
 

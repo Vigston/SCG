@@ -12,10 +12,10 @@ public class JoinPhase : MonoBehaviourPun
     // ===構造体===
     public enum State
     {
-        eState_Init,
-        eState_Start,
-		eState_JoinPeopleGameAction,
-        eState_End,
+        eState_Init,                    // 初期化
+        eState_Start,                   // 開始時
+		eState_JoinPeopleGameAction,    // 国民参加
+        eState_End,                     // 終了
     }
 
 	// ===変数===
@@ -63,7 +63,7 @@ public class JoinPhase : MonoBehaviourPun
                 End();
                 break;
             default:
-                Debug.Log("登録されていないステートです。");
+                Debug.Log($"{nameof(JoinPhase)}" + $"登録されていないステートです：{m_State}");
                 break;
         }
     }
@@ -71,19 +71,29 @@ public class JoinPhase : MonoBehaviourPun
     // 初期化
     void Init()
     {
+		if (m_StateValue == 1)
+        {
+			Debug.Log($"{nameof(JoinPhase)}" + "初期化ステート処理開始");
+		}
+
 		// 国民を参加させるアクションへ
 		SetNextStateAndFlag(State.eState_JoinPeopleGameAction);
 	}
 	// 国民を参加させるアクション
 	void JoinPeopleGameAction()
     {
-        // 場に空きがないなら終了へ
-        if (BattleStageMgr.instance.GetCardAreaNumFromEmptyCard() <= 0)
+        if (m_StateValue == 1)
         {
-            Debug.Log("JoinPhase：場に空きがないので終了へ");
+			Debug.Log($"{nameof(JoinPhase)}" + "国民参加ステート処理開始");
+		}
+
+		// 場に空きがないなら終了へ
+		if (BattleStageMgr.instance.GetCardAreaNumFromEmptyCard() <= 0)
+        {
+            Debug.Log("場に空きがないので終了へ");
             // 終了へ
             SetNextStateAndFlag(State.eState_End);
-            return;
+			return;
         }
 
         if (m_StateValue == 1)
@@ -117,12 +127,14 @@ public class JoinPhase : MonoBehaviourPun
     {
         if (m_StateValue == 1)
         {
+			Debug.Log($"{nameof(JoinPhase)}" + "終了ステート処理開始");
+
 			if (PhotonNetwork.IsConnected)
 			{
 				if (PhotonNetwork.IsMasterClient)
 				{
 					// メインフェイズに移動。
-					BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_Main);
+					BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Main);
 				}
 			}
 			else
@@ -149,15 +161,12 @@ public class JoinPhase : MonoBehaviourPun
             switch (m_State)
             {
                 case State.eState_Init:
-                    Debug.Log("JoinPhase：eState_Init");
                     nextState = await StateInit();
                     break;
                 case State.eState_JoinPeopleGameAction:
-					Debug.Log("JoinPhase：eState_JoinPeopleGameAction");
 					nextState = await StateJoinPeopleGameAction();
                     break;
                 case State.eState_End:
-					Debug.Log("JoinPhase：eState_End");
 					nextState = await StateEnd();
                     break;
                 default:

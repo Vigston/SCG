@@ -60,6 +60,12 @@ public class ActionMgr : MonoBehaviourPun
 	// 指定のアクションが終了しているか(終了しているならここでキューから削除)
 	public bool IsCompletedAction(GameObject _actionObject)
 	{
+		if(_actionObject == null)
+		{
+			Debug.Log($"アクションオブジェクトの参照が取れていません");
+			return false;
+		}
+
 		GameObject bufferAction = null;
 
 		if (bufferActionQueue.Contains(_actionObject))
