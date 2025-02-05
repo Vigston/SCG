@@ -62,9 +62,6 @@ public class DebugMgr : MonoBehaviour
     // DebugMgrの更新。
     void DebugMgrUpdate()
     {
-        // 更新フラグが立っていないなら処理しない。
-        if (!m_UpdateFlag) { return; }
-
         // ↓更新処理↓
         // バトル情報
         m_TextOperateUser.text = "操作側：" + BattleUserMgr.instance.GetSetOperateSide.ToString();
@@ -88,15 +85,6 @@ public class DebugMgr : MonoBehaviour
         m_TextScienceValue_E.text = "研究値：" + BattleMgr.instance.GetScienceValue(Side.eSide_Enemy).ToString();
         m_TextMilitaryCardNum_E.text = "軍事カード：" + BattleMgr.instance.GetMilitaryCardNum(Side.eSide_Enemy).ToString();
         m_TextSpyCardNum_E.text = "スパイカード：" + BattleMgr.instance.GetSpyCardNum(Side.eSide_Enemy).ToString();
-
-        // 更新処理が終わったのでフラグ降ろす。
-        if (m_UpdateFlag) { m_UpdateFlag = false; }
-    }
-
-    // 更新のリクエスト。(次にUpdateで走る)
-    public void UpdateRequest()
-    {
-        m_UpdateFlag = true;
     }
 
     // インスタンスを作成

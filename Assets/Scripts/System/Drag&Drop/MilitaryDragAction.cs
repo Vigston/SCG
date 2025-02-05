@@ -111,8 +111,6 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
                         // カードの行動回数加算
                         actionCard.AddActionNum();
                     }
-                    // BattleMgr更新リクエスト
-                    BattleMgr.instance.UpdateRequest();
                 }
             }
         }

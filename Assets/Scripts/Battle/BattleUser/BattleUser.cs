@@ -10,13 +10,25 @@ public class BattleUser : MonoBehaviour
     // ===変数===
     // 側
     [SerializeField, ReadOnly]
-    private Side m_Side;
+    Side m_Side;
 	// ネットワーク固有番号
 	[SerializeField, ReadOnly]
-	private int m_NetWorkActorNumber;
+	int m_NetWorkNumber;
 
+	[SerializeField, ReadOnly]
 	// 選択したカードエリア
 	CardArea m_SelectedCardArea;
+
+	[SerializeField, ReadOnly]
+	// フェイズ同期待ちフラグ
+	bool m_PhaseReadyFlag;
+
+    // --初期化--
+    // フェイズ情報の初期化
+    public void Init_PhaseInfo()
+    {
+        m_PhaseReadyFlag = false;
+    }
 
 	// --側--
 	public Side GetSetSide
@@ -26,10 +38,10 @@ public class BattleUser : MonoBehaviour
     }
 
     // --ネットワーク固有番号--
-    public int GetSetNetWorkActorNumber
+    public int GetSetNetWorkNumber
     {
-        get { return m_NetWorkActorNumber; }
-        set { m_NetWorkActorNumber = value; }
+        get { return m_NetWorkNumber; }
+        set { m_NetWorkNumber = value; }
     }
 
     // 選択したカードエリア
@@ -37,5 +49,12 @@ public class BattleUser : MonoBehaviour
     {
         get { return m_SelectedCardArea; }
         set { m_SelectedCardArea = value; }
+    }
+
+    // --フェイズ同期待ち--
+    public bool GetSetPhaseReadyFlag
+    {
+        get { return m_PhaseReadyFlag; }
+        set { m_PhaseReadyFlag = value; }
     }
 }

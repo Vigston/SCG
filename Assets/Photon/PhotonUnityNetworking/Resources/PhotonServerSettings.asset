@@ -57,6 +57,7 @@ MonoBehaviour:
   - PassReferencePhaseObject
   - AppendJob
   - CreateBattleCard_RPC
+  - RPC_PhaseReady
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

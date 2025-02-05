@@ -71,9 +71,9 @@ public class NetWorkSync : MonoBehaviourPun
 		}
 
 		// 操作側のクライアントじゃないならはじく。
-		if (operateUser.GetSetNetWorkActorNumber != PhotonNetwork.LocalPlayer.ActorNumber)
+		if (operateUser.GetSetNetWorkNumber != PhotonNetwork.LocalPlayer.ActorNumber)
 		{
-			Debug.Log($"操作側のクライアントじゃないので通信同期を行いません。操作側ActorNumber：{operateUser.GetSetNetWorkActorNumber}｜ローカルActorNumber：{PhotonNetwork.LocalPlayer.ActorNumber}");
+			Debug.Log($"操作側のクライアントじゃないので通信同期を行いません。操作側ActorNumber：{operateUser.GetSetNetWorkNumber}｜ローカルActorNumber：{PhotonNetwork.LocalPlayer.ActorNumber}");
 			return false;
 		}
 
@@ -91,7 +91,7 @@ public class NetWorkSync : MonoBehaviourPun
 	[PunRPC]
 	public void SetSyncTurnSide(int turnSide)
 	{
-		Debug.Log($"通信同期(SetSyncTurnSide)：{turnSide}");
+		Debug.Log($"通信同期(SetSyncTurnSide)：{Common.GetRevSide((Side)turnSide)}");
 		BattleMgr.instance.GetSetTurnSide = Common.GetRevSide((Side)turnSide);
 	}
 	
@@ -99,7 +99,7 @@ public class NetWorkSync : MonoBehaviourPun
 	[PunRPC]
 	public void SetSyncOperateUserSide(int operateUserSide)
 	{
-		Debug.Log($"通信同期(SetSyncOperateUserSide)：{operateUserSide}");
+		Debug.Log($"通信同期(SetSyncOperateUserSide)：{Common.GetRevSide((Side)operateUserSide)}");
 		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide((Side)operateUserSide);
 	}
 }

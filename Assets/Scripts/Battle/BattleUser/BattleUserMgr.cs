@@ -50,11 +50,24 @@ public class BattleUserMgr : MonoBehaviour
     }
 
     // ===関数===
+    // ---初期化---
+    // ユーザーのフェイズ情報初期化
+    public void Init_User_PhaseInfo()
+    {
+        // 各ユーザーのフェイズ情報初期化
+		foreach (var user in m_BattleUsers)
+		{
+			if (!user) continue;
+
+            user.Init_PhaseInfo();
+		}
+	}
+
     // ---ユーザー---
     // プレイヤーユーザー
     public BattleUser GetSetPlayerUser
     {
-        get { return m_BattleUsers[(int)Side.eSide_Player]; }
+		get { return m_BattleUsers[(int)Side.eSide_Player]; }
         set { m_BattleUsers[(int)Side.eSide_Player] = value; }
     }
 	// 敵ユーザー
@@ -67,6 +80,24 @@ public class BattleUserMgr : MonoBehaviour
     public BattleUser GetUser(Side Side)
     {
         return m_BattleUsers[(int)Side];
+    }
+    // ネットワーク固有番号からユーザーを取得
+    public BattleUser GetUserFromNetWorkNumber(int _netWorkNumber)
+    {
+        BattleUser battleUser = null;
+
+        // ユーザー検索
+        foreach (var user in m_BattleUsers)
+        {
+            if (!user) continue;
+
+            if(user.GetSetNetWorkNumber == _netWorkNumber)
+            {
+                battleUser = user;
+            }
+        }
+
+        return battleUser;
     }
 
     // ---操作側---

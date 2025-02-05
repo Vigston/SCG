@@ -55,8 +55,6 @@ public class BattleMgr : MonoBehaviourPun
     [SerializeField]
     private int[] m_GoldValue = new int[(int)Side.eSide_Max];
 
-    // 更新フラグ
-    private bool m_UpdateFlag = false;
     // フェイズ進行フラグ
     private bool m_NextPhaseFlag = false;
     // ターンエンドフラグ
@@ -92,39 +90,18 @@ public class BattleMgr : MonoBehaviourPun
 
 		// 勝敗更新
 		BattleResultUpdate().Forget();
-
-        // BattleMgrの更新リクエスト
-        UpdateRequest();
 	}
 
     // Update is called once per frame
     void Update()
     {
         BattleMgrUpdate();
-
-        switch (m_Phase)
-        {
-            case PhaseType.ePhaseType_Start:
-                break;
-            case PhaseType.ePhaseType_Join:
-                break;
-            case PhaseType.ePhaseType_Main:
-                break;
-            case PhaseType.ePhaseType_End:
-                break;
-            default:
-                break;
-
-        }
     }
 
     // =================関数================
     // BattleMgrの更新。
     void BattleMgrUpdate()
     {
-        // 更新フラグが立っていないなら処理しない。
-        if (!m_UpdateFlag) { return; }
-
         // ↓更新処理↓
         for (int i = 0; i < (int)Side.eSide_Max; i++)
         {
@@ -147,18 +124,6 @@ public class BattleMgr : MonoBehaviourPun
             int scienceValue = MathScienceValue(Side);
             SetScienceValue(Side, scienceValue);
         }
-
-		// DebugMgrの更新リクエスト
-		DebugMgr.instance.UpdateRequest();
-
-        // 更新処理が終わったのでフラグ降ろす。
-        if (m_UpdateFlag) { m_UpdateFlag = false; }
-    }
-
-    // 更新のリクエスト。(次にUpdateで走る)
-    public void UpdateRequest()
-    {
-        m_UpdateFlag = true;
     }
 
     // インスタンスを作成
@@ -185,14 +150,12 @@ public class BattleMgr : MonoBehaviourPun
         while(true)
         {
             Debug.Log("フェイズ更新！！");
-            // FightMgrの更新リクエスト
-            UpdateRequest();
             // 次のフェイズ(ここでは現在のフェイズを代入)
             PhaseType nextPhase = GetSetPhaseType;
             // 次のフェイズに移動するフラグ初期化
             m_NextPhaseFlag = false;
 
-            switch(m_Phase)
+            switch(GetSetPhaseType)
             {
                 case PhaseType.ePhaseType_Start:
                     Debug.Log("スタートフェイズ");
@@ -220,7 +183,7 @@ public class BattleMgr : MonoBehaviourPun
             }
 
             // 次のフェイズが現在と同じならはじく
-            if(nextPhase == m_Phase) { continue; }
+            if(nextPhase == GetSetPhaseType) { continue; }
 
 			// 次のフェイズを設定
 			GetSetPhaseType = nextPhase;
@@ -243,7 +206,10 @@ public class BattleMgr : MonoBehaviourPun
             photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
         }
 
-        await UniTask.WaitUntil(() => IsNextPhaseFlag());
+        // お互いのユーザーがフェイズ移行待機状態か
+		await UniTask.WaitUntil(() => IsPhaseReady());
+        // 次のフェイズに移行するか
+		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
@@ -251,13 +217,18 @@ public class BattleMgr : MonoBehaviourPun
             PhotonNetwork.Destroy(m_PhaseObject);
 		}
 
-        // 次のフェイズへ
-        return GetSetNextPhaseType;
+		// フェイズオブジェクト削除済みか
+		await UniTask.WaitUntil(() => m_PhaseObject == null);
+
+		// ユーザーのフェイズ情報初期化
+		BattleUserMgr.instance.Init_User_PhaseInfo();
+
+		// 次のフェイズへ
+		return GetSetNextPhaseType;
     }
     // ジョインフェイズ
     async UniTask<PhaseType> PhaseJoin()
     {
-		// フェイズオブジェクト設定
 		// フェイズオブジェクト設定
 		if (PhotonNetwork.IsMasterClient)
 		{
@@ -266,14 +237,22 @@ public class BattleMgr : MonoBehaviourPun
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 		}
 
+		// お互いのユーザーがフェイズ移行待機状態か
+		await UniTask.WaitUntil(() => IsPhaseReady());
+		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
 		{
 			PhotonNetwork.Destroy(m_PhaseObject);
-
 		}
+
+        // フェイズオブジェクト削除済みか
+		await UniTask.WaitUntil(() => m_PhaseObject == null);
+
+        // ユーザーのフェイズ情報初期化
+        BattleUserMgr.instance.Init_User_PhaseInfo();
 
 		// 次のフェイズへ
 		return GetSetNextPhaseType;
@@ -289,14 +268,23 @@ public class BattleMgr : MonoBehaviourPun
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 		}
 
+		// お互いのユーザーがフェイズ移行待機状態か
+		await UniTask.WaitUntil(() => IsPhaseReady());
+		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
 		{
 			PhotonNetwork.Destroy(m_PhaseObject);
-
 		}
+
+		// フェイズオブジェクト削除済みか
+		await UniTask.WaitUntil(() => m_PhaseObject == null);
+
+		// ユーザーのフェイズ情報初期化
+		BattleUserMgr.instance.Init_User_PhaseInfo();
+
 		// 次のフェイズへ
 		return GetSetNextPhaseType;
     }
@@ -311,6 +299,9 @@ public class BattleMgr : MonoBehaviourPun
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 		}
 
+		// お互いのユーザーがフェイズ移行待機状態か
+		await UniTask.WaitUntil(() => IsPhaseReady());
+		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
 		// フェイズオブジェクト削除
@@ -318,6 +309,12 @@ public class BattleMgr : MonoBehaviourPun
 		{
 			PhotonNetwork.Destroy(m_PhaseObject);
 		}
+
+		// フェイズオブジェクト削除済みか
+		await UniTask.WaitUntil(() => m_PhaseObject == null);
+
+		// ユーザーのフェイズ情報初期化
+		BattleUserMgr.instance.Init_User_PhaseInfo();
 
 		// ターン終了処理
 		TurnEnd();
@@ -559,7 +556,7 @@ public class BattleMgr : MonoBehaviourPun
     // 指定のフェイズか。
     public bool IsPhase(PhaseType _phase)
     {
-        return m_Phase == _phase;
+        return GetSetPhaseType == _phase;
     }
     // 次のフェイズに進むフラグを立てる
     public void SetNextPhaseFlag()
@@ -577,13 +574,45 @@ public class BattleMgr : MonoBehaviourPun
     {
 		GetSetNextPhaseType = _nextPhase;
         SetNextPhaseFlag();
-    }
-    [PunRPC]
-    void SetNextPhaseFlag_RPC(bool _nextPhaseFlag)
-    {
-        m_NextPhaseFlag = _nextPhaseFlag;
 
+		// フェイズ終了をマスタークライアントに送信
+		BattleUserMgr battleUserMgr = BattleUserMgr.instance;
+		if (!battleUserMgr) return;
+        BattleUser battleUser = battleUserMgr.GetSetPlayerUser;
+		if (!battleUser) return;
+
+        photonView.RPC(nameof(RPC_PhaseReady), RpcTarget.MasterClient, battleUser.GetSetNetWorkNumber);
+    }
+	// フェイズ終了をマスタークライアントに送信
+	[PunRPC]
+    void RPC_PhaseReady(int _netWorkActorNumber)
+    {
+        BattleUserMgr battleUserMgr = BattleUserMgr.instance;
+        if (!battleUserMgr) return;
+        BattleUser    battleUser    = battleUserMgr.GetUserFromNetWorkNumber(_netWorkActorNumber);
+        if (!battleUser) return;
+
+        // フェイズ移行の通信同期待ち状態に移行
+		battleUser.GetSetPhaseReadyFlag = true;
 	}
+    // お互いのユーザーがフェイズ移行待機状態か
+    bool IsPhaseReady()
+    {
+		BattleUserMgr battleUserMgr = BattleUserMgr.instance;
+		if (!battleUserMgr) return false;
+		BattleUser playerUser = battleUserMgr.GetSetPlayerUser;
+		BattleUser enemyUser = battleUserMgr.GetSetEnemyUser;
+		if (!playerUser) return false;
+		if (!enemyUser) return false;
+
+        // フェイズ移行待機状態ではない
+        if (!playerUser.GetSetPhaseReadyFlag) return false;
+		if (!enemyUser.GetSetPhaseReadyFlag) return false;
+
+		// どちらもフェイズ移行待機状態です
+		return true;
+    }
+
     // ---国民---
     // 国民カード数設定
     public void SetPeopleCardNum(Side _Side, int _value)

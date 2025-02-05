@@ -52,7 +52,7 @@ public class BattleUserCtr : MonoBehaviour
 
         // バトルユーザー設定
         battleUser.GetSetSide = Side.eSide_Player;
-        battleUser.GetSetNetWorkActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
+        battleUser.GetSetNetWorkNumber = PhotonNetwork.LocalPlayer.ActorNumber;
 
 		// BattleUserMgrに設定
 		BattleUserMgr.instance.GetSetPlayerUser = battleUser;
@@ -80,7 +80,7 @@ public class BattleUserCtr : MonoBehaviour
 		// プレイヤーのActorNumberを基に敵のActorNumberを設定
 		int playerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber;
 		int enemyActorNumber = (playerActorNumber == 1) ? 2 : 1;
-		battleUser.GetSetNetWorkActorNumber = enemyActorNumber;
+		battleUser.GetSetNetWorkNumber = enemyActorNumber;
 
 		// BattleUserMgrに設定
 		BattleUserMgr.instance.GetSetEnemyUser = battleUser;

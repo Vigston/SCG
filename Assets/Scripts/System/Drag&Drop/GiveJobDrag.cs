@@ -129,8 +129,5 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
 
 		// 職業付与
 		battleCard.AppendJob((BattleCard.JobKind)_jobKind);
-
-		// BattleMgr更新リクエスト
-		BattleMgr.instance.UpdateRequest();
 	}
 }

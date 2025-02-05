@@ -74,9 +74,6 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                     battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
                     // コスト分Goldを減らす
                     BattleMgr.instance.ReduceGoldValue(turnSide, costGoldValue);
-
-                    // BattleMgr更新リクエスト
-                    BattleMgr.instance.UpdateRequest();
                 }
             }
 
