@@ -62,3 +62,6 @@ crashlytics-build.properties
 UserSettings/
 UserSettings/Layouts/default-2021.dwlt
 Assets/Fonts/NotoSansJP-Medium SDF.asset.meta
+
+# User-specific settings
+UserSettings/
