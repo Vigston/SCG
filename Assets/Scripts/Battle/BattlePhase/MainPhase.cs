@@ -100,12 +100,8 @@ public class MainPhase : MonoBehaviour
 			Debug.Log($"{nameof(MainPhase)}" + "終了ステート処理開始");
 		}
 
-		// 操作側なら
-		if (IsMyOperateTurn())
-        {
-			// エンドフェイズに移動。
-			BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
-		}
+		// エンドフェイズに移動。
+		BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
 	}
 
     // --システム--

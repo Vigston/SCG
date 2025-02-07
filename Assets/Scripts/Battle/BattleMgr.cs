@@ -80,16 +80,20 @@ public class BattleMgr : MonoBehaviourPun
 
 		// 先行後攻を決める
 		DecidePrecedingSecond();
-
-		// スタートフェイズから始める
-		GetSetPhaseType = PhaseType.ePhaseType_Start;
-        // フェイズループ処理
-        PhaseLoop().Forget();
+		
         // アクション実行処理
         ActionMgr.instance.ExecuteActions().Forget();
 
 		// 勝敗更新
 		BattleResultUpdate().Forget();
+
+        // マスタークライアントじゃないならはじく
+        if (!PhotonNetwork.IsMasterClient) return;
+
+		// スタートフェイズから始める
+		GetSetPhaseType = PhaseType.ePhaseType_Start;
+		// フェイズループ処理
+		PhaseLoop().Forget();
 	}
 
     // Update is called once per frame
@@ -146,10 +150,8 @@ public class BattleMgr : MonoBehaviourPun
     // フェイズ更新
     async UniTask PhaseLoop()
     {
-        Debug.Log("PhaseLoop起動");
         while(true)
         {
-            Debug.Log("フェイズ更新！！");
             // 次のフェイズ(ここでは現在のフェイズを代入)
             PhaseType nextPhase = GetSetPhaseType;
             // 次のフェイズに移動するフラグ初期化
@@ -187,6 +189,7 @@ public class BattleMgr : MonoBehaviourPun
 
 			// 次のフェイズを設定
 			GetSetPhaseType = nextPhase;
+            Debug.Log($"m_Phase：{GetSetPhaseType}");
 
 			/////通信同期/////
 			NetWorkSync.instance.GameInfoNetworkSync();
@@ -204,10 +207,17 @@ public class BattleMgr : MonoBehaviourPun
 			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.StartPhase, Vector3.zero, Quaternion.identity);
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
             photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
-        }
+			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
+		}
 
-        // お互いのユーザーがフェイズ移行待機状態か
-		await UniTask.WaitUntil(() => IsPhaseReady());
+        // フェイズオブジェクト設定
+        if (PhotonNetwork.IsMasterClient)
+        {
+			// お互いのユーザーがフェイズ移行待機状態か
+			await UniTask.WaitUntil(() => IsPhaseReady());
+		}
+
         // 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
@@ -235,10 +245,17 @@ public class BattleMgr : MonoBehaviourPun
 			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.JoinPhase, Vector3.zero, Quaternion.identity);
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
 		}
 
-		// お互いのユーザーがフェイズ移行待機状態か
-		await UniTask.WaitUntil(() => IsPhaseReady());
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			// お互いのユーザーがフェイズ移行待機状態か
+			await UniTask.WaitUntil(() => IsPhaseReady());
+		}
+
 		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
@@ -266,10 +283,17 @@ public class BattleMgr : MonoBehaviourPun
 			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.MainPhase, Vector3.zero, Quaternion.identity);
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
 		}
 
-		// お互いのユーザーがフェイズ移行待機状態か
-		await UniTask.WaitUntil(() => IsPhaseReady());
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			// お互いのユーザーがフェイズ移行待機状態か
+			await UniTask.WaitUntil(() => IsPhaseReady());
+		}
+
 		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
@@ -294,13 +318,20 @@ public class BattleMgr : MonoBehaviourPun
 		// フェイズオブジェクト設定
 		if (PhotonNetwork.IsMasterClient)
 		{
-			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.JoinPhase, Vector3.zero, Quaternion.identity);
+			m_PhaseObject = PhotonNetwork.Instantiate(PrefabPath.EndPhase, Vector3.zero, Quaternion.identity);
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
+			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
 		}
 
-		// お互いのユーザーがフェイズ移行待機状態か
-		await UniTask.WaitUntil(() => IsPhaseReady());
+		// フェイズオブジェクト設定
+		if (PhotonNetwork.IsMasterClient)
+		{
+			// お互いのユーザーがフェイズ移行待機状態か
+			await UniTask.WaitUntil(() => IsPhaseReady());
+		}
+
 		// 次のフェイズに移行するか
 		await UniTask.WaitUntil(() => IsNextPhaseFlag());
 
@@ -326,31 +357,22 @@ public class BattleMgr : MonoBehaviourPun
     // 勝敗の更新
     async UniTask BattleResultUpdate()
     {
-        while(true)
-        {
-            await CheckBattleResult();
-        }
-    }
+		await UniTask.WaitUntil(() => IsWinCondition() || IsLoseCondition());
+		// 勝利条件
+		bool isWin = IsWinCondition();
+		// 敗北条件
+		bool isLose = IsLoseCondition();
 
-    // 勝敗をチェックする
-    async UniTask CheckBattleResult()
-    {
-        await UniTask.WaitUntil(() => IsWinCondition() || IsLoseCondition());
-        // 勝利条件
-        bool isWin = IsWinCondition();
-        // 敗北条件
-        bool isLose = IsLoseCondition();
-
-        // 勝敗を設定
-        if (isWin)
-        {
+		// 勝敗を設定
+		if (isWin)
+		{
 			GetSetBattleResult = BattleResult.eBattleResult_Win;
-        }
-        else if (isLose)
-        {
+		}
+		else if (isLose)
+		{
 			GetSetBattleResult = BattleResult.eBattleResult_Lose;
-        }
-    }
+		}
+	}
 
     // 勝利条件を満たしているか
     public bool IsWinCondition()
@@ -390,17 +412,13 @@ public class BattleMgr : MonoBehaviourPun
     public void SetTurnEndFlag()
     {
         GameObject phaseObj = GetPhaseObject();
-        Debug.Log("SetTurnEndFlag：1");
         // フェイズオブジェクトのnullチェック
         if (phaseObj == null) { return; }
-		Debug.Log("SetTurnEndFlag：2");
 		MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
         // メインフェイズじゃないならはじく
         if (mainPhase == null) { return; }
-		Debug.Log("SetTurnEndFlag：3");
 		// メインステートじゃなければはじく
 		if (mainPhase.GetSetState != MainPhase.State.eState_Main) { return; }
-		Debug.Log($"SetTurnEndFlag：4[{mainPhase.GetSetState}]");
 
 		// ターンエンドフラグを立てる
 		m_TurnEndFlag = true;
@@ -480,15 +498,20 @@ public class BattleMgr : MonoBehaviourPun
         get { return m_TurnNum; }
         set { m_TurnNum = value; }
     }
-    public int GetTurnNum()
-    {
-        return m_TurnNum;
-    }
+	// ターン数情報を他クライアントに送信する
+	[PunRPC]
+	void SyncTurnNum(int _turnNum)
+	{
+		// マスタークライアントならはじく
+		if (PhotonNetwork.IsMasterClient) return;
+
+		GetSetTurnNum = _turnNum;
+	}
 
 	// 先行後攻を決める
 	public void DecidePrecedingSecond()
 	{
-        if(PhotonNetwork.IsMasterClient == true)
+        if(PhotonNetwork.IsMasterClient)
         {
 			// 最初のターン側
 			Side firstTurnSide = Side.eSide_None;
@@ -521,14 +544,15 @@ public class BattleMgr : MonoBehaviourPun
             BattleUserMgr.instance.GetSetOperateSide = firstTurnSide;
 
             // マスタークライアント以外にターン側と操作側を渡す
-            NetWorkSync.instance.photonView.RPC("SetSyncTurnSide", RpcTarget.Others, GetSetTurnSide);
-			NetWorkSync.instance.photonView.RPC("SetSyncOperateUserSide", RpcTarget.Others, BattleUserMgr.instance.GetSetOperateSide);
+            NetWorkSync.instance.photonView.RPC(nameof(NetWorkSync.instance.SetSyncTurnSide), RpcTarget.Others, GetSetTurnSide);
+			NetWorkSync.instance.photonView.RPC(nameof(NetWorkSync.instance.SetSyncOperateUserSide), RpcTarget.Others, BattleUserMgr.instance.GetSetOperateSide);
 
 			Debug.Log($"DecidePrecedingSecond()｜乱数値：{rnd}、最初のターン側：{firstTurnSide}");
 		}
 	}
 
     // -------フェイズ------
+    // フェイズオブジェクトの参照を他のクライアントで取得する
     [PunRPC]
     void PassReferencePhaseObject(int _viewId)
     {
@@ -537,6 +561,15 @@ public class BattleMgr : MonoBehaviourPun
 
 		// ViewID を基に GameObject を取得
 		m_PhaseObject = PhotonView.Find(_viewId)?.gameObject;
+	}
+    // フェイズ情報を他クライアントに送信する
+    [PunRPC]
+    void SyncPhaseType(int _phaseType)
+    {
+		// マスタークライアントならはじく
+		if (PhotonNetwork.IsMasterClient) return;
+
+        GetSetPhaseType = (PhaseType)_phaseType;
 	}
 	public PhaseType GetSetPhaseType
     {
@@ -592,7 +625,7 @@ public class BattleMgr : MonoBehaviourPun
         BattleUser    battleUser    = battleUserMgr.GetUserFromNetWorkNumber(_netWorkActorNumber);
         if (!battleUser) return;
 
-        // フェイズ移行の通信同期待ち状態に移行
+		// フェイズ移行の通信同期待ち状態に移行
 		battleUser.GetSetPhaseReadyFlag = true;
 	}
     // お互いのユーザーがフェイズ移行待機状態か

@@ -77,22 +77,11 @@ public class EndPhase : MonoBehaviour
         if (m_StateValue == 1)
         {
             Debug.Log($"{nameof(EndPhase)}" + "終了ステート処理開始");
-
-            if(PhotonNetwork.IsConnected)
-            {
-                if(PhotonNetwork.IsMasterClient)
-                {
-					// スタートフェイズに移動。
-					BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Start);
-				}
-            }
-            else
-            {
-                // スタートフェイズに移動。
-                BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
-			}
         }
-    }
+
+		// スタートフェイズに移動。
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
+	}
 
     // --システム--
     async UniTask StateLoop()

@@ -122,19 +122,8 @@ public class StartPhase : MonoBehaviour
 			Debug.Log($"{nameof(StartPhase)}" + "終了ステート処理開始");
 		}
 
-		if (PhotonNetwork.IsConnected)
-		{
-			if (PhotonNetwork.IsMasterClient)
-			{
-				// ジョインフェイズに移動。
-				BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Join);
-			}
-		}
-		else
-		{
-			// ジョインフェイズに移動。
-			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
-		}
+		// ジョインフェイズに移動。
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
 	}
 
     // --システム--

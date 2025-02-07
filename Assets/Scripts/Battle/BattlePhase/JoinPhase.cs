@@ -117,6 +117,7 @@ public class JoinPhase : MonoBehaviourPun
                 // アクションオブジェクト削除
                 PhotonNetwork.Destroy(m_JoinPeopleGameAction);
             }
+
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
 		}
@@ -127,23 +128,12 @@ public class JoinPhase : MonoBehaviourPun
     {
         if (m_StateValue == 1)
         {
-			Debug.Log($"{nameof(JoinPhase)}" + "終了ステート処理開始");
-
-			if (PhotonNetwork.IsConnected)
-			{
-				if (PhotonNetwork.IsMasterClient)
-				{
-					// メインフェイズに移動。
-					BattleMgr.instance.photonView.RPC(nameof(BattleMgr.instance.SetNextPhaseAndFlag), RpcTarget.All, PhaseType.ePhaseType_Main);
-				}
-			}
-			else
-			{
-				// メインフェイズに移動。
-				BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-			}
+            Debug.Log($"{nameof(JoinPhase)}" + "終了ステート処理開始");
 		}
-    }
+
+		// メインフェイズに移動。
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+	}
 
     // --システム--
     async UniTask StateLoop()

@@ -58,6 +58,8 @@ MonoBehaviour:
   - AppendJob
   - CreateBattleCard_RPC
   - RPC_PhaseReady
+  - SyncPhaseType
+  - SyncTurnNum
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
