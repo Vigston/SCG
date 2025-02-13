@@ -189,7 +189,6 @@ public class BattleMgr : MonoBehaviourPun
 
 			// 次のフェイズを設定
 			GetSetPhaseType = nextPhase;
-            Debug.Log($"m_Phase：{GetSetPhaseType}");
 
 			/////通信同期/////
 			NetWorkSync.instance.GameInfoNetworkSync();

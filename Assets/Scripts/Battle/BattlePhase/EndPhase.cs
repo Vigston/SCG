@@ -84,29 +84,26 @@ public class EndPhase : MonoBehaviour
 			Debug.Log($"{nameof(EndPhase)}" + "ターン終了ステート処理開始");
 		}
 
-        if(PhotonNetwork.IsMasterClient)
+		// ターン終了リクエスト初期化
+		BattleMgr.instance.GetSetTurnEndFlag = false;
+
+		// カードのターン情報初期化
+		foreach (BattleCard battleCard in BattleCardMgr.instance.GetCardList())
+		{
+			// ターン情報初期化
+			battleCard.InitTurnInfo();
+
+			// ステータスを通常に設定する
+			battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
+		}
+
+		if (PhotonNetwork.IsMasterClient)
         {
 			// 現在のターンと操作側を逆にする
 			Side turnSide = BattleMgr.instance.GetSetTurnSide;
 			Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 			BattleMgr.instance.GetSetTurnSide = GetRevSide(turnSide);
 			BattleUserMgr.instance.GetSetOperateSide = GetRevSide(operateSide);
-
-			Debug.Log($"SIDETEST_ターン移行：{turnSide}→{BattleMgr.instance.GetSetTurnSide}");
-			Debug.Log($"SIDETEST_操作移行：{operateSide}→{BattleUserMgr.instance.GetSetOperateSide}");
-
-			// ターン終了リクエスト初期化
-			BattleMgr.instance.GetSetTurnEndFlag = false;
-
-			// カードのターン情報初期化
-			foreach (BattleCard battleCard in BattleCardMgr.instance.GetCardList())
-			{
-				// ターン情報初期化
-				battleCard.InitTurnInfo();
-
-				// ステータスを通常に設定する
-				battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
-			}
 		}
 
 		// 終了へ

@@ -45,7 +45,7 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
         }
 
         // ターゲットがいる場合
-        if(m_TargetCard != null)
+        if(m_TargetCard)
         {
             // アクションを行ったか
             bool IsAction = false;

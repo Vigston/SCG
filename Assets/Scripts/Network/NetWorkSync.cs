@@ -48,6 +48,10 @@ public class NetWorkSync : MonoBehaviourPun
 		if(IsExeNetworkSync() == false) { return false; }
 
 		/////通信同期/////
+		// ターン側
+		photonView.RPC(nameof(SetSyncTurnSide), RpcTarget.Others, BattleMgr.instance.GetSetTurnSide);
+		// 操作側
+		photonView.RPC(nameof(SetSyncOperateUserSide), RpcTarget.Others, BattleUserMgr.instance.GetSetOperateSide);
 
 		Debug.Log($"通信同期が終了しました：ActorNumber[{PhotonNetwork.LocalPlayer.ActorNumber}]");
 		// 正常に終了している
