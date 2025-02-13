@@ -3,9 +3,6 @@ using UnityEngine;
 
 using battleTypes;
 using Photon.Realtime;
-using static BattleMgr;
-using UnityEngine.Rendering;
-using System.IO;
 
 // ネットワーク通信同期オブジェクト
 public class NetWorkSync : MonoBehaviourPun
@@ -70,17 +67,17 @@ public class NetWorkSync : MonoBehaviourPun
 			return false;
 		}
 
-		// 操作側のクライアントじゃないならはじく。
-		if (operateUser.GetSetNetWorkNumber != PhotonNetwork.LocalPlayer.ActorNumber)
-		{
-			Debug.Log($"操作側のクライアントじゃないので通信同期を行いません。操作側ActorNumber：{operateUser.GetSetNetWorkNumber}｜ローカルActorNumber：{PhotonNetwork.LocalPlayer.ActorNumber}");
-			return false;
-		}
-
 		// 切断されていたら通信同期失敗としてはじく。
 		if (PhotonNetwork.NetworkClientState == ClientState.Disconnected)
 		{
 			Debug.LogError($"通信が切断されているので通信同期を行えませんでした。[NetworkClientState：{PhotonNetwork.NetworkClientState}]");
+			return false;
+		}
+
+		// マスタークライアントじゃないならはじく。
+		if (!PhotonNetwork.IsMasterClient)
+		{
+			Debug.Log($"マスタークライアントじゃないので通信同期を行いません。ローカルActorNumber：{PhotonNetwork.LocalPlayer.ActorNumber}");
 			return false;
 		}
 

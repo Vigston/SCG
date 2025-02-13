@@ -85,9 +85,15 @@ public class StartPhase : MonoBehaviour
         {
             Debug.Log($"{nameof(StartPhase)}" + "開始時ステート処理開始");
 
-            // Gold追加処理
-            // ターン側
-            Side turnSide = BattleMgr.instance.GetSetTurnSide;
+            if(PhotonNetwork.IsMasterClient)
+            {
+				// ターン数カウント
+				BattleMgr.instance.GetSetTurnNum++;
+			}
+
+			// Gold追加処理
+			// ターン側
+			Side turnSide = BattleMgr.instance.GetSetTurnSide;
             // 場にいる商人数
             int merchantNum = BattleCardMgr.instance.GetCardNumFromAppendKind(turnSide, BattleCard.JobKind.eAppendKind_Merchant);
             // 追加されるGold

@@ -198,9 +198,6 @@ public class BattleMgr : MonoBehaviourPun
     // スタートフェイズ
     async UniTask<PhaseType> PhaseStart()
     {
-        // ターン数カウント
-        m_TurnNum++;
-
         // フェイズオブジェクト設定
         if(PhotonNetwork.IsMasterClient)
         {
@@ -208,7 +205,7 @@ public class BattleMgr : MonoBehaviourPun
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
             photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
-			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, GetSetTurnNum);
 		}
 
         // フェイズオブジェクト設定
@@ -246,7 +243,7 @@ public class BattleMgr : MonoBehaviourPun
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
-			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, GetSetTurnNum);
 		}
 
 		// フェイズオブジェクト設定
@@ -284,7 +281,7 @@ public class BattleMgr : MonoBehaviourPun
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
-			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, GetSetTurnNum);
 		}
 
 		// フェイズオブジェクト設定
@@ -322,7 +319,7 @@ public class BattleMgr : MonoBehaviourPun
 			int viewId = m_PhaseObject.GetComponent<PhotonView>().ViewID;
 			photonView.RPC(nameof(PassReferencePhaseObject), RpcTarget.Others, viewId);
 			photonView.RPC(nameof(SyncPhaseType), RpcTarget.Others, (int)m_Phase);
-			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, m_TurnNum);
+			photonView.RPC(nameof(SyncTurnNum), RpcTarget.Others, GetSetTurnNum);
 		}
 
 		// フェイズオブジェクト設定
