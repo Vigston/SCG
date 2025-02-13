@@ -4,7 +4,7 @@ using System.Threading;
 using System;
 using battleTypes;
 using Photon.Pun;
-using Cysharp.Threading.Tasks.Triggers;
+using static Common;
 
 // 国民を参加させるアクション
 public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
@@ -160,10 +160,13 @@ public class JoinPeopleGameAction : MonoBehaviourPunCallbacks, IGameAction
 					// 選択したカードエリア設定
 					if (cardAreaObject)
 					{
-						CardArea cardArea = hit.transform.gameObject.GetComponent<CardArea>();
+						CardArea cardArea = cardAreaObject.GetComponent<CardArea>();
 
+						if (!cardArea) return;
+						// 自分のカードエリアじゃないならはじく
+						if (!IsMyCardArea(cardArea)) return;
 						// 既にカードが存在しているならここは選択できない
-						if (!cardArea.IsCardEmpty()) { return; }
+						if (!cardArea.IsCardEmpty()) return;
 
 						m_SelectedCardArea = cardArea;
 					}

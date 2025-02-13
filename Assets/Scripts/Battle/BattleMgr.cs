@@ -347,9 +347,6 @@ public class BattleMgr : MonoBehaviourPun
 		// ユーザーのフェイズ情報初期化
 		BattleUserMgr.instance.Init_User_PhaseInfo();
 
-		// ターン終了処理
-		TurnEnd();
-
 		// 次のフェイズへ
 		return GetSetNextPhaseType;
     }
@@ -408,53 +405,41 @@ public class BattleMgr : MonoBehaviourPun
         set { m_BattleResult = value; }
     }
 
-    // ターンエンドフラグの設定
-    public void SetTurnEndFlag()
+    // ターンエンドフラグ
+    public bool GetSetTurnEndFlag
     {
-        GameObject phaseObj = GetPhaseObject();
-        // フェイズオブジェクトのnullチェック
-        if (phaseObj == null) { return; }
+        get { return m_TurnEndFlag; }
+        set
+        {
+            m_TurnEndFlag = value;
+        }
+    }
+
+    // ターン終了ボタン
+    public void OnButtonTurnEnd()
+    {
+        // 自分のターンじゃないならはじく
+        if (!IsMyTurn()) return;
+
+        photonView.RPC(nameof(RPC_RaiseTurnEnd), RpcTarget.All);
+	}
+
+	// ターン終了フラグを立てる
+	[PunRPC]
+	void RPC_RaiseTurnEnd()
+    {
+		GameObject phaseObj = GetPhaseObject();
+		// フェイズオブジェクトのnullチェック
+		if (phaseObj == null) { return; }
 		MainPhase mainPhase = phaseObj.GetComponent<MainPhase>();
-        // メインフェイズじゃないならはじく
-        if (mainPhase == null) { return; }
+		// メインフェイズじゃないならはじく
+		if (mainPhase == null) { return; }
 		// メインステートじゃなければはじく
 		if (mainPhase.GetSetState != MainPhase.State.eState_Main) { return; }
 
 		// ターンエンドフラグを立てる
-		m_TurnEndFlag = true;
-    }
-
-    // ターンエンドフラグが立っているか
-    public bool IsTurnEndFlag()
-    {
-        return m_TurnEndFlag;
-    }
-
-    // ターン終了
-    public void TurnEnd()
-    {
-        // 現在のターンと操作側を逆にする
-        Side turnSide = GetSetTurnSide;
-        Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
-		GetSetTurnSide = GetRevSide(turnSide);
-
-		BattleUserMgr.instance.GetSetOperateSide = GetRevSide(operateSide);
-
-		// ターン終了リクエスト初期化
-		m_TurnEndFlag = false;
-
-        // カードのターン情報初期化
-        foreach(BattleCard battleCard in BattleCardMgr.instance.GetCardList())
-        {
-            // ターン情報初期化
-            battleCard.InitTurnInfo();
-
-            // ステータスを通常に設定する
-            battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
-        }
-
-        Debug.Log($"'{m_TurnSide}'ターンに進む");
-    }
+		GetSetTurnEndFlag = true;
+	}
 
 	// -----側-----
 	// ターン側のGetSetメソッド

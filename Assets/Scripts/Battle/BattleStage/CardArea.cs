@@ -52,6 +52,13 @@ public class CardArea : MonoBehaviour
     // カード取得
     public BattleCard GetCard(int _index)
     {
+        // 範囲チェック
+        if (_index < 0 || _index >= m_CardList.Count)
+        {
+            Debug.Log($"カードエリアからのカード取得時に範囲外参照発生：{_index}");
+            return null;
+        }
+
         return m_CardList[_index];
     }
     // カード追加

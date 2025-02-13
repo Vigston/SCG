@@ -60,6 +60,7 @@ MonoBehaviour:
   - RPC_PhaseReady
   - SyncPhaseType
   - SyncTurnNum
+  - RPC_RaiseTurnEnd
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

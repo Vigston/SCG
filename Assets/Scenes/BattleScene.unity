@@ -1394,7 +1394,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1314775403}
         m_TargetAssemblyTypeName: BattleMgr, Assembly-CSharp
-        m_MethodName: SetTurnEndFlag
+        m_MethodName: OnButtonTurnEnd
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

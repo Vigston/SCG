@@ -4,18 +4,15 @@ using UnityEngine;
 using battleTypes;
 using Cysharp.Threading.Tasks;
 using System.Threading;
-using Photon.Pun;
 
-public class BattleCard : MonoBehaviourPun
+public class BattleCard : MonoBehaviour
 {
     // ステータス
     public enum Status
     {
-        // 通常
-        eStatus_Normal,
-        // 疲労
-        eStatus_Fatigue,
-    }
+        eStatus_Normal,     // 通常
+		eStatus_Fatigue,    // 疲労
+	}
 
     // 基本種類
     public enum Kind
@@ -180,15 +177,11 @@ public class BattleCard : MonoBehaviourPun
         m_AppendKindList.Clear();
     }
     // ---有効フラグ---
-    // 有効フラグ設定
-    public void SetEnable(bool _enable)
+    // 有効フラグ
+    public bool GetSetEnable
     {
-        m_IsEnable = _enable;
-    }
-    // 有効フラグが立っているか
-    public bool IsEnable()
-    {
-        return m_IsEnable;
+        get { return m_IsEnable; }
+        set { m_IsEnable = value; }
     }
     // 描画フラグを設定
     public void SetIsDraw(bool isDraw)

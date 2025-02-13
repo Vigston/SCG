@@ -84,7 +84,7 @@ public class MainPhase : MonoBehaviour
 		}
 
 		// ターンエンドフラグが立っているなら終了する。
-		if (BattleMgr.instance.IsTurnEndFlag())
+		if (BattleMgr.instance.GetSetTurnEndFlag)
         {
             // 終了へ
             SetNextStateAndFlag(State.eState_End);

@@ -137,4 +137,15 @@ public static class Common
 
         return IsMyTurn() == IsMyCard(_battleCard);
 	}
+
+    // 自分のカードエリアか
+    public static bool IsMyCardArea(CardArea _cardArea)
+    {
+        if (!_cardArea) return false;
+
+        Side cardAreaSide = _cardArea.GetSide();
+		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
+
+        return cardAreaSide == operateSide;
+	}
 }

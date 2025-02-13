@@ -2,6 +2,7 @@
 using UnityEngine.EventSystems;
 using battleTypes;
 using Photon.Pun;
+using static Common;
 
 public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
@@ -100,9 +101,11 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
                     // スパイを除く職業が付与されていないなら
                     if (battleCard.GetAppendJobNum(true) <= 0)
                     {
-                        int battleCardViewId = battleCard.photonView.ViewID;
 						// 職業付与
-						photonView.RPC(nameof(AppendJob), RpcTarget.All, battleCardViewId, (int)m_GiveKind);
+						battleCard.AppendJob(m_GiveKind);
+
+						// 職業付与
+						photonView.RPC(nameof(AppendJob), RpcTarget.Others, (int)GetRevSide(battleCard.GetSetSide), (int)battleCard.GetSetPosition, (int)m_GiveKind);
                     }
                 }
             }
@@ -121,11 +124,12 @@ public class GiveJobDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IE
     }
 
     [PunRPC]
-    void AppendJob(int _battleCardViewId, int _jobKind)
+    void AppendJob(int _cardSide, int _cardPos, int _jobKind)
     {
-		BattleCard battleCard = PhotonView.Find(_battleCardViewId)?.gameObject.GetComponent<BattleCard>();
-
-        if (battleCard == null) return;
+        CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_cardSide, (Position)_cardPos);
+        if (!cardArea) return;
+		BattleCard battleCard = cardArea.GetCard(0);
+        if (!battleCard) return;
 
 		// 職業付与
 		battleCard.AppendJob((BattleCard.JobKind)_jobKind);

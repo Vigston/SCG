@@ -69,7 +69,7 @@ public class BattleCardCtr : MonoBehaviourPun
         battleCard.GetSetPosition   =   _pos;
         battleCard.GetSetStatus     =   BattleCard.Status.eStatus_Fatigue;
         battleCard.GetSetKind       =   _kind;
-        battleCard.SetEnable(isEnable);
+        battleCard.GetSetEnable     =   isEnable;
         battleCard.SetEntryTurn();
 
         // スパイの場合の処理
@@ -105,29 +105,67 @@ public class BattleCardCtr : MonoBehaviourPun
         // カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
         CreatePos.y += cardAreaHeight;
 
-        GameObject cardClone = PhotonNetwork.Instantiate(PrefabPath.Card, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+        GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
 		BattleCard battleCard = cardClone.GetComponent<BattleCard>();
+        if (!battleCard) return;
 
-        int cardViewId = battleCard.photonView.ViewID;
 		// 現在のターン
 		Side turnSide = BattleMgr.instance.GetSetTurnSide;
 		// カードに設定する側
 		Side cardSide = turnSide;
 
-        photonView.RPC(nameof(CreateBattleCard_RPC), RpcTarget.All, cardViewId, (int)cardSide, (int)_cardArea.GetPosition(), (int)BattleCard.Status.eStatus_Fatigue, (int)_kind, isEnable, IsSpy);
+		// 値設定
+		battleCard.GetSetSide       =   cardSide;
+		battleCard.GetSetPosition   =   _cardArea.GetPosition();
+		battleCard.GetSetStatus     =   BattleCard.Status.eStatus_Fatigue;
+		battleCard.GetSetKind       =   _kind;
+		battleCard.GetSetEnable     =   isEnable;
+		battleCard.SetEntryTurn();
+
+		// スパイの場合の処理
+		if (IsSpy)
+		{
+			// スパイ職業を付与
+			battleCard.AppendJob(BattleCard.JobKind.eAppendKind_Spy);
+		}
+
+		// BattleCardMgrに登録
+		BattleCardMgr.instance.AddCard(battleCard);
+
+		// 指定位置のカードエリアに登録
+		_cardArea.AddCard(battleCard);
+
+		photonView.RPC(nameof(CreateBattleCard_RPC), RpcTarget.Others, (int)GetRevSide(battleCard.GetSetSide), (int)battleCard.GetSetPosition, (int)battleCard.GetSetStatus, (int)battleCard.GetSetKind, isEnable, IsSpy);
     }
     [PunRPC]
-    void CreateBattleCard_RPC(int _battleCardViewId, int _side, int _areaPos, int _status, int _kind, bool isEnable, bool _isSpy)
+    void CreateBattleCard_RPC(int _side, int _areaPos, int _status, int _kind, bool isEnable, bool _isSpy)
     {
-        BattleCard battleCard = PhotonView.Find(_battleCardViewId)?.gameObject.GetComponent<BattleCard>();
+		CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_side, (Position)_areaPos);
+
+		BoxCollider cardAreaCollider = cardArea.GetComponent<BoxCollider>();
+		// 左上の手前
+		Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardAreaCollider)[0];
+		// 左上の奥
+		Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardAreaCollider)[3];
+		// カードエリアの厚み
+		float cardAreaHeight = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
+
+		// 生成位置
+		Vector3 CreatePos = cardArea.gameObject.transform.position;
+
+		// カードエリアの厚み分生成位置を上げる(カードエリアの上に生成するため)
+		CreatePos.y += cardAreaHeight;
+
+		GameObject cardClone = Instantiate(cardPrefab, CreatePos, Quaternion.Euler(0f, 180f, 0f));
+		BattleCard battleCard = cardClone.GetComponent<BattleCard>();
         if (battleCard == null) return;
 
 		// 値設定
-		battleCard.GetSetSide = (Side)_side;
-		battleCard.GetSetPosition = (Position)_areaPos;
-		battleCard.GetSetStatus = (BattleCard.Status)_status;
-		battleCard.GetSetKind = (BattleCard.Kind)_kind;
-		battleCard.SetEnable(isEnable);
+		battleCard.GetSetSide       = (Side)_side;
+		battleCard.GetSetPosition   = (Position)_areaPos;
+		battleCard.GetSetStatus     = (BattleCard.Status)_status;
+		battleCard.GetSetKind       = (BattleCard.Kind)_kind;
+		battleCard.GetSetEnable     = isEnable;
 		battleCard.SetEntryTurn();
 
 		// スパイの場合の処理
@@ -141,7 +179,6 @@ public class BattleCardCtr : MonoBehaviourPun
 		BattleCardMgr.instance.AddCard(battleCard);
 
         // 指定位置のカードエリアに登録
-        CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_side, (Position)_areaPos);
 		cardArea.AddCard(battleCard);
 
 		Debug.Log($"[{cardArea.GetSide()}]の'{cardArea.GetPosition()}'にカードを生成しました。");

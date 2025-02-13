@@ -4,14 +4,16 @@ using UnityEngine;
 using Cysharp.Threading.Tasks;
 using battleTypes;
 using Photon.Pun;
+using static Common;
 
 public class EndPhase : MonoBehaviour
 {
     // ===構造体===
     public enum State
     {
-        eState_Init,
-        eState_End,
+        eState_Init,    // 初期化
+        eState_TurnEnd, // ターン終了
+        eState_End,     // 終了
     }
 
     // ===変数===
@@ -50,6 +52,9 @@ public class EndPhase : MonoBehaviour
             case State.eState_Init:
                 Init();
                 break;
+            case State.eState_TurnEnd:
+                TurnEnd();
+                break;
             case State.eState_End:
                 End();
                 break;
@@ -67,9 +72,41 @@ public class EndPhase : MonoBehaviour
 			Debug.Log($"{nameof(EndPhase)}" + "初期化ステート処理開始");
 		}
 		
-        // 終了へ
-        SetNextStateAndFlag(State.eState_End);
+        // ターン終了へ
+        SetNextStateAndFlag(State.eState_TurnEnd);
     }
+
+	// ターン終了
+	void TurnEnd()
+    {
+        if (m_StateValue == 1)
+        {
+			Debug.Log($"{nameof(EndPhase)}" + "ターン終了ステート処理開始");
+		}
+
+		// 現在のターンと操作側を逆にする
+		Side turnSide = BattleMgr.instance.GetSetTurnSide;
+		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
+		BattleMgr.instance.GetSetTurnSide = GetRevSide(turnSide);
+
+		BattleUserMgr.instance.GetSetOperateSide = GetRevSide(operateSide);
+
+		// ターン終了リクエスト初期化
+		BattleMgr.instance.GetSetTurnEndFlag = false;
+
+		// カードのターン情報初期化
+		foreach (BattleCard battleCard in BattleCardMgr.instance.GetCardList())
+		{
+			// ターン情報初期化
+			battleCard.InitTurnInfo();
+
+			// ステータスを通常に設定する
+			battleCard.GetSetStatus = BattleCard.Status.eStatus_Normal;
+		}
+
+		// 終了へ
+		SetNextStateAndFlag(State.eState_End);
+	}
 
     // 終了
     void End()
@@ -101,7 +138,10 @@ public class EndPhase : MonoBehaviour
                 case State.eState_Init:
                     nextState = await StateInit();
                     break;
-                case State.eState_End:
+				case State.eState_TurnEnd:
+					nextState = await StateTurnEnd();
+					break;
+				case State.eState_End:
                     nextState = await StateEnd();
                     break;
                 default:
@@ -123,8 +163,15 @@ public class EndPhase : MonoBehaviour
         // 次のステートへ
         return GetNextState();
     }
-    // 終了
-    async UniTask<State> StateEnd()
+	// 初期化
+	async UniTask<State> StateTurnEnd()
+	{
+		await UniTask.WaitUntil(() => IsNextStateFlag());
+		// 次のステートへ
+		return GetNextState();
+	}
+	// 終了
+	async UniTask<State> StateEnd()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
 
