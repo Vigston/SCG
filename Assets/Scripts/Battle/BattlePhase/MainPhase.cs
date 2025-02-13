@@ -101,7 +101,7 @@ public class MainPhase : MonoBehaviour
 		}
 
 		// エンドフェイズに移動。
-		BattleMgr.instance.photonView.RPC("SetNextPhaseAndFlag", RpcTarget.All, PhaseType.ePhaseType_End);
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
 	}
 
     // --システム--
