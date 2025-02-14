@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine;
 using battleTypes;
+using Photon.Pun;
+using static Common;
 
 public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
@@ -44,78 +46,39 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
             }
         }
 
-        // ターゲットがいる場合
-        if(m_TargetCard)
-        {
-            // アクションを行ったか
-            bool IsAction = false;
-            BattleCard targetCard = m_TargetCard.GetComponent<BattleCard>();
-            // ターゲットがカードの場合
-            if(targetCard != null)
-            {
-                // 対象カードが自分のカードなら
-                if ( Common.IsMyCard(targetCard))
-                {
-                    // 対象カードがスパイなら
-                    if(targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy))
-                    {
-                        // 対象カードを破壊
-                        BattleCardCtr.instance.RemoveBattleCard(targetCard);
-                    }
-                    else
-                    {
-                        Debug.Log("指定のカードはスパイではありませんでした");
-                    }
+        // ターゲットカードオブジェクトが取得できていないならはじく
+        if (!m_TargetCard) return;
 
-                    IsAction = true;
-                }
-                // 対象カードが相手のカードなら
-                else
-                {
-                    BattleCard actionCard = m_ActionObj.GetComponent<BattleCard>();
-                    // 自分がスパイじゃないなら
-                    if(!actionCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Spy))
-                    {
-                        // 対象カードを破壊
-                        BattleCardCtr.instance.RemoveBattleCard(targetCard);
-                        // 対象カードが軍事カードなら自分も破壊
-                        if (targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Military))
-                        {
-                            // 自分を破壊
-                            BattleCardCtr.instance.RemoveBattleCard(actionCard);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log("このカードはスパイなので軍事行動できません");
-                    }
+		BattleCard targetCard = m_TargetCard.GetComponent<BattleCard>();
+        if (!targetCard) return;
 
-                    IsAction = true;
-                }
+		// 対象カードが自分のカードならはじく
+		if (IsMyCard(targetCard)) return;
 
-                // アクションを行っているなら
-                if(IsAction)
-                {
-                    BattleCard actionCard = m_ActionObj.GetComponent<BattleCard>();
-                    if(actionCard != null)
-                    {
-                        Military military = actionCard.GetMilitary();
+		BattleCard actionCard = m_ActionObj.GetComponent<BattleCard>();
+        if (!actionCard) return;
 
-                        if(military != null)
-                        {
-                            // アクションが終わったので非武装にする
-                            military.SetStatus(Military.Status.eStatus_Unarmed);
-                            actionCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
-                        }
+		// 対象カードを破壊
+		BattleCardCtr.instance.RemoveBattleCard(targetCard);
 
-                        // カードの行動回数加算
-                        actionCard.AddActionNum();
-                    }
-                }
-            }
-        }
+		// 対象カードが軍事カードなら自分も破壊
+		if (targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Military))
+		{
+			// 自分を破壊
+			BattleCardCtr.instance.RemoveBattleCard(actionCard);
+		}
 
-        m_ActionObj = null;
+		Military military = actionCard.GetMilitary();
+		// アクションが終わったので非武装にする
+		military.SetStatus(Military.Status.eStatus_Unarmed);
+		actionCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
+
+		// カードの行動回数加算
+		actionCard.AddActionNum();
+
+        NetWorkSync.instance.photonView.RPC(nameof(NetWorkSync.instance.RPC_MilitaryAction), RpcTarget.Others, (int)GetRevSide(actionCard.GetSetSide), (int)actionCard.GetSetPosition, (int)GetRevSide(targetCard.GetSetSide), (int)targetCard.GetSetPosition);
+
+		m_ActionObj = null;
         Debug.Log($"軍事行動ドラッグ終了。");
     }
 
@@ -123,34 +86,26 @@ public class MilitaryDragAction : MonoBehaviour, IDragHandler, IBeginDragHandler
     public bool IsMilitalyAction()
     {
         BattleCard battleCard = gameObject.GetComponent<BattleCard>();
-		Debug.Log("IsMilitalyAction：０");
 		// バトルカードじゃないならはじく
 		if (battleCard == null) { return false; }
-        Debug.Log("IsMilitalyAction：１");
         // 疲労状態ならはじく
         if (battleCard.IsStatus(BattleCard.Status.eStatus_Fatigue)) { return false; }
-		Debug.Log("IsMilitalyAction：２");
 		// 行動できないならはじく
 		if (!battleCard.IsAction()) { return false; }
-		Debug.Log("IsMilitalyAction：３");
 		// 自分のターンで自分のカードじゃないならはじく
-		if (!Common.IsMyTurnAndMyCard(battleCard)) { return false; }
-		Debug.Log("IsMilitalyAction：４");
+		if (!IsMyTurnAndMyCard(battleCard)) { return false; }
 		// メインフェイズじゃなければはじく
 		if (!BattleMgr.instance.IsPhase(PhaseType.ePhaseType_Main)) { return false; }
-		Debug.Log("IsMilitalyAction：５");
 
 		Military military = battleCard.GetMilitary();
         // 軍事じゃないならはじく
         if(military == null) { return false; }
-		Debug.Log("IsMilitalyAction：６");
 		// 非武装状態ならはじく
 		if (military.IsStatus(Military.Status.eStatus_Unarmed))
         {
             Debug.Log("非武装状態なので行動出来ません！！");
             return false;
         }
-		Debug.Log("IsMilitalyAction：７");
 
 		// 行動できる
 		return true;

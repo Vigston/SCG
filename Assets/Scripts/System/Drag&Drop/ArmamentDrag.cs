@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using UnityEngine.EventSystems;
 using UnityEngine;
 using battleTypes;
+using Photon.Pun;
+using static Common;
 
-public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEndDragHandler
+public class ArmamentDrag : MonoBehaviourPun, IDragHandler, IBeginDragHandler, IEndDragHandler
 {
     [SerializeField]
     private const int costGoldValue = 20;
@@ -69,11 +71,16 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
                     // 軍事カードじゃないならはじく
                     if(military == null) { return; }
 
-                    // 武装付与
-                    military.SetStatus(Military.Status.eStatus_Armed);
-                    battleCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
+                    Military.Status     militaryStatus  = Military.Status.eStatus_Armed;
+                    BattleCard.JobKind jobKind = BattleCard.JobKind.eAppendKind_Military;
+
+					// 武装付与
+					military.SetStatus(militaryStatus);
+                    battleCard.SetMaterial(jobKind);
                     // コスト分Goldを減らす
                     BattleMgr.instance.ReduceGoldValue(turnSide, costGoldValue);
+
+					photonView.RPC(nameof(RPC_Armament), RpcTarget.Others, (int)militaryStatus, (int)jobKind, (int)GetRevSide(battleCard.GetSetSide), (int)battleCard.GetSetPosition);
                 }
             }
 
@@ -110,4 +117,28 @@ public class ArmamentDrag : MonoBehaviour, IDragHandler, IBeginDragHandler, IEnd
 		// 行える
 		return true;
     }
+
+    // 武装付与
+    [PunRPC]
+    void RPC_Armament(int _militaryStatus, int _jobKind, int _cardSide, int _cardPos)
+    {
+        // カードエリア
+        CardArea cardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_cardSide, (Position)_cardPos);
+        if (!cardArea) return;
+        // カード
+        BattleCard card = cardArea.GetCard(0);
+        if (!card) return;
+        // 軍事
+        Military military = card.GetMilitary();
+        if (!military) return;
+
+        // ターン側
+		Side turnSide = BattleMgr.instance.GetSetTurnSide;
+
+		// 武装付与
+		military.SetStatus((Military.Status)_militaryStatus);
+		card.SetMaterial((BattleCard.JobKind)_jobKind);
+		// コスト分Goldを減らす
+		BattleMgr.instance.ReduceGoldValue(turnSide, costGoldValue);
+	}
 }

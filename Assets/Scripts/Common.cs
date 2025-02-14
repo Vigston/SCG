@@ -33,7 +33,7 @@ public static class Common
      * 6 = 左下(上)
      * 7 = 右下(上)
      */
-    public static Vector3[] GetBoxCollideVertices(BoxCollider Col)
+    public static Vector3[] GetBoxColliderVertices(BoxCollider Col)
     {
         Transform trs = Col.transform;
         Vector3 sc = trs.lossyScale;
@@ -86,19 +86,20 @@ public static class Common
     }
 
     // 逆の側を取得
-    public static Side GetRevSide(Side _Side)
+    public static Side GetRevSide(Side _side)
     {
         // プレイヤー
-        if(_Side == Side.eSide_Player)
+        if(_side == Side.eSide_Player)
         {
             return Side.eSide_Enemy;
         }
         // 敵
-        else if(_Side == Side.eSide_Enemy)
+        else if(_side == Side.eSide_Enemy)
         {
             return Side.eSide_Player;
         }
 
+        Debug.Log($"{nameof(GetRevSide)}で逆側を取得できなかったのでNoneを返しました：引数({_side})");
         return Side.eSide_None;
     }
 
@@ -114,9 +115,8 @@ public static class Common
 	public static bool IsMyTurn()
 	{
         Side turnSide       = BattleMgr.instance.GetSetTurnSide;
-        Side operateSide    = BattleUserMgr.instance.GetSetOperateSide;
 
-		return turnSide == operateSide;
+		return turnSide == Side.eSide_Player;
 	}
 
     // 自分のカードか
@@ -125,9 +125,8 @@ public static class Common
 		if (_battleCard == null) { return false; }
 
 		Side cardSide = _battleCard.GetSetSide;
-		Side operateSide    = BattleUserMgr.instance.GetSetOperateSide;
 
-		return cardSide == operateSide;
+		return cardSide == Side.eSide_Player;
 	}
 
 	// 自分のターンで自分のカードか
@@ -144,8 +143,7 @@ public static class Common
         if (!_cardArea) return false;
 
         Side cardAreaSide = _cardArea.GetSide();
-		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
 
-        return cardAreaSide == operateSide;
+        return cardAreaSide == Side.eSide_Player;
 	}
 }

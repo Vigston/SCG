@@ -1,8 +1,8 @@
 ﻿using Photon.Pun;
 using UnityEngine;
-
 using battleTypes;
 using Photon.Realtime;
+using static Common;
 
 // ネットワーク通信同期オブジェクト
 public class NetWorkSync : MonoBehaviourPun
@@ -92,15 +92,52 @@ public class NetWorkSync : MonoBehaviourPun
 	[PunRPC]
 	public void SetSyncTurnSide(int turnSide)
 	{
-		Debug.Log($"通信同期(SetSyncTurnSide)：{Common.GetRevSide((Side)turnSide)}");
-		BattleMgr.instance.GetSetTurnSide = Common.GetRevSide((Side)turnSide);
+		Debug.Log($"通信同期(SetSyncTurnSide)：{GetRevSide((Side)turnSide)}");
+		BattleMgr.instance.GetSetTurnSide = GetRevSide((Side)turnSide);
 	}
 	
 	// 相手側に操作側プレイヤーの同期を行う
 	[PunRPC]
 	public void SetSyncOperateUserSide(int operateUserSide)
 	{
-		Debug.Log($"通信同期(SetSyncOperateUserSide)：{Common.GetRevSide((Side)operateUserSide)}");
-		BattleUserMgr.instance.GetSetOperateSide = Common.GetRevSide((Side)operateUserSide);
+		Debug.Log($"通信同期(SetSyncOperateUserSide)：{GetRevSide((Side)operateUserSide)}");
+		BattleUserMgr.instance.GetSetOperateSide = GetRevSide((Side)operateUserSide);
+	}
+
+	// 軍事アクションの同期
+	[PunRPC]
+	public void RPC_MilitaryAction(int _actionCardSide, int _actionCardPos, int _targetCardSide, int _targetCardPos)
+	{
+		// アクションカード
+		CardArea actionCardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_actionCardSide, (Position)_actionCardPos);
+		if (!actionCardArea) return;
+		BattleCard actionCard = actionCardArea.GetCard(0);
+		if (!actionCard) return;
+		Military military = actionCard.GetMilitary();
+		if (!military) return;
+
+		// 対象カード
+		CardArea targetCardArea = BattleStageMgr.instance.GetCardAreaFromPos((Side)_targetCardSide, (Position)_targetCardPos);
+		if (!targetCardArea) return;
+		BattleCard targetCard = targetCardArea.GetCard(0);
+		if (!targetCard) return;
+
+		// 軍事アクション
+		// 対象カードが軍事カードならアクションカードも破壊
+		if (targetCard.IsHaveAppendKind(BattleCard.JobKind.eAppendKind_Military))
+		{
+			// 自分を破壊
+			BattleCardCtr.instance.RemoveBattleCard(actionCard);
+		}
+
+		// 対象カード破壊
+		BattleCardCtr.instance.RemoveBattleCard(targetCard);
+
+		// アクションが終わったので非武装にする
+		military.SetStatus(Military.Status.eStatus_Unarmed);
+		actionCard.SetMaterial(BattleCard.JobKind.eAppendKind_Military);
+
+		// カードの行動回数加算
+		actionCard.AddActionNum();
 	}
 }

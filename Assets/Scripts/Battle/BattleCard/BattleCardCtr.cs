@@ -44,9 +44,9 @@ public class BattleCardCtr : MonoBehaviourPun
         BoxCollider cardAreaCollider = cardArea.GetComponent<BoxCollider>();
 
         // 左上の手前
-        Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardAreaCollider)[0];
+        Vector3 vecCardLeftTopUp = Common.GetBoxColliderVertices(cardAreaCollider)[0];
         // 左上の奥
-        Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardAreaCollider)[3];
+        Vector3 vecCardLeftTopDown = Common.GetBoxColliderVertices(cardAreaCollider)[3];
         // カードエリアの厚み
         float cardAreaHeight = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
 
@@ -93,9 +93,9 @@ public class BattleCardCtr : MonoBehaviourPun
 
         BoxCollider cardAreaCollider = _cardArea.GetComponent<BoxCollider>();
         // 左上の手前
-        Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardAreaCollider)[0];
+        Vector3 vecCardLeftTopUp = Common.GetBoxColliderVertices(cardAreaCollider)[0];
         // 左上の奥
-        Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardAreaCollider)[3];
+        Vector3 vecCardLeftTopDown = Common.GetBoxColliderVertices(cardAreaCollider)[3];
         // カードエリアの厚み
         float cardAreaHeight = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
 
@@ -144,9 +144,9 @@ public class BattleCardCtr : MonoBehaviourPun
 
 		BoxCollider cardAreaCollider = cardArea.GetComponent<BoxCollider>();
 		// 左上の手前
-		Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardAreaCollider)[0];
+		Vector3 vecCardLeftTopUp = Common.GetBoxColliderVertices(cardAreaCollider)[0];
 		// 左上の奥
-		Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardAreaCollider)[3];
+		Vector3 vecCardLeftTopDown = Common.GetBoxColliderVertices(cardAreaCollider)[3];
 		// カードエリアの厚み
 		float cardAreaHeight = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
 

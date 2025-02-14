@@ -70,13 +70,13 @@ public class BattleStageCtr : MonoBehaviour
             BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
 
             // 左上の手前
-            Vector3 vecCardLeftTopUp = Common.GetBoxCollideVertices(cardCollider)[0];
+            Vector3 vecCardLeftTopUp = Common.GetBoxColliderVertices(cardCollider)[0];
             // 左上の奥
-            Vector3 vecCardLeftTopDown = Common.GetBoxCollideVertices(cardCollider)[3];
+            Vector3 vecCardLeftTopDown = Common.GetBoxColliderVertices(cardCollider)[3];
             // 左下の手前
-            Vector3 vecCardLeftBottomUp = Common.GetBoxCollideVertices(cardCollider)[6];
+            Vector3 vecCardLeftBottomUp = Common.GetBoxColliderVertices(cardCollider)[6];
             // 右上の手前
-            Vector3 vecCardRightTopUp = Common.GetBoxCollideVertices(cardCollider)[1];
+            Vector3 vecCardRightTopUp = Common.GetBoxColliderVertices(cardCollider)[1];
 
             // カードの半分だけ上に移動。
             baseVec.z += Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) / 2;
@@ -89,16 +89,16 @@ public class BattleStageCtr : MonoBehaviour
             // プレイヤー側
             if (Side == Side.eSide_Player)
             {
-                Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(PlayerArea)[0];
-                Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(PlayerArea)[6];
+                Vector3 vecLeftTopUp = Common.GetBoxColliderVertices(PlayerArea)[0];
+                Vector3 vecLeftBottomUp = Common.GetBoxColliderVertices(PlayerArea)[6];
 
                 baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
             }
             // 敵側
             else if (Side == Side.eSide_Enemy)
             {
-                Vector3 vecLeftTopUp = Common.GetBoxCollideVertices(EnemyArea)[0];
-                Vector3 vecLeftBottomUp = Common.GetBoxCollideVertices(EnemyArea)[6];
+                Vector3 vecLeftTopUp = Common.GetBoxColliderVertices(EnemyArea)[0];
+                Vector3 vecLeftBottomUp = Common.GetBoxColliderVertices(EnemyArea)[6];
 
                 baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
             }

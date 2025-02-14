@@ -61,6 +61,8 @@ MonoBehaviour:
   - SyncPhaseType
   - SyncTurnNum
   - RPC_RaiseTurnEnd
+  - RPC_Armament
+  - MilitaryAction
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
