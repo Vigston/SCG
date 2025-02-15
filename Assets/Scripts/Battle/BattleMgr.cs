@@ -405,10 +405,7 @@ public class BattleMgr : MonoBehaviourPun
     public bool GetSetTurnEndFlag
     {
         get { return m_TurnEndFlag; }
-        set
-        {
-            m_TurnEndFlag = value;
-        }
+        set { m_TurnEndFlag = value; }
     }
 
     // ターン終了ボタン

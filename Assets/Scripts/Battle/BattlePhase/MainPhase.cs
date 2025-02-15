@@ -81,6 +81,12 @@ public class MainPhase : MonoBehaviour
 		if (m_StateValue == 1)
 		{
 			Debug.Log($"{nameof(MainPhase)}" + "メインステート処理開始");
+
+            // ターンエンドフラグが立っているなら終了する。
+            if (BattleMgr.instance.GetSetTurnEndFlag)
+            {
+                Debug.Log("ここでターンエンドフラグ立ってるならバグ!!!!!");
+            }
 		}
 
 		// ターンエンドフラグが立っているなら終了する。
