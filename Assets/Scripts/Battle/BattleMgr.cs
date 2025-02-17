@@ -576,7 +576,6 @@ public class BattleMgr : MonoBehaviourPun
         set { m_NextPhaseFlag = value; }
     }
     // 次のフェイズとフラグを設定
-    [PunRPC]
     public void SetNextPhaseAndFlag(PhaseType _nextPhase)
     {
 		GetSetNextPhaseType = _nextPhase;
@@ -588,11 +587,11 @@ public class BattleMgr : MonoBehaviourPun
         BattleUser battleUser = battleUserMgr.GetSetPlayerUser;
 		if (!battleUser) return;
 
-        photonView.RPC(nameof(RPC_PhaseReady), RpcTarget.MasterClient, battleUser.GetSetNetWorkNumber);
+        photonView.RPC(nameof(RPC_PhaseReady), RpcTarget.MasterClient, battleUser.GetSetNetWorkNumber, (int)GetSetPhaseType);
     }
 	// フェイズ終了をマスタークライアントに送信
 	[PunRPC]
-    void RPC_PhaseReady(int _netWorkActorNumber)
+    void RPC_PhaseReady(int _netWorkActorNumber, int _phase)
     {
         BattleUserMgr battleUserMgr = BattleUserMgr.instance;
         if (!battleUserMgr) return;
@@ -601,6 +600,14 @@ public class BattleMgr : MonoBehaviourPun
 
 		// フェイズ移行の通信同期待ち状態に移行
 		battleUser.GetSetPhaseReadyFlag = true;
+        
+        // 現在のフェイズが違うのならログを生成
+		if (GetSetPhaseType != (PhaseType)_phase)
+        {
+            Debug.Log($"[{nameof(RPC_PhaseReady)}]現在のフェイズが各クライアント間で一致していません" +
+                      $"送信側：{battleUser.GetSetSide}||フェイズ：{(PhaseType)_phase}" +
+                      $"受信側：{BattleUserMgr.instance.GetSetPlayerUser.GetSetSide}||フェイズ：{GetSetPhaseType}");
+		}
 
         Debug.Log($"{nameof(RPC_PhaseReady)}｜Side：{battleUser.GetSetSide}｜PhaseReadyFlag：{battleUser.GetSetPhaseReadyFlag}");
 	}

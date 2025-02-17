@@ -109,6 +109,8 @@ public class JoinPhase : MonoBehaviourPun
 			}
 		}
 
+        // 
+
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
         {
