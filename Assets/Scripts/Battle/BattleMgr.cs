@@ -215,7 +215,7 @@ public class BattleMgr : MonoBehaviourPun
 		}
 
         // 次のフェイズに移行するか
-		await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => GetSetNextPhaseFlag);
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
@@ -253,7 +253,7 @@ public class BattleMgr : MonoBehaviourPun
 		}
 
 		// 次のフェイズに移行するか
-		await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => GetSetNextPhaseFlag);
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
@@ -291,7 +291,7 @@ public class BattleMgr : MonoBehaviourPun
 		}
 
 		// 次のフェイズに移行するか
-		await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => GetSetNextPhaseFlag);
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
@@ -329,7 +329,7 @@ public class BattleMgr : MonoBehaviourPun
 		}
 
 		// 次のフェイズに移行するか
-		await UniTask.WaitUntil(() => IsNextPhaseFlag());
+		await UniTask.WaitUntil(() => GetSetNextPhaseFlag);
 
 		// フェイズオブジェクト削除
 		if (PhotonNetwork.IsMasterClient)
@@ -569,22 +569,18 @@ public class BattleMgr : MonoBehaviourPun
     {
         return GetSetPhaseType == _phase;
     }
-    // 次のフェイズに進むフラグを立てる
-    public void SetNextPhaseFlag()
+    // 次のフェイズに進むフラグ
+    public bool GetSetNextPhaseFlag
     {
-        m_NextPhaseFlag = true;
-    }
-    // 次のフェイズに進むフラグが立っているか
-    public bool IsNextPhaseFlag()
-    {
-        return m_NextPhaseFlag;
+        get { return m_NextPhaseFlag; }
+        set { m_NextPhaseFlag = value; }
     }
     // 次のフェイズとフラグを設定
     [PunRPC]
     public void SetNextPhaseAndFlag(PhaseType _nextPhase)
     {
 		GetSetNextPhaseType = _nextPhase;
-        SetNextPhaseFlag();
+		GetSetNextPhaseFlag = true;
 
 		// フェイズ終了をマスタークライアントに送信
 		BattleUserMgr battleUserMgr = BattleUserMgr.instance;
@@ -605,6 +601,8 @@ public class BattleMgr : MonoBehaviourPun
 
 		// フェイズ移行の通信同期待ち状態に移行
 		battleUser.GetSetPhaseReadyFlag = true;
+
+        Debug.Log($"{nameof(RPC_PhaseReady)}｜Side：{battleUser.GetSetSide}｜PhaseReadyFlag：{battleUser.GetSetPhaseReadyFlag}");
 	}
     // お互いのユーザーがフェイズ移行待機状態か
     bool IsPhaseReady()

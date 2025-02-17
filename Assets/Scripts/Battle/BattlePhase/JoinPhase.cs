@@ -131,8 +131,11 @@ public class JoinPhase : MonoBehaviourPun
             Debug.Log($"{nameof(JoinPhase)}" + "終了ステート処理開始");
 		}
 
-		// メインフェイズに移動。
-		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+		if (!BattleMgr.instance.GetSetNextPhaseFlag)
+        {
+			// メインフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
+		}
 	}
 
     // --システム--

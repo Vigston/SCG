@@ -27,7 +27,7 @@ public class BattleUser : MonoBehaviour
     // フェイズ情報の初期化
     public void Init_PhaseInfo()
     {
-        m_PhaseReadyFlag = false;
+		GetSetPhaseReadyFlag = false;
     }
 
 	// --側--

@@ -128,8 +128,11 @@ public class StartPhase : MonoBehaviour
 			Debug.Log($"{nameof(StartPhase)}" + "終了ステート処理開始");
 		}
 
-		// ジョインフェイズに移動。
-		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+        if(!BattleMgr.instance.GetSetNextPhaseFlag)
+        {
+			// ジョインフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Join);
+		}
 	}
 
     // --システム--

@@ -118,8 +118,11 @@ public class EndPhase : MonoBehaviour
             Debug.Log($"{nameof(EndPhase)}" + "終了ステート処理開始");
         }
 
-		// スタートフェイズに移動。
-		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
+		if (!BattleMgr.instance.GetSetNextPhaseFlag)
+        {
+			// スタートフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Start);
+		}
 	}
 
     // --システム--

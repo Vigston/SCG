@@ -106,8 +106,11 @@ public class MainPhase : MonoBehaviour
 			Debug.Log($"{nameof(MainPhase)}" + "終了ステート処理開始");
 		}
 
-		// エンドフェイズに移動。
-		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+		if (!BattleMgr.instance.GetSetNextPhaseFlag)
+        {
+			// エンドフェイズに移動。
+			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_End);
+		}
 	}
 
     // --システム--
