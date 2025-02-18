@@ -15,6 +15,7 @@ public class JoinPhase : MonoBehaviourPun
         eState_Init,                    // 初期化
         eState_Start,                   // 開始時
 		eState_JoinPeopleGameAction,    // 国民参加
+        eState_Destroy,                 // オブジェクト破棄
         eState_End,                     // 終了
     }
 
@@ -59,7 +60,10 @@ public class JoinPhase : MonoBehaviourPun
             case State.eState_JoinPeopleGameAction:
 				JoinPeopleGameAction();
                 break;
-            case State.eState_End:
+			case State.eState_Destroy:
+				Destroy();
+				break;
+			case State.eState_End:
                 End();
                 break;
             default:
@@ -109,35 +113,51 @@ public class JoinPhase : MonoBehaviourPun
 			}
 		}
 
-        // 
-
         // アクションが終了しているなら
         if (ActionMgr.instance.IsCompletedAction(m_JoinPeopleGameAction))
         {
-            if(PhotonNetwork.IsMasterClient)
-            {
-                // アクションオブジェクト削除
-                PhotonNetwork.Destroy(m_JoinPeopleGameAction);
-            }
+			// オブジェクト破棄へ
+			SetNextStateAndFlag(State.eState_Destroy);
+		}
+	}
 
+	// オブジェクト破棄
+	void Destroy()
+	{
+		if (m_StateValue == 1)
+		{
+			Debug.Log($"{nameof(JoinPhase)}" + "オブジェクト破棄ステート処理開始");
+		}
+
+        // アクションオブジェクトが存在しているなら
+        if(m_JoinPeopleGameAction)
+        {
+			// マスタークライアント側からオブジェクト破棄
+			if (PhotonNetwork.IsMasterClient)
+			{
+				// アクションオブジェクト削除
+				PhotonNetwork.Destroy(m_JoinPeopleGameAction);
+			}
+		}
+
+        // オブジェクトの破棄が完了しているなら
+        if (!m_JoinPeopleGameAction)
+        {
 			// 終了へ
 			SetNextStateAndFlag(State.eState_End);
 		}
 	}
 
-    // 終了
-    void End()
+	// 終了
+	void End()
     {
         if (m_StateValue == 1)
         {
             Debug.Log($"{nameof(JoinPhase)}" + "終了ステート処理開始");
 		}
 
-		if (!BattleMgr.instance.GetSetNextPhaseFlag)
-        {
-			// メインフェイズに移動。
-			BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
-		}
+		// メインフェイズに移動。
+		BattleMgr.instance.SetNextPhaseAndFlag(PhaseType.ePhaseType_Main);
 	}
 
     // --システム--
@@ -161,7 +181,10 @@ public class JoinPhase : MonoBehaviourPun
                 case State.eState_JoinPeopleGameAction:
 					nextState = await StateJoinPeopleGameAction();
                     break;
-                case State.eState_End:
+				case State.eState_Destroy:
+					nextState = await StateDestroy();
+					break;
+				case State.eState_End:
 					nextState = await StateEnd();
                     break;
                 default:
@@ -190,8 +213,15 @@ public class JoinPhase : MonoBehaviourPun
         // 次のステートへ
         return GetNextState();
     }
-    // 終了
-    async UniTask<State> StateEnd()
+	// オブジェクト破棄
+	async UniTask<State> StateDestroy()
+	{
+		await UniTask.WaitUntil(() => IsNextStateFlag());
+		// 次のステートへ
+		return GetNextState();
+	}
+	// 終了
+	async UniTask<State> StateEnd()
     {
         await UniTask.WaitUntil(() => IsNextStateFlag());
 

@@ -64,6 +64,7 @@ MonoBehaviour:
   - RPC_Armament
   - MilitaryAction
   - RPC_MilitaryAction
+  - ChangeToEndState
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

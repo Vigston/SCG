@@ -88,7 +88,7 @@ public class BattleMgr : MonoBehaviourPun
 		BattleResultUpdate().Forget();
 
         // マスタークライアントじゃないならはじく
-        if (!PhotonNetwork.IsMasterClient) return;
+        //if (!PhotonNetwork.IsMasterClient) return;
 
 		// スタートフェイズから始める
 		GetSetPhaseType = PhaseType.ePhaseType_Start;
@@ -598,22 +598,26 @@ public class BattleMgr : MonoBehaviourPun
         BattleUser    battleUser    = battleUserMgr.GetUserFromNetWorkNumber(_netWorkActorNumber);
         if (!battleUser) return;
 
+		// 現在のフェイズが違うのならログを生成してはじく。
+		if (GetSetPhaseType != (PhaseType)_phase)
+		{
+			Debug.Log($"[{nameof(RPC_PhaseReady)}]現在のフェイズが各クライアント間で一致していません" +
+					  $"送信側：{battleUser.GetSetSide}||フェイズ：{(PhaseType)_phase}" +
+					  $"受信側：{BattleUserMgr.instance.GetSetPlayerUser.GetSetSide}||フェイズ：{GetSetPhaseType}");
+            return;
+		}
+
 		// フェイズ移行の通信同期待ち状態に移行
 		battleUser.GetSetPhaseReadyFlag = true;
-        
-        // 現在のフェイズが違うのならログを生成
-		if (GetSetPhaseType != (PhaseType)_phase)
-        {
-            Debug.Log($"[{nameof(RPC_PhaseReady)}]現在のフェイズが各クライアント間で一致していません" +
-                      $"送信側：{battleUser.GetSetSide}||フェイズ：{(PhaseType)_phase}" +
-                      $"受信側：{BattleUserMgr.instance.GetSetPlayerUser.GetSetSide}||フェイズ：{GetSetPhaseType}");
-		}
 
         Debug.Log($"{nameof(RPC_PhaseReady)}｜Side：{battleUser.GetSetSide}｜PhaseReadyFlag：{battleUser.GetSetPhaseReadyFlag}");
 	}
     // お互いのユーザーがフェイズ移行待機状態か
     bool IsPhaseReady()
     {
+		// フェイズオブジェクトが取得されているか確認
+		if (m_PhaseObject == null) return false;
+
 		BattleUserMgr battleUserMgr = BattleUserMgr.instance;
 		if (!battleUserMgr) return false;
 		BattleUser playerUser = battleUserMgr.GetSetPlayerUser;
@@ -621,8 +625,8 @@ public class BattleMgr : MonoBehaviourPun
 		if (!playerUser) return false;
 		if (!enemyUser) return false;
 
-        // フェイズ移行待機状態ではない
-        if (!playerUser.GetSetPhaseReadyFlag) return false;
+		// フェイズ移行待機状態ではない
+		if (!playerUser.GetSetPhaseReadyFlag) return false;
 		if (!enemyUser.GetSetPhaseReadyFlag) return false;
 
 		// どちらもフェイズ移行待機状態です
