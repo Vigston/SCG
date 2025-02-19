@@ -675,7 +675,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e068be8ddf386841b5de8655561210e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentPhaseIndex: 0
+  m_Phases: []
+  m_CurrentPhaseIndex: 0
+  m_PhaseParent: {fileID: 923004747}
 --- !u!4 &1732921042
 Transform:
   m_ObjectHideFlags: 0
@@ -684,7 +686,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1732921040}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 601, y: 269, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
