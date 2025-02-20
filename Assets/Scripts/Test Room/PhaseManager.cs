@@ -15,6 +15,8 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 
 	private async void Start()
 	{
+		Debug.Log($"PhotonNetwork.IsMasterClient：{PhotonNetwork.IsMasterClient}");
+
 		if (m_PhaseParent == null)
 		{
 			Debug.LogError($"親フェイズオブジェクト「{nameof(m_PhaseParent)}」が見つかりません！{nameof(PhaseManager)}にアタッチされているか確認してください。");
@@ -37,12 +39,30 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 				GetPhase(mainPhaseObj),
 				GetPhase(endPhaseObj),
 			};
+
+			// 各フェイズオブジェクトのPhotonViewIdを取得
+			int[] phaseViewIDs = new int[m_Phases.Length];
+
+			for (int i = 0; i < m_Phases.Length; i++)
+			{
+				PhotonView photonView = m_Phases[i]?.GetComponent<PhotonView>();
+
+				if (!photonView)
+				{
+					Debug.LogWarning($"PhotonViewIdが取得できませんでした。|| m_Phases.Length：{m_Phases.Length}");
+					continue;
+				}
+
+				// PhotonViewId取得
+				phaseViewIDs[i] = photonView.ViewID;
+			}
+
+			// フェイズオブジェクトの通信同期を行う
+			photonView.RPC(nameof(RPC_SyncPhases_MC), RpcTarget.OthersBuffered, phaseViewIDs);
 		}
-		else
-		{
-			// **非マスタークライアント側：フェーズオブジェクトを検索して取得**
-			await SetPhasesForClients();
-		}
+
+		// フェイズオブジェクトの生成、通信同期が正常に終了するまで待機
+		await WaitSyncCreatePhase();
 
 		// ターンループ処理
 		RunTurnCycle().Forget();
@@ -55,9 +75,9 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		GameObject phaseObject = PhotonNetwork.Instantiate(prefabName, Vector3.zero, Quaternion.identity);
 
 		// 親オブジェクト
-		if (m_PhaseParent == null)
+		if (!m_PhaseParent)
 		{
-			Debug.LogError($"親フェイズオブジェクト「{nameof(m_PhaseParent)}」が見つかりませんでした");
+			Debug.LogWarning($"親フェイズオブジェクト「{nameof(m_PhaseParent)}」が見つかりませんでした");
 			return phaseObject;
 		}
 
@@ -67,41 +87,34 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		return phaseObject;
 	}
 
-	// フェーズリストを取得 (非マスタークライアント側)
-	private async UniTask SetPhasesForClients()
+	// フェイズオブジェクトの生成、通信同期が正常に行われるまで待機
+	private async UniTask WaitSyncCreatePhase()
 	{
-		// マスタークライアントならはじく
-		if (PhotonNetwork.IsMasterClient)
+		Debug.Log($"{nameof(WaitSyncCreatePhase)}開始");
+		// フェイズオブジェクトの生成が行われるまで待機
+		await UniTask.WaitUntil(() => m_Phases != null);
+		// Indexに異常値が入っている場合は通信同期が正しく行われていないので待機
+		await UniTask.WaitUntil(() => m_Phases.Length > 0 && m_Phases.Length > m_CurrentPhaseIndex);
+
+		Debug.Log($"{nameof(WaitSyncCreatePhase)}終了");
+	}
+
+	[PunRPC]
+	private void RPC_SyncPhases_MC(int[] phaseViewIDs)
+	{
+		m_Phases = new Phase[phaseViewIDs.Length];
+
+		for (int i = 0; i < phaseViewIDs.Length; i++)
 		{
-			Debug.LogError($"非マスタークライアントの処理がマスタークライアントで呼ばれています：{nameof(SetPhasesForClients)}");
-			return;
-		}
-
-		Debug.Log("非マスタークライアント側でフェーズオブジェクトの取得開始");
-
-		while (m_Phases == null || m_Phases.Length == 0)
-		{
-			await UniTask.Delay(m_SyncDelay); // データ同期待機
-
-			if (m_Phases.Length > 0)
+			PhotonView photonView = PhotonView.Find(phaseViewIDs[i]);
+			if (!photonView)
 			{
-				Debug.Log($"フェーズオブジェクトを取得完了（{m_Phases.Length} 個）");
+				Debug.LogError($"PhotonViewID {phaseViewIDs[i]} のオブジェクトが見つかりませんでした。");
+				continue;
 			}
 
-			await UniTask.Yield();
+			m_Phases[i] = photonView.GetComponent<Phase>();
 		}
-
-		// **親オブジェクトの設定（念のため）**
-		foreach (var phase in m_Phases)
-		{
-			if (phase != null && phase.transform.parent == null)
-			{
-				// 生成されたオブジェクトの親を設定
-				phase.transform.SetParent(m_PhaseParent.transform);
-			}
-		}
-
-		await UniTask.Yield();
 	}
 
 	// フェイズ取得
@@ -118,6 +131,8 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 	// ターンループ処理
 	private async UniTask RunTurnCycle()
 	{
+		Debug.Log("ターンループ処理開始");
+
 		while (true)
 		{
 			if(m_Phases == null)
@@ -127,6 +142,14 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 				Debug.Log($"同期待ちが終了したので処理を再開します");
 				continue;
 			}
+
+			if(m_Phases.Length < 0 || m_Phases.Length <= m_CurrentPhaseIndex)
+			{
+				Debug.LogWarning($"範囲外Index参照エラー || m_Phases.Length：{m_Phases.Length} m_CurrentPhaseIndex：{m_CurrentPhaseIndex}");
+				await UniTask.Delay(m_SyncDelay);
+				continue;
+			}
+
 			await m_Phases[m_CurrentPhaseIndex].RunPhase();
 
 			m_CurrentPhaseIndex++;
