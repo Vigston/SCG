@@ -1,26 +1,40 @@
 ﻿using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public abstract class Phase : MonoBehaviourPunCallbacks
 {
 	public enum eState
 	{
-		Init,
+		Start,
 		Main,
-		End
+		End,
+		
+		// 例外状態
+		None = -1,
 	}
 
-	protected eState state = eState.Init;
+	// フェイズステート
+	[SerializeField, ReadOnly]
+	protected eState m_State = eState.None;
 
+	// ステートフレーム
+	[SerializeField, ReadOnly]
+	protected int m_StateFrame = 0;
+
+	// フェイズ処理
 	public async UniTask RunPhase()
 	{
-		while (state != eState.End)
+		while (GetSetState != eState.End)
 		{
-			switch (state)
+			// ステートフレーム数初期化。
+			GetSetStateFrame = 0;
+
+			switch (GetSetState)
 			{
-				case eState.Init:
-					await InitState();
+				case eState.Start:
+					await StartState();
 					break;
 				case eState.Main:
 					await MainState();
@@ -29,27 +43,51 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 					await EndState();
 					break;
 			}
+
+			// ステートフレーム数加算。
+			GetSetStateFrame++;
 			await UniTask.Yield();
 		}
 	}
 
-	protected virtual async UniTask InitState()
+	// フェイズ初期化
+	public virtual void InitPhase()
 	{
-		Debug.Log($"{this.GetType().Name} InitState");
-		state = eState.Main;
-		await UniTask.Yield();
+		GetSetState = eState.Start;
 	}
 
+	// 各ステート処理
+	protected virtual async UniTask StartState()
+	{
+		Debug.Log($"{this.GetType().Name} StartState");
+		GetSetState = eState.Main;
+		await UniTask.CompletedTask;
+	}
 	protected virtual async UniTask MainState()
 	{
 		Debug.Log($"{this.GetType().Name} MainState");
-		state = eState.End;
-		await UniTask.Yield();
+		GetSetState = eState.End;
+		await UniTask.CompletedTask;
 	}
-
 	protected virtual async UniTask EndState()
 	{
 		Debug.Log($"{this.GetType().Name} EndState");
-		await UniTask.Yield();
+		GetSetState = eState.None;
+		await UniTask.CompletedTask;
+	}
+
+
+	// == プロパティ == //
+	// フェイズステート
+	protected eState GetSetState
+	{
+		get { return m_State; }
+		set { m_State = value; }
+	}
+	// ステートフレーム
+	protected int GetSetStateFrame
+	{
+		get { return m_StateFrame; }
+		set { m_StateFrame = value; }
 	}
 }

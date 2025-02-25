@@ -5,23 +5,24 @@ using UnityEngine;
 
 public class TestEndPhase : Phase
 {
-	protected override async UniTask InitState()
+	protected override async UniTask StartState()
 	{
-		Debug.Log($"{nameof(TestEndPhase)}：{nameof(InitState)}");
-		state = eState.Main;
-		await UniTask.Yield();
+		// 基底処理実行
+		await base.StartState();
+		await UniTask.CompletedTask;
 	}
 
 	protected override async UniTask MainState()
 	{
-		Debug.Log($"{nameof(TestEndPhase)}：{nameof(MainState)}");
-		state = eState.End;
-		await UniTask.Yield();
+		// 基底処理実行
+		await base.MainState();
+		await UniTask.CompletedTask;
 	}
 
 	protected override async UniTask EndState()
 	{
-		Debug.Log($"{nameof(TestEndPhase)}：EndState");
-		await UniTask.Yield();
+		// 基底処理実行
+		await base.EndState();
+		await UniTask.CompletedTask;
 	}
 }

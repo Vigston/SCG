@@ -676,7 +676,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Phases: []
-  m_CurrentPhaseIndex: 0
+  m_PhaseType: 0
   m_PhaseParent: {fileID: 923004747}
   m_SyncDelay: 500
 --- !u!4 &1732921042

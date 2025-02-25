@@ -4,10 +4,18 @@ using UnityEngine;
 
 public class PhaseManager : MonoBehaviourPunCallbacks
 {
+	public enum PhaseType
+	{
+		Start,
+		Join,
+		Main,
+		End
+	}
+
 	[SerializeField]
 	private Phase[] m_Phases;
 	[SerializeField]
-	private int m_CurrentPhaseIndex = 0;
+	private PhaseType m_PhaseType;
 	[SerializeField]
 	private GameObject m_PhaseParent; // 親オブジェクト（===Phase===）
 	[SerializeField]
@@ -94,7 +102,7 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		// フェイズオブジェクトの生成が行われるまで待機
 		await UniTask.WaitUntil(() => m_Phases != null);
 		// Indexに異常値が入っている場合は通信同期が正しく行われていないので待機
-		await UniTask.WaitUntil(() => m_Phases.Length > 0 && m_Phases.Length > m_CurrentPhaseIndex);
+		await UniTask.WaitUntil(() => m_Phases.Length > 0 && m_Phases.Length > (int)m_PhaseType);
 
 		Debug.Log($"{nameof(WaitSyncCreatePhase)}終了");
 	}
@@ -114,6 +122,7 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 			}
 
 			m_Phases[i] = photonView.GetComponent<Phase>();
+			m_Phases[i].transform.SetParent(m_PhaseParent.transform);
 		}
 	}
 
@@ -128,10 +137,23 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		return phase;
 	}
 
+	// 全フェイズ初期化
+	private void InitAllPhase()
+	{
+
+	}
+
 	// ターンループ処理
 	private async UniTask RunTurnCycle()
 	{
 		Debug.Log("ターンループ処理開始");
+
+		// 全フェイズ初期化
+		foreach (var phase in m_Phases)
+		{
+			// フェイズ初期化
+			phase.InitPhase();
+		}
 
 		while (true)
 		{
@@ -143,21 +165,36 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 				continue;
 			}
 
-			if(m_Phases.Length < 0 || m_Phases.Length <= m_CurrentPhaseIndex)
+			if(m_Phases.Length < 0 || m_Phases.Length <= (int)m_PhaseType)
 			{
-				Debug.LogWarning($"範囲外Index参照エラー || m_Phases.Length：{m_Phases.Length} m_CurrentPhaseIndex：{m_CurrentPhaseIndex}");
+				Debug.LogWarning($"範囲外Index参照エラー || m_Phases.Length：{m_Phases.Length} m_PhaseType：{m_PhaseType}");
 				await UniTask.Delay(m_SyncDelay);
 				continue;
 			}
 
-			await m_Phases[m_CurrentPhaseIndex].RunPhase();
+			// フェイズ処理
+			await m_Phases[(int)m_PhaseType].RunPhase();
 
-			m_CurrentPhaseIndex++;
-			if (m_CurrentPhaseIndex >= m_Phases.Length)
+			// 左シフト+Pでフェイズ移行
+			if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
 			{
-				m_CurrentPhaseIndex = 0; // 次のターンへ
+				PhaseType nextPhaseType = m_PhaseType + 1;
+				Debug.Log($"フェイズ移行：{m_PhaseType}→{nextPhaseType}");
+				// フェイズ初期化
+				m_Phases[(int)m_PhaseType].InitPhase();
+				m_PhaseType++;
+			}
+
+			// 通信同期
+
+			
+			if ((int)m_PhaseType >= m_Phases.Length)
+			{
+				m_PhaseType = PhaseType.Start; // 次のターンへ
 				Debug.Log("Next Turn");
 			}
+
+			await UniTask.Yield();
 		}
 	}
 }
