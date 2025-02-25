@@ -158,8 +158,6 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 				m_CurrentPhaseIndex = 0; // 次のターンへ
 				Debug.Log("Next Turn");
 			}
-
-			await UniTask.Yield();
 		}
 	}
 }
