@@ -107,6 +107,7 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		Debug.Log($"{nameof(WaitSyncCreatePhase)}終了");
 	}
 
+	// フェイズオブジェクトの通信同期処理
 	[PunRPC]
 	private void RPC_SyncPhases_MC(int[] phaseViewIDs)
 	{
@@ -135,12 +136,6 @@ public class PhaseManager : MonoBehaviourPunCallbacks
 		Phase phase = phaseObject.GetComponent<Phase>();
 
 		return phase;
-	}
-
-	// 全フェイズ初期化
-	private void InitAllPhase()
-	{
-
 	}
 
 	// ターンループ処理
