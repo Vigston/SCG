@@ -66,6 +66,8 @@ MonoBehaviour:
   - RPC_MilitaryAction
   - ChangeToEndState
   - RPC_SyncPhases_MC
+  - RPC_PushUser_CM
+  - RPC_SyncUser_MC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

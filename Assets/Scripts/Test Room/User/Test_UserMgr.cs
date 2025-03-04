@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using battleTypes;
 using System.Linq;
+using Photon.Pun;
 
 public class Test_UserMgr : MonoBehaviour
 {
@@ -61,9 +62,65 @@ public class Test_UserMgr : MonoBehaviour
 		}
 	}
 
-    // ---ユーザー---
-    // プレイヤーユーザー
-    public Test_User GetSetPlayerUser
+	// ---ユーザー---
+	// プレイヤーユーザー作成
+	public void CreatePlayerUser()
+	{
+		// ゲームオブジェクト生成
+		GameObject playerUserObj = new GameObject();
+
+		// ユーザークラス追加
+		playerUserObj.AddComponent<Test_User>();
+
+		// オブジェクト名設定
+		playerUserObj.name = "User_Player";
+
+		Test_User playerUser = playerUserObj.GetComponent<Test_User>();
+
+		// バトルユーザーがないならはじく
+		if (!playerUser) { return; }
+
+		// == ユーザー設定 ==
+		playerUser.GetSetSide   = Side.eSide_Player;                        // 側
+		playerUser.GetSetID     = PhotonNetwork.LocalPlayer.ActorNumber;    // プレイヤーID
+
+		// プレイヤーユーザーに設定
+		GetSetPlayerUser = playerUser;
+	}
+
+	// 敵ユーザー作成
+	public void CreateEnemyUser()
+	{
+		// ゲームオブジェクト生成
+		GameObject enemyUserObj = new GameObject();
+
+		// ユーザークラス追加
+		enemyUserObj.AddComponent<Test_User>();
+
+		// オブジェクト名設定
+		enemyUserObj.name = "User_Enemy";
+
+		Test_User enemyUser = enemyUserObj.GetComponent<Test_User>();
+
+		// ユーザーがないならはじく
+		if (!enemyUser) { return; }
+
+		// バトルユーザー設定
+		enemyUser.GetSetSide = Side.eSide_Enemy;                       // 側
+
+		// 下記処理はちゃんと他クライアントから値の通信同期を取って行うのでコメントアウト 2025/3/4 n_oishi
+
+		// プレイヤーのActorNumberを基に敵のActorNumberを設定
+		//int playerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber; 
+		//int enemyActorNumber = (playerActorNumber == 1) ? 2 : 1;
+		//enemyUser.GetSetID = enemyActorNumber;
+
+		// 敵ユーザーに設定
+		GetSetEnemyUser = enemyUser;
+	}
+
+	// プレイヤーユーザー
+	public Test_User GetSetPlayerUser
     {
 		get { return m_Users[(int)Side.eSide_Player]; }
         set { m_Users[(int)Side.eSide_Player] = value; }

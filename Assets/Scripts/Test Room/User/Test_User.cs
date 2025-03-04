@@ -19,9 +19,8 @@ public class Test_User : MonoBehaviour
 	// フェイズ同期待ちフラグ
 	bool m_PhaseReadyFlag;
 
-    // --初期化--
-    // フェイズ情報の初期化
-    public void Init_PhaseInfo()
+	// フェイズ情報の初期化
+	public void Init_PhaseInfo()
     {
 		GetSetPhaseReadyFlag = false;
     }
