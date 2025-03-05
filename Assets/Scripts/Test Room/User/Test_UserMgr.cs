@@ -5,7 +5,6 @@ using Photon.Pun;
 
 public class Test_UserMgr : MonoBehaviour
 {
-    // =================変数=================
     // インスタンス
     public static Test_UserMgr instance;
 
