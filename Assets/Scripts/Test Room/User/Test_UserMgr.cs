@@ -2,6 +2,8 @@
 using battleTypes;
 using System.Linq;
 using Photon.Pun;
+using Photon.Realtime;
+using Cysharp.Threading.Tasks;
 
 public class Test_UserMgr : MonoBehaviour
 {
@@ -20,13 +22,28 @@ public class Test_UserMgr : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start()
+    private async void Start()
     {
+        // マスタークライアントじゃないならはじく
+        if (!PhotonNetwork.IsMasterClient) return;
 
-    }
+        // ユーザー作成
+        CreatePlayerUser();     // プレイヤー
+        CreateEnemyUser();      // 敵
+
+		// ユーザーの生成が完了するまで待機
+		await UniTask.WaitUntil(() => GetSetPlayerUser != null && GetSetEnemyUser != null);
+
+        /////通信同期/////
+        Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
+        // Userクラスをjson形式に変換して送信
+        string playerUserjsonData = JsonUtility.ToJson(GetSetPlayerUser);
+		string enemyUserjsonData = JsonUtility.ToJson(GetSetEnemyUser);
+        test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUserjsonData, enemyUserjsonData);
+	}
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
 
     }
@@ -53,7 +70,7 @@ public class Test_UserMgr : MonoBehaviour
     public void Init_User_PhaseInfo()
     {
         // 各ユーザーのフェイズ情報初期化
-		foreach (var user in m_Users)
+		foreach (var user in GetSetUsers)
 		{
 			if (!user) continue;
 
@@ -61,84 +78,66 @@ public class Test_UserMgr : MonoBehaviour
 		}
 	}
 
-	// ---ユーザー---
-	// プレイヤーユーザー作成
+    // ---ユーザー---
+    // プレイヤーユーザー作成
 	public void CreatePlayerUser()
 	{
-		// ゲームオブジェクト生成
-		GameObject playerUserObj = new GameObject();
-
-		// ユーザークラス追加
-		playerUserObj.AddComponent<Test_User>();
-
-		// オブジェクト名設定
-		playerUserObj.name = "User_Player";
-
-		Test_User playerUser = playerUserObj.GetComponent<Test_User>();
-
-		// バトルユーザーがないならはじく
-		if (!playerUser) { return; }
+		// プレイヤーユーザーがないならはじく
+		if (!GetSetPlayerUser) { return; }
 
 		// == ユーザー設定 ==
-		playerUser.GetSetSide   = Side.eSide_Player;                        // 側
-		playerUser.GetSetID     = PhotonNetwork.LocalPlayer.ActorNumber;    // プレイヤーID
-
-		// プレイヤーユーザーに設定
-		GetSetPlayerUser = playerUser;
+		GetSetPlayerUser.GetSetSide   = Side.eSide_Player;                        // 側
+		GetSetPlayerUser.GetSetID     = PhotonNetwork.LocalPlayer.ActorNumber;    // ID
 	}
 
-	// 敵ユーザー作成
+    // 敵ユーザー作成
 	public void CreateEnemyUser()
 	{
-		// ゲームオブジェクト生成
-		GameObject enemyUserObj = new GameObject();
+		// 敵ユーザーがないならはじく
+		if (!GetSetEnemyUser) { return; }
 
-		// ユーザークラス追加
-		enemyUserObj.AddComponent<Test_User>();
+		// 敵ユーザー設定
+		GetSetEnemyUser.GetSetSide = Side.eSide_Enemy;          // 側
 
-		// オブジェクト名設定
-		enemyUserObj.name = "User_Enemy";
-
-		Test_User enemyUser = enemyUserObj.GetComponent<Test_User>();
-
-		// ユーザーがないならはじく
-		if (!enemyUser) { return; }
-
-		// バトルユーザー設定
-		enemyUser.GetSetSide = Side.eSide_Enemy;                       // 側
-
-		// 下記処理はちゃんと他クライアントから値の通信同期を取って行うのでコメントアウト 2025/3/4 n_oishi
-
-		// プレイヤーのActorNumberを基に敵のActorNumberを設定
-		//int playerActorNumber = PhotonNetwork.LocalPlayer.ActorNumber; 
-		//int enemyActorNumber = (playerActorNumber == 1) ? 2 : 1;
-		//enemyUser.GetSetID = enemyActorNumber;
-
-		// 敵ユーザーに設定
-		GetSetEnemyUser = enemyUser;
+        // 相手プレイヤーのActorNumberをIDとして取得
+        foreach(Player player in PhotonNetwork.PlayerList)
+        {
+            // 自分以外のプレイヤーなら敵なのでIDを設定
+            if(player != PhotonNetwork.LocalPlayer)
+            {
+				GetSetEnemyUser.GetSetID = player.ActorNumber;  // ID
+                break;
+            }
+        }
 	}
 
+    // ユーザーリスト
+    public Test_User[] GetSetUsers
+    {
+        get { return m_Users; }
+        set { m_Users = value; }
+    }
 	// プレイヤーユーザー
 	public Test_User GetSetPlayerUser
     {
-		get { return m_Users[(int)Side.eSide_Player]; }
-        set { m_Users[(int)Side.eSide_Player] = value; }
+		get { return GetSetUsers[(int)Side.eSide_Player]; }
+        set { GetSetUsers[(int)Side.eSide_Player] = value; }
     }
 	// 敵ユーザー
 	public Test_User GetSetEnemyUser
 	{
-		get { return m_Users[(int)Side.eSide_Enemy]; }
-		set { m_Users[(int)Side.eSide_Enemy] = value; }
+		get { return GetSetUsers[(int)Side.eSide_Enemy]; }
+		set { GetSetUsers[(int)Side.eSide_Enemy] = value; }
 	}
     // 指定側のユーザー取得
     public Test_User GetUser(Side Side)
     {
-        return m_Users[(int)Side];
+        return GetSetUsers[(int)Side];
     }
     // ユーザーIDからユーザーを取得
     public Test_User GetUserFromUserID(int _userID)
     {
-		return m_Users.FirstOrDefault(user => user != null && user.GetSetID == _userID);
+		return GetSetUsers.FirstOrDefault(user => user != null && user.GetSetID == _userID);
     }
 
     // ---操作側---
@@ -156,8 +155,8 @@ public class Test_UserMgr : MonoBehaviour
     // 操作側のユーザー
     public Test_User GetSetOperateUser
     {
-        get { return m_Users[(int)m_OperateUserSide]; }
-        set { m_Users[(int)m_OperateUserSide] = value; }
+        get { return GetSetUsers[(int)m_OperateUserSide]; }
+        set { GetSetUsers[(int)m_OperateUserSide] = value; }
     }
     // 指定の操作側か
     public bool IsOperateSide(Side _side)

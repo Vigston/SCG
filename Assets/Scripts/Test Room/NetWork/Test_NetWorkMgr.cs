@@ -78,7 +78,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	//////////////////////////
 	// ユーザー情報の通信同期
 	[PunRPC]
-    public void RPC_SyncUser_MC()
+    public void RPC_SyncUser_MC(string _playerUserjsonData, string _enemyUserjsonData)
     {
         // マスタークライアントならはじく
         if (PhotonNetwork.IsMasterClient)
@@ -86,7 +86,13 @@ public class Test_NetWorkMgr : MonoBehaviourPun
             Debug.LogError($"{nameof(RPC_SyncUser_MC)}がマスタークライアントで呼ばれているため処理を行わず終了しました");
             return;
         }
-    }
+
+		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+
+		// 受け取ったユーザー情報をこちらの環境に設定
+		test_UserMgr.GetSetPlayerUser = JsonUtility.FromJson<Test_User>(_playerUserjsonData);
+		test_UserMgr.GetSetEnemyUser = JsonUtility.FromJson<Test_User>(_enemyUserjsonData);
+	}
 
     // ユーザー情報の送信
     [PunRPC]

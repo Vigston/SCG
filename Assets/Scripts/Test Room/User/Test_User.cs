@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using battleTypes;
 
+[System.Serializable]
 public class Test_User : MonoBehaviour
 {
     // ===変数===
     // 側
-    [SerializeField, ReadOnly]
+    [SerializeField]
     Side m_Side;
 	// ネットワーク固有番号
 	[SerializeField, ReadOnly]

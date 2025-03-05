@@ -68,6 +68,8 @@ MonoBehaviour:
   - RPC_SyncPhases_MC
   - RPC_PushUser_CM
   - RPC_SyncUser_MC
+  - CreateEnemyUser
+  - CreatePlayerUser
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0
