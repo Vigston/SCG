@@ -1,6 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Photon.Pun;
-using static Phase;
 using UnityEngine;
 
 public class TestStartPhase : Phase
@@ -9,6 +7,9 @@ public class TestStartPhase : Phase
 	{
 		// 基底処理実行
 		await base.StartState();
+
+		// メインステートへ
+		SwitchState(eState.Main);
 		await UniTask.CompletedTask;
 	}
 
@@ -16,6 +17,14 @@ public class TestStartPhase : Phase
 	{
 		// 基底処理実行
 		await base.MainState();
+
+		// 左シフト+Pでフェイズ移行
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
+		{
+			// 終了ステートへ
+			SwitchState(eState.End);
+		}
+
 		await UniTask.CompletedTask;
 	}
 

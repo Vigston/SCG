@@ -31,15 +31,16 @@ public class Test_UserMgr : MonoBehaviour
         CreatePlayerUser();     // プレイヤー
         CreateEnemyUser();      // 敵
 
+        Test_User playerUser    =   GetSetPlayerUser;
+        Test_User enemyUser     =   GetSetEnemyUser;
+
 		// ユーザーの生成が完了するまで待機
-		await UniTask.WaitUntil(() => GetSetPlayerUser != null && GetSetEnemyUser != null);
+		await UniTask.WaitUntil(() => playerUser != null && enemyUser != null);
 
         /////通信同期/////
         Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-        // Userクラスをjson形式に変換して送信
-        string playerUserjsonData = JsonUtility.ToJson(GetSetPlayerUser);
-		string enemyUserjsonData = JsonUtility.ToJson(GetSetEnemyUser);
-        test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUserjsonData, enemyUserjsonData);
+        test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetID, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
+		test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)enemyUser.GetSetSide, (int)enemyUser.GetSetID, (int)enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag);
 	}
 
     // Update is called once per frame

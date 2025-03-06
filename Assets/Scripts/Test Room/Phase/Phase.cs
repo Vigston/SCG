@@ -60,25 +60,34 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 	protected virtual async UniTask StartState()
 	{
 		Debug.Log($"{this.GetType().Name} StartState");
-		GetSetState = eState.Main;
 		await UniTask.CompletedTask;
 	}
 	protected virtual async UniTask MainState()
 	{
 		Debug.Log($"{this.GetType().Name} MainState");
-		GetSetState = eState.End;
 		await UniTask.CompletedTask;
 	}
 	protected virtual async UniTask EndState()
 	{
 		Debug.Log($"{this.GetType().Name} EndState");
-		GetSetState = eState.None;
 		await UniTask.CompletedTask;
 	}
 
+	// == 関数 == //
+	// 最初のステートフレームか
+	protected bool IsFirstStateFrame()
+	{
+		return GetSetStateFrame == 0;
+	}
+
+	// 指定のステートへ
+	protected void SwitchState(eState _state)
+	{
+		GetSetState = _state;
+	}
 
 	// == プロパティ == //
-	// フェイズステート
+	// ステート
 	protected eState GetSetState
 	{
 		get { return m_State; }

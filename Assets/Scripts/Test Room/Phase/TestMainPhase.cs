@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Photon.Pun;
-using static Phase;
 using UnityEngine;
 
 public class TestMainPhase : Phase
@@ -9,6 +8,8 @@ public class TestMainPhase : Phase
 	{
 		// 基底処理実行
 		await base.StartState();
+		// メインステートへ
+		SwitchState(eState.Main);
 		await UniTask.CompletedTask;
 	}
 
@@ -17,15 +18,11 @@ public class TestMainPhase : Phase
 		// 基底処理実行
 		await base.MainState();
 
-		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.T))
+		// 左シフト+Pでフェイズ移行
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
 		{
-			Debug.Log("スペースキーが押されました。EndStateへ遷移。");
-
-			// マスタークライアントがEndStateへの遷移を通知
-			if (PhotonNetwork.IsMasterClient)
-			{
-				photonView.RPC(nameof(ChangeToEndState), RpcTarget.All);
-			}
+			// 終了ステートへ
+			SwitchState(eState.End);
 		}
 
 		await UniTask.CompletedTask;
@@ -36,11 +33,5 @@ public class TestMainPhase : Phase
 		// 基底処理実行
 		await base.EndState();
 		await UniTask.CompletedTask;
-	}
-
-	[PunRPC]
-	private void ChangeToEndState()
-	{
-		GetSetState = eState.End;
 	}
 }

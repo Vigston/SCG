@@ -103,48 +103,6 @@ public class PhaseManager : MonoBehaviour
 		return false;
 	}
 
-	// フェイズオブジェクトの生成
-	private GameObject CreatePhasePhotonObject(string prefabName)
-	{
-		// Photonでフェーズオブジェクトを生成
-		GameObject phaseObject = PhotonNetwork.Instantiate(prefabName, Vector3.zero, Quaternion.identity);
-
-		// 親オブジェクト
-		if (!GetSetPhaseParentObj)
-		{
-			Debug.LogWarning($"親フェイズオブジェクト「{nameof(GetSetPhaseParentObj)}」が見つかりませんでした");
-			return phaseObject;
-		}
-
-		// 生成されたオブジェクトの親を設定
-		phaseObject.transform.SetParent(GetSetPhaseParentObj.transform);
-
-		return phaseObject;
-	}
-
-	// フェイズオブジェクトの生成、通信同期が正常に行われるまで待機
-	private async UniTask WaitSyncCreatePhase()
-	{
-		Debug.Log($"{nameof(WaitSyncCreatePhase)}開始");
-		// フェイズオブジェクトの生成が行われるまで待機
-		await UniTask.WaitUntil(() => GetSetPhases != null);
-		// Indexに異常値が入っている場合は通信同期が正しく行われていないので待機
-		await UniTask.WaitUntil(() => GetSetPhases.Length > 0 && GetSetPhases.Length > (int)GetSetPhaseType);
-
-		Debug.Log($"{nameof(WaitSyncCreatePhase)}終了");
-	}
-
-	// フェイズ取得
-	private Phase GetPhase(GameObject phaseObject)
-	{
-
-		if (!phaseObject) { return null; }
-		// フェイズ取得
-		Phase phase = phaseObject.GetComponent<Phase>();
-
-		return phase;
-	}
-
 	// ターンループ処理
 	private async UniTask RunTurnCycle()
 	{
@@ -177,19 +135,21 @@ public class PhaseManager : MonoBehaviour
 			// フェイズ処理
 			await GetSetPhases[(int)GetSetPhaseType].RunPhase();
 
-			// 左シフト+Pでフェイズ移行
-			if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
-			{
-				PhaseType nextPhaseType = GetSetPhaseType + 1;
-				Debug.Log($"フェイズ移行：{GetSetPhaseType}→{nextPhaseType}");
-				// フェイズ初期化
-				GetSetPhases[(int)GetSetPhaseType].InitPhase();
-				GetSetPhaseType++;
-			}
+			////////////////////////
+			///// フェイズ遷移 /////
+			////////////////////////
+			// 次のフェイズに遷移可能な状態になるまで待機
+			await UniTask.WaitUntil(() => IsSwitchPhase());
+
+			PhaseType nextPhaseType = GetSetPhaseType + 1;
+			Debug.Log($"フェイズ移行：{GetSetPhaseType}→{nextPhaseType}");
+			// フェイズ初期化
+			GetSetPhases[(int)GetSetPhaseType].InitPhase();
+			GetSetPhaseType++;
 
 			// 通信同期
 
-			
+
 			if ((int)GetSetPhaseType >= GetSetPhases.Length)
 			{
 				GetSetPhaseType = PhaseType.Start; // 次のターンへ
@@ -200,6 +160,97 @@ public class PhaseManager : MonoBehaviour
 		}
 	}
 
+	//////////////////////////
+	// ===== フェイズ ===== //
+	//////////////////////////
+	// フェイズオブジェクトの生成
+	private GameObject CreatePhasePhotonObject(string prefabName)
+	{
+		// Photonでフェーズオブジェクトを生成
+		GameObject phaseObject = PhotonNetwork.Instantiate(prefabName, Vector3.zero, Quaternion.identity);
+
+		// 親オブジェクト
+		if (!GetSetPhaseParentObj)
+		{
+			Debug.LogWarning($"親フェイズオブジェクト「{nameof(GetSetPhaseParentObj)}」が見つかりませんでした");
+			return phaseObject;
+		}
+
+		// 生成されたオブジェクトの親を設定
+		phaseObject.transform.SetParent(GetSetPhaseParentObj.transform);
+
+		return phaseObject;
+	}
+	// フェイズオブジェクトの生成、通信同期が正常に行われるまで待機
+	private async UniTask WaitSyncCreatePhase()
+	{
+		Debug.Log($"{nameof(WaitSyncCreatePhase)}開始");
+		// フェイズオブジェクトの生成が行われるまで待機
+		await UniTask.WaitUntil(() => GetSetPhases != null);
+		// Indexに異常値が入っている場合は通信同期が正しく行われていないので待機
+		await UniTask.WaitUntil(() => GetSetPhases.Length > 0 && GetSetPhases.Length > (int)GetSetPhaseType);
+
+		Debug.Log($"{nameof(WaitSyncCreatePhase)}終了");
+	}
+	// フェイズ取得
+	private Phase GetPhase(GameObject phaseObject)
+	{
+
+		if (!phaseObject) { return null; }
+		// フェイズ取得
+		Phase phase = phaseObject.GetComponent<Phase>();
+
+		return phase;
+	}
+	// 次のフェイズへ遷移可能な状態か
+	private bool IsSwitchPhase()
+	{
+		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
+		Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+
+		// ユーザーが取得できていないなら不可能
+		if (!playerUser || !enemyUser)
+		{
+			Debug.LogError($"{nameof(IsSwitchPhase)}でユーザー取得ができていなかったのでフェイズ遷移を行えませんでした。" +
+						   $"PlayerUser：{playerUser} || EnemyUser：{enemyUser}");
+			return false;
+		}
+
+		// マスタークライアント
+		if(PhotonNetwork.IsMasterClient)
+		{
+			// 自分と相手のユーザーフェイズが一致しないので不可能
+			if (playerUser.GetSetPhaseType != enemyUser.GetSetPhaseType)
+			{
+				Debug.LogError($"自分と相手のフェイズが一致しないのでフェイズ遷移を行えませんでした。通信同期が正しく行えているのか確認をお願いします。" +
+							   $"PlayerUser：{playerUser.GetSetPhaseType} || EnemyUser：{enemyUser.GetSetPhaseType}");
+				return false;
+			}
+
+			// 自分と相手のユーザーフェイズ同期待ちフラグが両方立っていないので不可能
+			if (!playerUser.GetSetPhaseReadyFlag || !enemyUser.GetSetPhaseReadyFlag)
+			{
+				Debug.LogError($"自分と相手のフェイズ同期待ちフラグが両方立っていないのでフェイズ遷移を行えませんでした。通信同期が正しく行えているのか確認をお願いします。" +
+							   $"PlayerUser：{playerUser.GetSetPhaseReadyFlag} || EnemyUser：{enemyUser.GetSetPhaseReadyFlag}");
+				return false;
+			}
+		}
+
+		// 自分と相手がユーザーフェイズ遷移可能じゃないので不可能
+		if (!playerUser.GetSetPhaseSwitchFlag || !enemyUser.GetSetPhaseSwitchFlag)
+		{
+			Debug.LogError($"自分と相手がフェイズ遷移可能じゃないのでフェイズ遷移を行えません。通信同期が正しく行われているのか確認をお願いします。" +
+						   $"PlayerUser：{playerUser.GetSetPhaseSwitchFlag} || EnemyUser：{enemyUser.GetSetPhaseSwitchFlag}");
+			return false;
+		}
+
+		// 遷移可能
+		return true;
+	}
+
+	//////////////////////////////////
+	// ===== GetSetプロパティ ===== //
+	//////////////////////////////////
 	public Phase[] GetSetPhases
 	{
 		get { return m_Phases; }

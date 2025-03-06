@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 using Photon.Pun;
+using Cysharp.Threading.Tasks;
+using battleTypes;
+using static Common;
 
 public class Test_NetWorkMgr : MonoBehaviourPun
 {
@@ -78,7 +81,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	//////////////////////////
 	// ユーザー情報の通信同期
 	[PunRPC]
-    public void RPC_SyncUser_MC(string _playerUserjsonData, string _enemyUserjsonData)
+    public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag)
     {
         // マスタークライアントならはじく
         if (PhotonNetwork.IsMasterClient)
@@ -87,11 +90,21 @@ public class Test_NetWorkMgr : MonoBehaviourPun
             return;
         }
 
-		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+		// 後々選択中のカードエリアも同期してください n_oishi 2025/3/6
+		// 自分と相手のユーザー情報の側は逆なのでここで逆にする
+		Side		userSide	=	GetRevSide((Side)_userSide);	// ユーザー側
+		PhaseType	phaseType	=	(PhaseType)_phaseType;			// 現在のフェイズ
 
-		// 受け取ったユーザー情報をこちらの環境に設定
-		test_UserMgr.GetSetPlayerUser = JsonUtility.FromJson<Test_User>(_playerUserjsonData);
-		test_UserMgr.GetSetEnemyUser = JsonUtility.FromJson<Test_User>(_enemyUserjsonData);
+		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+		Test_User test_User = test_UserMgr.GetUser(userSide);
+
+		// ユーザーの生成が完了するまで待機
+		await UniTask.WaitUntil(() => test_User != null);
+
+		// ユーザー設定
+		test_User.GetSetID = _id;
+		test_User.GetSetPhaseType = phaseType;
+		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
 	}
 
     // ユーザー情報の送信
