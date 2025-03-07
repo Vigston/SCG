@@ -102,20 +102,36 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		await UniTask.WaitUntil(() => test_User != null);
 
 		// ユーザー設定
-		test_User.GetSetID = _id;
+		if(test_User.GetSetID == 0)
+		{
+			test_User.GetSetID = _id;
+		}
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
 	}
 
     // ユーザー情報の送信
     [PunRPC]
-    public void RPC_PushUser_CM()
+    public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag)
     {
-        // マスタークライアントじゃないならはじく
+        // 非マスタークライアントならはじく
         if(!PhotonNetwork.IsMasterClient)
         {
 			Debug.LogError($"{nameof(RPC_PushUser_CM)}非マスタークライアントで呼ばれているため処理を行わず終了しました");
 			return;
 		}
-    }
+
+		// 自分と相手のユーザー情報の側は逆なのでここで逆にする
+		Side userSide = GetRevSide((Side)_userSide);    // ユーザー側
+		PhaseType phaseType = (PhaseType)_phaseType;            // 現在のフェイズ
+
+		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+		Test_User test_User = test_UserMgr.GetUser(userSide);
+
+		// ユーザーの生成が完了するまで待機
+		await UniTask.WaitUntil(() => test_User != null);
+
+		test_User.GetSetPhaseType = phaseType;
+		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
+	}
 }

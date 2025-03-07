@@ -22,10 +22,6 @@ public class Test_User : MonoBehaviour
 	// フェイズ同期待ちフラグ
 	bool m_PhaseReadyFlag;
 
-	[SerializeField, ReadOnly]
-	// フェイズ遷移可能フラグ
-	bool m_PhaseSwitchFlag;
-
 	// フェイズ情報の初期化
 	public void Init_PhaseInfo()
     {
@@ -65,11 +61,4 @@ public class Test_User : MonoBehaviour
         get { return m_PhaseReadyFlag; }
         set { m_PhaseReadyFlag = value; }
     }
-
-	// --フェイズ遷移可能か--
-	public bool GetSetPhaseSwitchFlag
-	{
-		get { return m_PhaseSwitchFlag; }
-		set { m_PhaseSwitchFlag = value; }
-	}
 }

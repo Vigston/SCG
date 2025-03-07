@@ -28,8 +28,8 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 	{
 		while (GetSetState != eState.End)
 		{
-			// ステートフレーム数初期化。
-			GetSetStateFrame = 0;
+			// ステートフレーム数加算。
+			GetSetStateFrame++;
 
 			switch (GetSetState)
 			{
@@ -44,8 +44,8 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 					break;
 			}
 
-			// ステートフレーム数加算。
-			GetSetStateFrame++;
+			// ステートフレーム数初期化。
+			GetSetStateFrame = 0;
 			await UniTask.Yield();
 		}
 	}
@@ -59,17 +59,26 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 	// 各ステート処理
 	protected virtual async UniTask StartState()
 	{
-		Debug.Log($"{this.GetType().Name} StartState");
+		if(IsFirstStateFrame())
+		{
+			Debug.Log($"{this.GetType().Name} StartState");
+		}
 		await UniTask.CompletedTask;
 	}
 	protected virtual async UniTask MainState()
 	{
-		Debug.Log($"{this.GetType().Name} MainState");
+		if (IsFirstStateFrame())
+		{
+			Debug.Log($"{this.GetType().Name} MainState");
+		}
 		await UniTask.CompletedTask;
 	}
 	protected virtual async UniTask EndState()
 	{
-		Debug.Log($"{this.GetType().Name} EndState");
+		if (IsFirstStateFrame())
+		{
+			Debug.Log($"{this.GetType().Name} EndState");
+		}
 		await UniTask.CompletedTask;
 	}
 
