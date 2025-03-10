@@ -26,11 +26,8 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 	// フェイズ処理
 	public async UniTask RunPhase()
 	{
-		while (GetSetState != eState.End)
+		while (GetSetState != eState.None)
 		{
-			// ステートフレーム数加算。
-			GetSetStateFrame++;
-
 			switch (GetSetState)
 			{
 				case eState.Start:
@@ -44,8 +41,8 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 					break;
 			}
 
-			// ステートフレーム数初期化。
-			GetSetStateFrame = 0;
+			// ステートフレーム数加算。
+			GetSetStateFrame++;
 			await UniTask.Yield();
 		}
 	}
@@ -54,12 +51,13 @@ public abstract class Phase : MonoBehaviourPunCallbacks
 	public virtual void InitPhase()
 	{
 		GetSetState = eState.Start;
+		GetSetStateFrame = 0;
 	}
 
 	// 各ステート処理
 	protected virtual async UniTask StartState()
 	{
-		if(IsFirstStateFrame())
+		if (IsFirstStateFrame())
 		{
 			Debug.Log($"{this.GetType().Name} StartState");
 		}

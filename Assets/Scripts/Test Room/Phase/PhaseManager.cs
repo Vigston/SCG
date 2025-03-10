@@ -132,8 +132,28 @@ public class PhaseManager : MonoBehaviour
 				continue;
 			}
 
+			// 参照取得
+			Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
+			Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
+			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+
+			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
+			if (!PhotonNetwork.IsMasterClient)
+			{
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
+			}
+
 			// フェイズ開始可能な状態になるまで待機
 			await UniTask.WaitUntil(() => IsPhaseStartable());
+
+			////////////////////
+			///// 通信同期 /////
+			////////////////////
+			if (PhotonNetwork.IsMasterClient)
+			{
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag);
+			}
 
 			// フェイズ処理
 			await GetSetPhases[(int)GetSetPhaseType].RunPhase();
@@ -141,9 +161,6 @@ public class PhaseManager : MonoBehaviour
 			////////////////////////
 			///// フェイズ終了 /////
 			////////////////////////
-			Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-			Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
 			// フェイズ終了同期待ち状態に設定
 			playerUser.GetSetPhaseReadyFlag = true;
 
@@ -317,6 +334,10 @@ public class PhaseManager : MonoBehaviour
 						   $"PlayerUser：{playerUser.GetSetPhaseReadyFlag} || EnemyUser：{enemyUser.GetSetPhaseReadyFlag}");
 			return false;
 		}
+
+		Debug.Log($"フェイズ遷移可能なので{GetSetPhaseType}から遷移します。" +
+				  $"[Player]PhaseType：{playerUser.GetSetPhaseType}, PhaseReadyFlag：{playerUser.GetSetPhaseReadyFlag}" +
+				  $"[Enemy]PhaseType：{enemyUser.GetSetPhaseType}, PhaseReadyFlag：{enemyUser.GetSetPhaseReadyFlag}");
 
 		// 遷移可能
 		return true;

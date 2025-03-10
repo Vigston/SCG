@@ -7,7 +7,6 @@ public class TestStartPhase : Phase
 	{
 		// 基底処理実行
 		await base.StartState();
-
 		// メインステートへ
 		SwitchState(eState.Main);
 		await UniTask.CompletedTask;
@@ -32,6 +31,8 @@ public class TestStartPhase : Phase
 	{
 		// 基底処理実行
 		await base.EndState();
+		// ターン終了
+		SwitchState(eState.None);
 		await UniTask.CompletedTask;
 	}
 }

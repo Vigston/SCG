@@ -31,6 +31,8 @@ public class TestJoinPhase : Phase
 	{
 		// 基底処理実行
 		await base.EndState();
+		// ターン終了
+		SwitchState(eState.None);
 		await UniTask.CompletedTask;
 	}
 }

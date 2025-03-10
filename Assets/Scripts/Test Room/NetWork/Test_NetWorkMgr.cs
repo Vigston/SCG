@@ -51,6 +51,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	[PunRPC]
 	public void RPC_SyncPhases_MC(int[] phaseViewIDs)
 	{
+		Debug.Log($"{nameof(RPC_SyncPhases_MC)}");
 		// マスタークライアントならはじく
 		if (PhotonNetwork.IsMasterClient)
 		{
@@ -83,8 +84,10 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	[PunRPC]
     public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag)
     {
-        // マスタークライアントならはじく
-        if (PhotonNetwork.IsMasterClient)
+		Debug.Log($"{nameof(RPC_SyncUser_MC)}" +
+				  $"_userSide：{_userSide}, _id：{_id}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
+		// マスタークライアントならはじく
+		if (PhotonNetwork.IsMasterClient)
         {
             Debug.LogError($"{nameof(RPC_SyncUser_MC)}がマスタークライアントで呼ばれているため処理を行わず終了しました");
             return;
@@ -114,6 +117,8 @@ public class Test_NetWorkMgr : MonoBehaviourPun
     [PunRPC]
     public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag)
     {
+		Debug.Log($"{nameof(RPC_PushUser_CM)}" +
+				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
         // 非マスタークライアントならはじく
         if(!PhotonNetwork.IsMasterClient)
         {
