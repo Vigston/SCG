@@ -8,7 +8,8 @@ public class CardAbilityManager : MonoBehaviour
 	// インスタンス
 	public static CardAbilityManager instance;
 
-	private List<ICardAbility> activeAbilities = new List<ICardAbility>();
+	[SerializeReference, ReadOnly]
+	private List<ICardAbility> activeAbilities;
 
 	private void Awake()
 	{
