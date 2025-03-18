@@ -1,11 +1,16 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
+using System.Collections.Generic;
+using UnityEditor.Playables;
 using UnityEngine;
 
 public class ActionManager : MonoBehaviour
 {
 	// インスタンス
 	public static ActionManager instance;
+
+	[SerializeReference]
+	private List<ActionBase> activeActionList;
 
 	private void Awake()
 	{
@@ -35,7 +40,9 @@ public class ActionManager : MonoBehaviour
 		var action = (T)Activator.CreateInstance(typeof(T), args);  // Action を動的に生成
 		Debug.Log($"{typeof(T).Name} を実行しました");
 
-		action.ExecuteAsync().Forget();  // 非同期実行
+		activeActionList.Add(action);									// 追加
+		action.OnCompleted += _ => activeActionList.Remove(action);		// 終了時にリストから削除
+		action.ExecuteAsync().Forget();									// 非同期実行
 		return action;
 	}
 

@@ -18,6 +18,18 @@ public class TestMainPhase : Phase
 		// 基底処理実行
 		await base.MainState();
 
+		var cardAbilityManager = CardAbilityManager.instance;
+		ICardAbility cardAbility = null;
+
+		// 左シフト+Enterでアビリティ発動
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.KeypadEnter))
+		{
+			// ダメージアビリティ発動
+			cardAbility = cardAbilityManager.ActivateAbility<DamageCardAbility>(10);
+		}
+
+		await cardAbilityManager.WaitForAbility(cardAbility);
+
 		// 左シフト+Pでフェイズ移行
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
 		{

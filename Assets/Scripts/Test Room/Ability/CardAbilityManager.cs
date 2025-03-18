@@ -8,8 +8,8 @@ public class CardAbilityManager : MonoBehaviour
 	// インスタンス
 	public static CardAbilityManager instance;
 
-	[SerializeReference, ReadOnly]
-	private List<ICardAbility> activeAbilities;
+	[SerializeReference]
+	private List<ICardAbility> activeAbilityList;
 
 	private void Awake()
 	{
@@ -39,13 +39,20 @@ public class CardAbilityManager : MonoBehaviour
 		var ability = (T)Activator.CreateInstance(typeof(T), args);
 		Debug.Log($"{typeof(T).Name} を発動しました");
 
-		activeAbilities.Add(ability);
-		ability.ExecuteAsync().Forget(); // 非同期実行
+		activeAbilityList.Add(ability);									// 追加
+		ability.OnCompleted += _ => activeAbilityList.Remove(ability);	// 終了時にリストから削除
+		ability.ExecuteAsync().Forget();								// 非同期実行
 		return ability;
 	}
 
 	public async UniTask WaitForAbility(ICardAbility ability)
 	{
+		if(ability == null)
+		{
+			Debug.LogWarning($"{nameof(WaitForAbility)}の引数(ability)でNULLが検知されましたので処理を終了しました。");
+			return;
+		}
+
 		if (!ability.IsRunning)
 		{
 			var tcs = new UniTaskCompletionSource();
