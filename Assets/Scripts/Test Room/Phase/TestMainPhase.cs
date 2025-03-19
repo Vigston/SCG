@@ -22,7 +22,7 @@ public class TestMainPhase : Phase
 		ICardAbility cardAbility = null;
 
 		// 左シフト+Enterでアビリティ発動
-		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.KeypadEnter))
+		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
 		{
 			// ダメージアビリティ発動
 			cardAbility = cardAbilityManager.ActivateAbility<DamageCardAbility>(10);
