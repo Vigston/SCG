@@ -1,16 +1,16 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 
-public abstract class ActionBase
+public abstract class ActionBase : TestIAction
 {
-	public bool IsCompleted { get; protected set; }
-	public event Action<ActionBase> OnCompleted;
+	public bool IsRunning { get; private set; }
+	public event Action<TestIAction> OnCompleted;
 
 	public async UniTask ExecuteAsync()
 	{
-		IsCompleted = false;
+		IsRunning = true;
 		await Execute();
-		IsCompleted = true;
+		IsRunning = false;
 		OnCompleted?.Invoke(this);
 	}
 

@@ -12,6 +12,7 @@ public class DamageAction : ActionBase
 
 	protected override async UniTask Execute()
 	{
+		Debug.Log($"{this.ToString()} {nameof(Execute)}");
 		Debug.Log($"相手に {damageAmount} ダメージ！");
 		await UniTask.Delay(1000); // 処理のシミュレーション
 	}

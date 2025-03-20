@@ -10,7 +10,7 @@ public class ActionManager : MonoBehaviour
 	public static ActionManager instance;
 
 	[SerializeReference]
-	private List<ActionBase> activeActionList;
+	private List<TestIAction> activeActionList;
 
 	private void Awake()
 	{
@@ -35,7 +35,7 @@ public class ActionManager : MonoBehaviour
 		return false;
 	}
 
-	public ActionBase ActivateAction<T>(params object[] args) where T : ActionBase
+	public T ActivateAction<T>(params object[] args) where T : TestIAction
 	{
 		var action = (T)Activator.CreateInstance(typeof(T), args);  // Action を動的に生成
 		Debug.Log($"{typeof(T).Name} を実行しました");
@@ -46,9 +46,15 @@ public class ActionManager : MonoBehaviour
 		return action;
 	}
 
-	public async UniTask WaitForAction(ActionBase action)
+	public async UniTask WaitForAction(TestIAction action)
 	{
-		if (!action.IsCompleted)
+		if (action == null)
+		{
+			Debug.LogWarning($"{nameof(WaitForAction)}の引数(action)でNULLが検知されましたので処理を終了しました。");
+			return;
+		}
+
+		if (!action.IsRunning)
 		{
 			var tcs = new UniTaskCompletionSource();
 			action.OnCompleted += _ => tcs.TrySetResult();

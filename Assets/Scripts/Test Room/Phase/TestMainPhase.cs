@@ -21,11 +21,12 @@ public class TestMainPhase : Phase
 		var cardAbilityManager = CardAbilityManager.instance;
 		ICardAbility cardAbility = null;
 
-		// 左シフト+Enterでアビリティ発動
+		// 左シフト+Aでアビリティ発動
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
 		{
 			// ダメージアビリティ発動
 			cardAbility = cardAbilityManager.ActivateAbility<DamageCardAbility>(10);
+			Debug.Log($"{cardAbility}：カードアビリティ発動！！");
 		}
 
 		await cardAbilityManager.WaitForAbility(cardAbility);
