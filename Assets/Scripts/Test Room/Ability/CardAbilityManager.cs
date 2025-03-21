@@ -9,7 +9,7 @@ public class CardAbilityManager : MonoBehaviour
 	public static CardAbilityManager instance;
 
 	[SerializeReference]
-	private List<ICardAbility> activeAbilityList;
+	private List<CardAbilityBase> activeAbilityList;
 
 	private void Awake()
 	{
@@ -34,7 +34,7 @@ public class CardAbilityManager : MonoBehaviour
 		return false;
 	}
 
-	public T ActivateAbility<T>(params object[] args) where T : ICardAbility
+	public T ActivateAbility<T>(params object[] args) where T : CardAbilityBase
 	{
 		var ability = (T)Activator.CreateInstance(typeof(T), args);
 		Debug.Log($"{typeof(T).Name} を発動しました");
@@ -45,7 +45,7 @@ public class CardAbilityManager : MonoBehaviour
 		return ability;
 	}
 
-	public async UniTask WaitForAbility(ICardAbility ability)
+	public async UniTask WaitForAbility(CardAbilityBase ability)
 	{
 		if(ability == null)
 		{

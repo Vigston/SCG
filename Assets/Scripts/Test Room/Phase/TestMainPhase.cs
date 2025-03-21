@@ -19,7 +19,7 @@ public class TestMainPhase : Phase
 		await base.MainState();
 
 		var cardAbilityManager = CardAbilityManager.instance;
-		ICardAbility cardAbility = null;
+		CardAbilityBase cardAbility = null;
 
 		// 左シフト+Aでアビリティ発動
 		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))

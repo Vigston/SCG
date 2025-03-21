@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using System;
 
+[Serializable]
 public abstract class CardAbilityBase : ICardAbility
 {
 	public bool IsRunning { get; private set; }

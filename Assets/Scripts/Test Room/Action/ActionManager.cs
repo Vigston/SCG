@@ -10,7 +10,7 @@ public class ActionManager : MonoBehaviour
 	public static ActionManager instance;
 
 	[SerializeReference]
-	private List<TestIAction> activeActionList;
+	private List<ActionBase> activeActionList;
 
 	private void Awake()
 	{
@@ -35,7 +35,7 @@ public class ActionManager : MonoBehaviour
 		return false;
 	}
 
-	public T ActivateAction<T>(params object[] args) where T : TestIAction
+	public T ActivateAction<T>(params object[] args) where T : ActionBase
 	{
 		var action = (T)Activator.CreateInstance(typeof(T), args);  // Action を動的に生成
 		Debug.Log($"{typeof(T).Name} を実行しました");
@@ -46,7 +46,7 @@ public class ActionManager : MonoBehaviour
 		return action;
 	}
 
-	public async UniTask WaitForAction(TestIAction action)
+	public async UniTask WaitForAction(ActionBase action)
 	{
 		if (action == null)
 		{
