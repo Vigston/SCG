@@ -1,52 +1,112 @@
 ﻿using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using System.Collections.Generic;
+using System;
 using UnityEngine;
+using static TestStartPhase;
+using static TestJoinPhase;
 
 public class TestMainPhase : Phase
 {
-	protected override async UniTask StartState()
+	// 独自のState列挙型
+	public enum MainPhaseState
 	{
-		// 基底処理実行
-		await base.StartState();
-		// メインステートへ
-		SwitchState(eState.Main);
+		StartState,             // 開始
+		MainState,              // メイン
+		EndState,               // 終了
+
+		TurnEndState = -1,      // ターン終了
+	}
+
+	private void Awake()
+	{
+		// ステートとアクションを辞書型で紐づける
+		GetSetActionDict = new Dictionary<Enum, Action>()
+		{
+			{ MainPhaseState.StartState, StartStateAction },
+			{ MainPhaseState.MainState, MainStateAction },
+			{ MainPhaseState.EndState, EndStateAction }
+		};
+	}
+
+	// フェイズ進行中の処理
+	public override async UniTask UpdatePhase()
+	{
+		while ((MainPhaseState)GetSetState != MainPhaseState.TurnEndState)
+		{
+			Enum bufferState = GetSetState;
+
+			// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
+			if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+			{
+				stateAction();
+			}
+
+			// フェイズフレーム加算
+			GetSetPhaseFrame++;
+
+			// ステート遷移しているならステート遷移時の処理を行って次のループへ
+			if ((MainPhaseState)bufferState != (MainPhaseState)GetSetState)
+			{
+				// ステート遷移時の処理
+				OnSwitchState();
+			}
+			// ステート遷移していないならステートフレーム加算
+			else
+			{
+				// ステートフレーム加算
+				GetSetStateFrame++;
+			}
+
+			// 次フレーム待機
+			await UniTask.Yield();
+		}
+
+		// タスク終了
 		await UniTask.CompletedTask;
 	}
 
-	protected override async UniTask MainState()
+	/////////////////////
+	//////アクション/////
+	/////////////////////
+	// 状態ごとのアクションを定義
+	private void StartStateAction()
 	{
-		// 基底処理実行
-		await base.MainState();
-
-		var cardAbilityManager = CardAbilityManager.instance;
-		CardAbilityBase cardAbility = null;
-
-		// 左シフト+Aでアビリティ発動
-		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.A))
+		if (IsFirstState())
 		{
-			// ダメージアビリティ発動
-			cardAbility = cardAbilityManager.ActivateAbility<DamageCardAbility>(10);
-			Debug.Log($"{cardAbility}：カードアビリティ発動！！");
+			Debug.Log($"{this}：{nameof(StartStateAction)}");
 		}
 
-		await cardAbilityManager.WaitForAbility(cardAbility);
-
-		// 左シフト+Pでフェイズ移行
-		if (Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
-		{
-			// 終了ステートへ
-			SwitchState(eState.End);
-		}
-
-		await UniTask.CompletedTask;
+		// メインへ
+		SwitchState(MainPhaseState.MainState);
 	}
 
-	protected override async UniTask EndState()
+	private void MainStateAction()
 	{
-		// 基底処理実行
-		await base.EndState();
+		if (IsFirstState())
+		{
+			Debug.Log($"{this}：{nameof(MainStateAction)}");
+		}
+
+		// 終了へ
+		SwitchState(MainPhaseState.EndState);
+	}
+
+	private void EndStateAction()
+	{
+		if (IsFirstState())
+		{
+			Debug.Log($"{this}：{nameof(EndStateAction)}");
+		}
+
 		// ターン終了
-		SwitchState(eState.None);
-		await UniTask.CompletedTask;
+		SwitchState(MainPhaseState.TurnEndState);
+	}
+
+	// 初期状態
+	public override Enum GetInitState()
+	{
+		// 開始
+		return MainPhaseState.StartState;
 	}
 }

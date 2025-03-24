@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using System;
 using UnityEngine;
 
 public class PhaseManager : MonoBehaviour
@@ -14,6 +15,9 @@ public class PhaseManager : MonoBehaviour
 
 	// インスタンス
 	public static PhaseManager instance;
+
+	[SerializeField]
+	private Phase m_Phase;
 
 	[SerializeField]
 	private Phase[] m_Phases;
@@ -156,7 +160,7 @@ public class PhaseManager : MonoBehaviour
 			}
 
 			// フェイズ処理
-			await GetSetPhases[(int)GetSetPhaseType].RunPhase();
+			await GetSetPhases[(int)GetSetPhaseType].UpdatePhase();
 
 			////////////////////////
 			///// フェイズ終了 /////
@@ -262,8 +266,8 @@ public class PhaseManager : MonoBehaviour
 		PhaseType nextPhaseType = GetSetPhaseType + 1;
 		Debug.Log($"フェイズ移行：{GetSetPhaseType}→{nextPhaseType}");
 
-		// フェイズ初期化
-		GetSetPhases[(int)GetSetPhaseType].InitPhase();
+		// フェイズ終了時処理
+		GetSetPhases[(int)GetSetPhaseType].EndPhase();
 
 		// ユーザーのフェイズ情報を初期化
 		playerUser.Init_PhaseInfo();
@@ -346,6 +350,12 @@ public class PhaseManager : MonoBehaviour
 	//////////////////////////////////
 	// ===== GetSetプロパティ ===== //
 	//////////////////////////////////
+	public Phase GetSetPhase
+	{
+		get { return m_Phase; }
+		set { m_Phase = value; }
+	}
+
 	public Phase[] GetSetPhases
 	{
 		get { return m_Phases; }
