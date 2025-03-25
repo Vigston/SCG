@@ -10,7 +10,9 @@ public class PhaseManager : MonoBehaviour
 		Start,
 		Join,
 		Main,
-		End
+		End,
+
+		TurnEnd,
 	}
 
 	// インスタンス
@@ -187,19 +189,27 @@ public class PhaseManager : MonoBehaviour
 			}
 
 			////////////////////////
-			///// フェイズ遷移 /////
+			///// フェイズ終了 /////
 			////////////////////////
 			// フェイズ終了時の処理
 			OnPhaseEnd();
 
+			//////////////////////
+			///// ターン遷移 /////
+			//////////////////////
 			// 全てのフェイズが終了しているならターン遷移を行う
-			if ((int)GetSetPhaseType >= GetSetPhases.Length)
+			if ((int)GetSetPhaseType >= GetSetPhases.Length - 1)
 			{
-				//////////////////////
-				///// ターン遷移 /////
-				//////////////////////
 				// ターン終了時の処理
 				OnTurnEnd();
+			}
+			////////////////////////
+			///// フェイズ遷移 /////
+			////////////////////////
+			else
+			{
+				// フェイズ遷移時の処理
+				OnSwitchPhase();
 			}
 
 			await UniTask.Yield();
@@ -212,8 +222,13 @@ public class PhaseManager : MonoBehaviour
 	// ターン終了時
 	private void OnTurnEnd()
 	{
+		GameMgr gameMgr = GameMgr.instance;
+
 		// スタートフェイズに設定
 		GetSetPhaseType = PhaseType.Start;
+
+		// ターンカウント加算
+		gameMgr.GetSetTurnCnt++;
 	}
 
 	//////////////////////////
@@ -262,15 +277,16 @@ public class PhaseManager : MonoBehaviour
 	private void OnPhaseEnd()
 	{
 		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-
-		PhaseType nextPhaseType = GetSetPhaseType + 1;
-		Debug.Log($"フェイズ移行：{GetSetPhaseType}→{nextPhaseType}");
-
 		// フェイズ終了時処理
 		GetSetPhases[(int)GetSetPhaseType].EndPhase();
-
 		// ユーザーのフェイズ情報を初期化
 		playerUser.Init_PhaseInfo();
+	}
+	// フェイズ遷移時
+	private void OnSwitchPhase()
+	{
+		PhaseType nextPhaseType = GetSetPhaseType + 1;
+		Debug.Log($"フェイズ遷移：{GetSetPhaseType}→{nextPhaseType}");
 
 		// == 次のフェイズへ == //
 		GetSetPhaseType++;
