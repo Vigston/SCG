@@ -2,7 +2,6 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using static TestStartPhase;
 
 public class TestJoinPhase : Phase
 {

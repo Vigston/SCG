@@ -1,10 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using Photon.Pun;
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using static TestStartPhase;
-using static TestJoinPhase;
 
 public class TestMainPhase : Phase
 {

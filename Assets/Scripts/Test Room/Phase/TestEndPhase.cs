@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using static TestStartPhase;
-using static TestJoinPhase;
 
 public class TestEndPhase : Phase
 {
