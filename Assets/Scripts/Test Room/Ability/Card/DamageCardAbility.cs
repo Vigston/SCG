@@ -15,6 +15,6 @@ public class DamageCardAbility : CardAbilityBase
 	{
 		Debug.Log($"{this.ToString()} {nameof(Execute)}");
 		var action = ActionManager.instance.ActivateAction<DamageAction>(damage);
-		await action.ExecuteAsync();
+		await ActionManager.instance.WaitForAction(action);
 	}
 }

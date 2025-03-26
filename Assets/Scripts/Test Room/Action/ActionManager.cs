@@ -48,17 +48,21 @@ public class ActionManager : MonoBehaviour
 
 	public async UniTask WaitForAction(ActionBase action)
 	{
+		// nullチェック（無効な能力の場合は警告を出して処理を終了）
 		if (action == null)
 		{
 			Debug.LogWarning($"{nameof(WaitForAction)}の引数(action)でNULLが検知されましたので処理を終了しました。");
 			return;
 		}
 
-		if (!action.IsRunning)
-		{
-			var tcs = new UniTaskCompletionSource();
-			action.OnCompleted += _ => tcs.TrySetResult();
-			await tcs.Task;
-		}
+		// 既に完了しているならはじく
+		if (!action.IsRunning) return;
+
+		// 完了を待つための非同期タスクを作成
+		var tcs = new UniTaskCompletionSource();
+		// カード効果の完了時にタスクを完了させる
+		action.OnCompleted += _ => tcs.TrySetResult();
+		// カード効果が終了するまで待機
+		await tcs.Task;
 	}
 }

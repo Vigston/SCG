@@ -139,4 +139,9 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
 	}
+
+	/////////////////////////////
+	// ===== CardAbility ===== //
+	/////////////////////////////
+	
 }

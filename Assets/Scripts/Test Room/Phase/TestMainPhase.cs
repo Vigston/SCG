@@ -15,6 +15,8 @@ public class TestMainPhase : Phase
 		TurnEndState = -1,      // ターン終了
 	}
 
+	DamageCardAbility m_DamageCardAbility;
+
 	private void Awake()
 	{
 		// ステートとアクションを辞書型で紐づける
@@ -78,12 +80,17 @@ public class TestMainPhase : Phase
 		SwitchState(MainPhaseState.MainState);
 	}
 
-	private void MainStateAction()
+	private async void MainStateAction()
 	{
 		if (IsFirstState())
 		{
 			Debug.Log($"{this}：{nameof(MainStateAction)}");
+
+			// カードアビリティテスト
+			m_DamageCardAbility = CardAbilityManager.instance.ActivateAbility<DamageCardAbility>(10);
 		}
+
+		await CardAbilityManager.instance.WaitForAbility(m_DamageCardAbility);
 
 		// 終了へ
 		SwitchState(MainPhaseState.EndState);
