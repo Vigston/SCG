@@ -3,6 +3,8 @@ using Photon.Pun;
 using Cysharp.Threading.Tasks;
 using battleTypes;
 using static Common;
+using System;
+using Photon.Realtime;
 
 public class Test_NetWorkMgr : MonoBehaviourPun
 {
@@ -13,18 +15,6 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	{
 		// インスタンス生成
 		CreateInstance();
-	}
-
-
-	void Start()
-	{
-
-	}
-
-
-	void Update()
-	{
-
 	}
 
 	// インスタンスを作成
@@ -143,5 +133,37 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	/////////////////////////////
 	// ===== CardAbility ===== //
 	/////////////////////////////
-	
+	// 下記の型以外をobjectに入れてしまうとRPCで送信できないので辞めてください。
+	// string, int, float, bool, Vector3, Quaternion, byte[], int[], string[], List<int>
+	// それ以外の型を送信する場合は、自前でシリアライズして送信してください。
+	// カード効果を実行
+	[PunRPC]
+	public async void RPC_ActivateAbility_Other(string _abilityType_str, object[] _args)
+	{
+		// アビリティID取得
+		int abilityId = Convert.ToInt32(_args[0]);
+
+		// 自分が発行したアビリティがRPCで送信されてくることは意図した挙動じゃないのでログを出してはじく
+		if(PhotonNetwork.LocalPlayer.ActorNumber == abilityId)
+		{
+			Debug.LogError($"{nameof(RPC_ActivateAbility_Other)}" +
+						   $"自分が発行したアビリティがRPCで送信されてきました。：{_abilityType_str}");
+			return;
+		}
+
+		Type abilityType = Type.GetType(_abilityType_str);
+
+		Debug.Log($"{nameof(RPC_ActivateAbility_Other)}" +
+				  $"_abilityType：{abilityType}, _args：{_args}");
+
+		CardAbilityManager cardAbilityMgr = CardAbilityManager.instance;
+
+		// カード効果種類
+		if(cardAbilityMgr.GetSetAbilityTypeActDict.TryGetValue(abilityType, out Action<object[]> abilityAction))
+		{
+			abilityAction(_args);
+		}
+
+		await UniTask.CompletedTask;
+	}
 }

@@ -4,6 +4,7 @@ using System;
 [Serializable]
 public abstract class CardAbilityBase : ICardAbility
 {
+	public abstract int Id { get; protected set; }
 	public bool IsRunning { get; private set; }
 	public event Action<ICardAbility> OnCompleted;
 

@@ -1,13 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
-using System;
 
 public class GainResourceCardAbility : CardAbilityBase
 {
+	public override int Id { get; protected set; }
 	private int value;
 
-	public GainResourceCardAbility(int value)
+	public GainResourceCardAbility(int _id, int _value)
 	{
-		this.value = value;
+		this.Id = _id;
+		this.value = _value;
 	}
 
 	protected override async UniTask Execute()

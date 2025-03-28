@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using Cysharp.Threading.Tasks;
-using System;
 
 public class DamageCardAbility : CardAbilityBase
 {
+	public override int Id { get; protected set; }
 	private int damage;
 
-	public DamageCardAbility(int damage)
+	public DamageCardAbility(int _id, int _damage)
 	{
-		this.damage = damage;
+		this.Id = _id;
+		this.damage = _damage;
 	}
 
 	protected override async UniTask Execute()

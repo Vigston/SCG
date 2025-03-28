@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using Photon.Pun;
 
 public class TestMainPhase : Phase
 {
@@ -86,8 +87,12 @@ public class TestMainPhase : Phase
 		{
 			Debug.Log($"{this}：{nameof(MainStateAction)}");
 
-			// カードアビリティテスト
-			m_DamageCardAbility = CardAbilityManager.instance.ActivateAbility<DamageCardAbility>(10);
+			if(PhotonNetwork.IsMasterClient)
+			{
+				// カードアビリティテスト
+				int abilityId = PhotonNetwork.LocalPlayer.ActorNumber;
+				m_DamageCardAbility = CardAbilityManager.instance.ActivateAbility<DamageCardAbility>(abilityId, 10);
+			}
 		}
 
 		await CardAbilityManager.instance.WaitForAbility(m_DamageCardAbility);
