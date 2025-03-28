@@ -143,5 +143,17 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	/////////////////////////////
 	// ===== CardAbility ===== //
 	/////////////////////////////
-	
+	public async void RPC_ActivateAbility_Other(byte[] _abilityType, object[] _args)
+	{
+		Debug.Log($"{nameof(RPC_ActivateAbility_Other)}" +
+				  $"_abilityType：{_abilityType}, _args：{_args}");
+
+		var abilityType = PhotonDataConverter.Deserialize_ByteToObjType<dynamic>(_abilityType);
+
+		// カード効果を実行
+		CardAbilityManager cardAbilityManager = CardAbilityManager.instance;
+		//cardAbilityManager.ActivateAbility<_abilityType.GetType>(_args);
+
+		await UniTask.CompletedTask;
+	}
 }
