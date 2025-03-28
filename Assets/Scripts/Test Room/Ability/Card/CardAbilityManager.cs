@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using Photon.Pun;
 
 public class CardAbilityManager : MonoBehaviour
 {
@@ -49,10 +48,6 @@ public class CardAbilityManager : MonoBehaviour
 
 		// 非同期でカード効果を実行（例外を投げずに処理を忘れる）
 		ability.ExecuteAsync().Forget();
-
-		var netWorkMgr = Test_NetWorkMgr.instance;
-		netWorkMgr.photonView.RPC(nameof(netWorkMgr.RPC_ActivateAbility_Other), RpcTarget.OthersBuffered, PhotonDataConverter.Serialize_ObjTypeToByte(typeof(T)));
-
 		return ability;
 	}
 
