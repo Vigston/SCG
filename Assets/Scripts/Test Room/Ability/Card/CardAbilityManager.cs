@@ -76,7 +76,13 @@ public class CardAbilityManager : MonoBehaviour
 
 		Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
 		string abilityType_str = abilityType.AssemblyQualifiedName;
-		test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_ActivateAbility_Other), RpcTarget.OthersBuffered, abilityType_str, args);
+		// アビリティID取得
+		int abilityId = Convert.ToInt32(args[0]);
+		// 自分が発行したアビリティなら相手にも送信
+		if (PhotonNetwork.LocalPlayer.ActorNumber == abilityId)
+		{
+			test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_ActivateAbility_Other), RpcTarget.OthersBuffered, abilityType_str, args);
+		}
 
 		return ability;
 	}
@@ -86,15 +92,11 @@ public class CardAbilityManager : MonoBehaviour
 	{
 		// カードアビリティが生成されるまで待機
 		await UniTask.WaitUntil(() => ability != null);
-		//// nullチェック（無効な能力の場合は警告を出して処理を終了）
-		//if (ability == null)
-		//{
-		//	Debug.LogWarning($"{nameof(WaitForAbility)}の引数(ability)でNULLが検知されましたので処理を終了しました。");
-		//	return;
-		//}
+		Debug.Log($"{ability.GetType().Name} の生成が行われました");
 
-		// 既に完了しているならはじく
-		if (!ability.IsRunning) return;
+		// 完了するまで待機
+		await UniTask.WaitUntil(() => !ability.IsRunning);
+		Debug.Log($"{ability.GetType().Name} の処理が完了しました。");
 
 		// 完了を待つための非同期タスクを作成
 		var tcs = new UniTaskCompletionSource();
