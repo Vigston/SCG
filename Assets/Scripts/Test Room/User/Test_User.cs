@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using battleTypes;
-using System;
 
 public class Test_User : MonoBehaviour
 {
@@ -16,19 +15,12 @@ public class Test_User : MonoBehaviour
 	// 選択したカードエリア
 	CardArea m_SelectedCardArea;
 
-	// フェイズ情報
-	[SerializeField, ReadOnly]
-	PhaseManager.PhaseType m_PhaseType;
-	// フェイズ同期待ちフラグ
-	[SerializeField, ReadOnly]
-	bool m_PhaseReadyFlag;
+    [SerializeField, ReadOnly]
+    PhaseType m_PhaseType;
 
-	// ステート情報
 	[SerializeField, ReadOnly]
-	Enum m_PhaseState;
-	// ステート同期待ちフラグ
-	[SerializeField, ReadOnly]
-	bool m_PhaseStateReadyFlag;
+	// フェイズ同期待ちフラグ
+	bool m_PhaseReadyFlag;
 
 	// フェイズ情報の初期化
 	public void Init_PhaseInfo()
@@ -57,8 +49,7 @@ public class Test_User : MonoBehaviour
         set { m_SelectedCardArea = value; }
     }
 
-	// フェイズ情報取得
-    public PhaseManager.PhaseType GetSetPhaseType
+    public PhaseType GetSetPhaseType
     {
         get { return m_PhaseType; }
         set { m_PhaseType = value; }
@@ -70,18 +61,4 @@ public class Test_User : MonoBehaviour
         get { return m_PhaseReadyFlag; }
         set { m_PhaseReadyFlag = value; }
     }
-
-	// ステート情報取得
-	public Enum GetSetPhaseState
-	{
-		get { return m_PhaseState; }
-		set { m_PhaseState = value; }
-	}
-
-	// --ステート同期待ち--
-	public bool GetSetPhaseStateReadyFlag
-	{
-		get { return m_PhaseStateReadyFlag; }
-		set { m_PhaseStateReadyFlag = value; }
-	}
 }

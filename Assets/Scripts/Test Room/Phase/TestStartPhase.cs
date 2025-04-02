@@ -2,7 +2,6 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using Photon.Pun;
 
 public class TestStartPhase : Phase
 {
@@ -33,11 +32,6 @@ public class TestStartPhase : Phase
 		// ターン終了じゃなければフェイズ更新を行う
 		while ((StartPhaseState)GetSetState != StartPhaseState.TurnEndState)
 		{
-			// 参照取得
-			Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-			Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
-
 			Enum bufferState = GetSetState;
 
 			// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
@@ -52,23 +46,6 @@ public class TestStartPhase : Phase
 			// ステート遷移しているならステート遷移時の処理を行って次のループへ
 			if ((StartPhaseState)bufferState != (StartPhaseState)GetSetState)
 			{
-				// 通信同期
-				// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
-				if (!PhotonNetwork.IsMasterClient)
-				{
-					test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetPhaseState, playerUser.GetSetPhaseStateReadyFlag);
-				}
-
-				// 次のステートへ遷移可能な状態になるまで待機
-				await UniTask.WaitUntil(() => IsSwitchState());
-
-				// 通信同期
-				if (PhotonNetwork.IsMasterClient)
-				{
-					test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetPhaseState, playerUser.GetSetPhaseStateReadyFlag);
-					test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetPhaseState, enemyUser.GetSetPhaseStateReadyFlag);
-				}
-
 				// ステート遷移時の処理
 				OnSwitchState();
 			}

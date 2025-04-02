@@ -72,7 +72,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	//////////////////////////
 	// ユーザー情報の通信同期
 	[PunRPC]
-    public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag, int _phaseState, bool _phaseStateReadyFlag)
+    public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag)
     {
 		Debug.Log($"{nameof(RPC_SyncUser_MC)}" +
 				  $"_userSide：{_userSide}, _id：{_id}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
@@ -85,29 +85,8 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 
 		// 後々選択中のカードエリアも同期してください n_oishi 2025/3/6
 		// 自分と相手のユーザー情報の側は逆なのでここで逆にする
-		Side					userSide	=	GetRevSide((Side)_userSide);		// ユーザー側
-		PhaseManager.PhaseType	phaseType	=	(PhaseManager.PhaseType)_phaseType;	// 現在のフェイズ
-		Enum					phaseState	=	null;								// 現在のステート
-
-		// フェイズに応じて適切なEnum型に変換
-		switch (phaseType)
-		{
-			case PhaseManager.PhaseType.Start:
-				phaseState = (TestStartPhase.StartPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.Join:
-				phaseState = (TestJoinPhase.JoinPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.Main:
-				phaseState = (TestMainPhase.MainPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.End:
-				phaseState = (TestEndPhase.EndPhaseState)_phaseState;
-				break;
-			default:
-				Debug.LogError($"意図していないフェイズ情報を検知。確認をお願いします。：phaseType {phaseType}|| phaseState {_phaseState}");
-				break;
-		}
+		Side		userSide	=	GetRevSide((Side)_userSide);	// ユーザー側
+		PhaseType	phaseType	=	(PhaseType)_phaseType;			// 現在のフェイズ
 
 		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
 		Test_User test_User = test_UserMgr.GetUser(userSide);
@@ -122,13 +101,11 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		}
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
-		test_User.GetSetPhaseState = phaseState;
-		test_User.GetSetPhaseStateReadyFlag = _phaseStateReadyFlag;
 	}
 
     // ユーザー情報の送信
     [PunRPC]
-    public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag, int _phaseState, bool _phaseStateReadyFlag)
+    public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag)
     {
 		Debug.Log($"{nameof(RPC_PushUser_CM)}" +
 				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
@@ -140,29 +117,8 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		}
 
 		// 自分と相手のユーザー情報の側は逆なのでここで逆にする
-		Side userSide = GetRevSide((Side)_userSide);	// ユーザー側
-		PhaseManager.PhaseType phaseType = (PhaseManager.PhaseType)_phaseType;	// 現在のフェイズ
-		Enum phaseState = null;							// 現在のステート
-
-		// フェイズに応じて適切なEnum型に変換
-		switch (phaseType)
-		{
-			case PhaseManager.PhaseType.Start:
-				phaseState = (TestStartPhase.StartPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.Join:
-				phaseState = (TestJoinPhase.JoinPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.Main:
-				phaseState = (TestMainPhase.MainPhaseState)_phaseState;
-				break;
-			case PhaseManager.PhaseType.End:
-				phaseState = (TestEndPhase.EndPhaseState)_phaseState;
-				break;
-			default:
-				Debug.LogError($"意図していないフェイズ情報を検知。確認をお願いします。：phaseType {phaseType}|| phaseState {_phaseState}");
-				break;
-		}
+		Side userSide = GetRevSide((Side)_userSide);    // ユーザー側
+		PhaseType phaseType = (PhaseType)_phaseType;            // 現在のフェイズ
 
 		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
 		Test_User test_User = test_UserMgr.GetUser(userSide);
@@ -172,8 +128,6 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
-		test_User.GetSetPhaseState = phaseState;
-		test_User.GetSetPhaseStateReadyFlag = _phaseStateReadyFlag;
 	}
 
 	/////////////////////////////
