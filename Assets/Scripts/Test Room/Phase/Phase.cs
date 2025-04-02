@@ -59,19 +59,11 @@ public abstract class Phase : MonoBehaviour
 		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
 		Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
 
-		// NULLチェック(ユーザー)
+		// ユーザーが取得できていないなら不可能
 		if (!playerUser || !enemyUser)
 		{
 			Debug.LogError($"{nameof(IsSwitchState)}でユーザー取得ができていなかったのでフェイズ遷移を行えませんでした。" +
 						   $"PlayerUser：{playerUser} || EnemyUser：{enemyUser}");
-			return false;
-		}
-
-		// NULLチェック(ステート)
-		if(playerUser.GetSetPhaseState == null || enemyUser.GetSetPhaseState == null)
-		{
-			Debug.LogError($"{nameof(IsSwitchState)}でステート取得ができていなかったのでフェイズ遷移を行えませんでした。" +
-						   $"PlayerUser：{playerUser.GetSetPhaseState} || EnemyUser：{enemyUser.GetSetPhaseState}");
 			return false;
 		}
 
@@ -84,7 +76,7 @@ public abstract class Phase : MonoBehaviour
 		}
 
 		// 自分と相手のユーザーステートが一致しないので不可能
-		if ((int)(object)playerUser.GetSetPhaseState != (int)(object)enemyUser.GetSetPhaseState)
+		if (playerUser.GetSetPhaseState != enemyUser.GetSetPhaseState)
 		{
 			Debug.LogError($"自分と相手のステートが一致しないのでステート遷移を行えませんでした。通信同期が正しく行えているのか確認をお願いします。" +
 						   $"PlayerUser：{playerUser.GetSetPhaseState} || EnemyUser：{enemyUser.GetSetPhaseState}");
