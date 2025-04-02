@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using static TestMainPhase;
 
 public class TestEndPhase : Phase
 {
@@ -105,5 +106,12 @@ public class TestEndPhase : Phase
 	{
 		// 開始
 		return EndPhaseState.StartState;
+	}
+
+	// 終了状態
+	public override Enum GetEndState()
+	{
+		// 終了
+		return EndPhaseState.TurnEndState;
 	}
 }

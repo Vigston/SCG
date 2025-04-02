@@ -67,6 +67,25 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		}
 	}
 
+	// フェイズ終了の通知
+	[PunRPC]
+	public void RPC_EndPhase_MC(int _phaseIdx, int _state)
+	{
+		// マスタークライアントならはじく
+		if (PhotonNetwork.IsMasterClient)
+		{
+			Debug.LogError($"{nameof(RPC_EndPhase_MC)}がマスタークライアントで呼ばれているため処理を行わず終了しました");
+			return;
+		}
+
+		Debug.Log($"{nameof(RPC_EndPhase_MC)}" +
+				  $"_phaseIdx：{_phaseIdx}, _state：{_state}");
+
+		PhaseManager phaseManager = PhaseManager.instance;
+		// フェイズ終了通知
+		phaseManager.GetSetPhases[_phaseIdx].SwitchState((Enum)(object)_state);
+	}
+
 	//////////////////////////
 	// ===== ユーザー ===== //
 	//////////////////////////

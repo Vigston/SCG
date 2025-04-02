@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using static TestStartPhase;
 
 public class TestJoinPhase : Phase
 {
@@ -105,5 +106,12 @@ public class TestJoinPhase : Phase
 	{
 		// 開始
 		return JoinPhaseState.StartState;
+	}
+
+	// 終了状態
+	public override Enum GetEndState()
+	{
+		// 終了
+		return JoinPhaseState.TurnEndState;
 	}
 }

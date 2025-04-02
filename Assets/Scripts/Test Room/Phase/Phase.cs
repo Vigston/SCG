@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
 
 public abstract class Phase : MonoBehaviour
 {
@@ -41,9 +42,21 @@ public abstract class Phase : MonoBehaviour
 	}
 
 	// 指定のステートへ遷移
-	public void SwitchState(Enum nextState)
+	public void SwitchState(Enum _nextState)
 	{
-		GetSetState = nextState;
+		GetSetState = _nextState;
+
+		// Phase終了なら他クライアントに通知
+		if(GetEndState() == _nextState)
+		{
+			PhaseManager phaseManager = PhaseManager.instance;
+			Test_NetWorkMgr netWorkMgr = Test_NetWorkMgr.instance;
+
+			int phaseIdx = (int)(object)phaseManager.GetSetPhase;
+			int nextState = (int)(object)_nextState;
+
+			netWorkMgr.photonView.RPC(nameof(netWorkMgr.RPC_EndPhase_MC), RpcTarget.OthersBuffered, phaseIdx, nextState);
+		}
 	}
 
 	// ステート遷移時の処理
@@ -55,6 +68,9 @@ public abstract class Phase : MonoBehaviour
 
 	// フェイズ内で状態に対応する初期状態を取得
 	public abstract Enum GetInitState();
+
+	// フェイズ内で状態に対応する終了状態を取得
+	public abstract Enum GetEndState();
 
 	public virtual Enum GetSetState
 	{

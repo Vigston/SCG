@@ -71,6 +71,7 @@ MonoBehaviour:
   - CreateEnemyUser
   - CreatePlayerUser
   - RPC_ActivateAbility_Other
+  - RPC_EndPhase_MC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 0

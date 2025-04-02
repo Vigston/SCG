@@ -2,6 +2,7 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using Photon.Pun;
 
 public class TestStartPhase : Phase
 {
@@ -34,10 +35,14 @@ public class TestStartPhase : Phase
 		{
 			Enum bufferState = GetSetState;
 
-			// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
-			if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+			// マスタークライアントでアクションを実行
+			if (PhotonNetwork.IsMasterClient)
 			{
-				stateAction();
+				// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
+				if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+				{
+					stateAction();
+				}
 			}
 
 			// フェイズフレーム加算
@@ -106,5 +111,12 @@ public class TestStartPhase : Phase
 	{
 		// 開始
 		return StartPhaseState.StartState;
+	}
+
+	// 終了状態
+	public override Enum GetEndState()
+	{
+		// 終了
+		return StartPhaseState.TurnEndState;
 	}
 }

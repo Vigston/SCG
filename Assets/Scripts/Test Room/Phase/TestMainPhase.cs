@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using Photon.Pun;
+using static TestJoinPhase;
 
 public class TestMainPhase : Phase
 {
@@ -117,5 +118,12 @@ public class TestMainPhase : Phase
 	{
 		// 開始
 		return MainPhaseState.StartState;
+	}
+
+	// 終了状態
+	public override Enum GetEndState()
+	{
+		// 終了
+		return MainPhaseState.TurnEndState;
 	}
 }
