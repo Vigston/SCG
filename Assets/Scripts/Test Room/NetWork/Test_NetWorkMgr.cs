@@ -75,7 +75,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
     public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag, int _phaseState, bool _phaseStateReadyFlag)
     {
 		Debug.Log($"{nameof(RPC_SyncUser_MC)}" +
-				  $"_userSide：{_userSide}, _id：{_id}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
+				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}, _phaseState：{_phaseState}, _phaseStateReadyFlag：{_phaseStateReadyFlag}");
 		// マスタークライアントならはじく
 		if (PhotonNetwork.IsMasterClient)
         {
@@ -131,7 +131,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
     public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag, int _phaseState, bool _phaseStateReadyFlag)
     {
 		Debug.Log($"{nameof(RPC_PushUser_CM)}" +
-				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
+				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}, _phaseState：{_phaseState}, _phaseStateReadyFlag：{_phaseStateReadyFlag}");
         // 非マスタークライアントならはじく
         if(!PhotonNetwork.IsMasterClient)
         {
