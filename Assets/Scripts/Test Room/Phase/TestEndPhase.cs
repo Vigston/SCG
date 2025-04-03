@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using static TestMainPhase;
+using Photon.Pun;
 
 public class TestEndPhase : Phase
 {
@@ -30,14 +31,19 @@ public class TestEndPhase : Phase
 	// フェイズ進行中の処理
 	public override async UniTask UpdatePhase()
 	{
+		// ターン終了じゃなければフェイズ更新を行う
 		while ((EndPhaseState)GetSetState != EndPhaseState.TurnEndState)
 		{
 			Enum bufferState = GetSetState;
 
-			// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
-			if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+			// マスタークライアントでアクションを実行
+			if (PhotonNetwork.IsMasterClient)
 			{
-				stateAction();
+				// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
+				if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+				{
+					stateAction();
+				}
 			}
 
 			// フェイズフレーム加算

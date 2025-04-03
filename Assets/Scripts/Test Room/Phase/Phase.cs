@@ -9,11 +9,20 @@ public abstract class Phase : MonoBehaviour
 	[SerializeField]
 	private Enum m_State;
 	[SerializeField]
+	private string m_StateName;
+	[SerializeField]
 	private int m_PhaseFrame;
 	[SerializeField]
 	private int m_StateFrame;
 	[SerializeField]
 	private Dictionary<Enum, Action> m_ActionDict;
+
+	private void Update()
+	{
+		if (GetSetState == null) return;
+
+		m_StateName = GetSetState.ToString();
+	}
 
 	// フェイズ初期化
 	public virtual void InitPhase()
@@ -44,15 +53,18 @@ public abstract class Phase : MonoBehaviour
 	// 指定のステートへ遷移
 	public void SwitchState(Enum _nextState)
 	{
+		Debug.Log($"{nameof(SwitchState)}：{_nextState.ToString()}");
 		GetSetState = _nextState;
 
 		// Phase終了なら他クライアントに通知
-		if(GetEndState() == _nextState)
+		if(GetEndState().Equals(_nextState))
 		{
+			Debug.Log($"{nameof(SwitchState)}：{GetEndState().ToString()} == {_nextState.ToString()}");
+
 			PhaseManager phaseManager = PhaseManager.instance;
 			Test_NetWorkMgr netWorkMgr = Test_NetWorkMgr.instance;
 
-			int phaseIdx = (int)(object)phaseManager.GetSetPhase;
+			int phaseIdx = (int)phaseManager.GetSetPhaseType;
 			int nextState = (int)(object)_nextState;
 
 			netWorkMgr.photonView.RPC(nameof(netWorkMgr.RPC_EndPhase_MC), RpcTarget.OthersBuffered, phaseIdx, nextState);

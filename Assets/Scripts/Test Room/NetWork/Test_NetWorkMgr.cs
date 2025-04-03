@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 using Photon.Pun;
 using Cysharp.Threading.Tasks;
-using battleTypes;
 using static Common;
+using battleTypes;
 using System;
 using Photon.Realtime;
 
@@ -82,8 +82,32 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 				  $"_phaseIdx：{_phaseIdx}, _state：{_state}");
 
 		PhaseManager phaseManager = PhaseManager.instance;
+
+		PhaseManager.PhaseType phaseType = (PhaseManager.PhaseType)_phaseIdx;
+		Enum stateEnum = null;
+
+		switch(phaseType)
+		{
+			case PhaseManager.PhaseType.Start:
+				stateEnum = (TestStartPhase.StartPhaseState)_state;
+				break;
+			case PhaseManager.PhaseType.Join:
+				stateEnum = (TestJoinPhase.JoinPhaseState)_state;
+				break;
+			case PhaseManager.PhaseType.Main:
+				stateEnum = (TestMainPhase.MainPhaseState)_state;
+				break;
+			case PhaseManager.PhaseType.End:
+				stateEnum = (TestEndPhase.EndPhaseState)_state;
+				break;
+			default:
+				Debug.LogError($"{nameof(RPC_EndPhase_MC)}" +
+							   $"switchで想定外の値を検知。phaseType：{phaseType}、_state：{_state}");
+				break;
+		}
+
 		// フェイズ終了通知
-		phaseManager.GetSetPhases[_phaseIdx].SwitchState((Enum)(object)_state);
+		phaseManager.GetSetPhases[(int)phaseType].SwitchState(stateEnum);
 	}
 
 	//////////////////////////

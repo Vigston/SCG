@@ -45,6 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 50e5fae55d827e74597b04d031c8acf3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_StateName: 
   m_PhaseFrame: 0
   m_StateFrame: 0
 --- !u!114 &2527090743798908180
