@@ -37,6 +37,7 @@ public abstract class Phase : MonoBehaviour
 	{
 		GetSetState = GetInitState();
 		GetSetPhaseFrame = 0;
+		GetSetStateFrame = 0;
 	}
 
 	// 最初のフェイズフレームか
