@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using Photon.Pun;
-using static CardAbilityManager;
 
 public class CardAbilityManager : MonoBehaviour
 {
@@ -20,6 +19,9 @@ public class CardAbilityManager : MonoBehaviour
 	[SerializeReference]
 	private List<CardAbilityBase> activeAbilityList; // 現在実行中のカード効果リスト
 
+	private Queue<CardAbilityBase> abilityQueue = new Queue<CardAbilityBase>(); // 実行待ちのカード効果キュー
+	private bool isExecuting = false; // 現在実行中かどうかのフラグ
+
 	private Dictionary<Type, Action<object[]>> m_AbilityTypeActDict;
 
 	private void Awake()
@@ -33,6 +35,15 @@ public class CardAbilityManager : MonoBehaviour
 			{ typeof(DamageCardAbility), Activate_DamageCardAbility },
 			{ typeof(GainResourceCardAbility), Activate_GainResourceCardAbility },
 		};
+	}
+
+	private void Update()
+	{
+		// キューにアビリティが存在し、現在実行中でない場合に次のアビリティを実行
+		if (abilityQueue.Count > 0 && !IsExecuting())
+		{
+			ExecuteNextAbility().Forget();
+		}
 	}
 
 	// インスタンスを作成（シングルトンパターン）
@@ -65,14 +76,8 @@ public class CardAbilityManager : MonoBehaviour
 		var ability = (T)Activator.CreateInstance(abilityType, args);
 		Debug.Log($"{abilityType.Name} を発動しました");
 
-		// 実行中のカード効果リストに追加
-		activeAbilityList.Add(ability);
-
-		// カード効果が完了したらリストから削除
-		ability.OnCompleted += _ => activeAbilityList.Remove(ability);
-
-		// 非同期でカード効果を実行（例外を投げずに処理を忘れる）
-		ability.ExecuteAsync().Forget();
+		// 実行待ちのカード効果キューに追加
+		abilityQueue.Enqueue(ability);
 
 		Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
 		string abilityType_str = abilityType.AssemblyQualifiedName;
@@ -81,17 +86,33 @@ public class CardAbilityManager : MonoBehaviour
 		return ability;
 	}
 
+	// 次のカード効果を実行
+	private async UniTask ExecuteNextAbility()
+	{
+		// 実行中フラグを立てる
+		isExecuting = true;
+
+		// キューから次のアビリティを取り出す
+		var ability = abilityQueue.Dequeue();
+
+		// 実行中のカード効果リストに追加
+		activeAbilityList.Add(ability);
+
+		// カード効果が完了したらリストから削除
+		ability.OnCompleted += _ => activeAbilityList.Remove(ability);
+
+		// カード効果を実行
+		await ability.ExecuteAsync();
+
+		// 実行中フラグを下ろす
+		isExecuting = false;
+	}
+
 	// 指定されたカード効果が完了するまで待機
 	public async UniTask WaitForAbility(CardAbilityBase ability)
 	{
 		// カードアビリティが生成されるまで待機
 		await UniTask.WaitUntil(() => ability != null);
-		//// nullチェック（無効な能力の場合は警告を出して処理を終了）
-		//if (ability == null)
-		//{
-		//	Debug.LogWarning($"{nameof(WaitForAbility)}の引数(ability)でNULLが検知されましたので処理を終了しました。");
-		//	return;
-		//}
 
 		// 既に完了しているならはじく
 		if (!ability.IsRunning) return;
@@ -104,6 +125,18 @@ public class CardAbilityManager : MonoBehaviour
 
 		// カード効果が終了するまで待機
 		await tcs.Task;
+	}
+
+	// キューが空かどうかを確認
+	public bool IsQueueEmpty()
+	{
+		return abilityQueue.Count == 0;
+	}
+
+	// 現在実行中かどうかを確認
+	public bool IsExecuting()
+	{
+		return isExecuting;
 	}
 
 	///////////////////////////////////////////

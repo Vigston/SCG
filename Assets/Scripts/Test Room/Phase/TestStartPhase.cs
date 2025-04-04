@@ -51,6 +51,10 @@ public class TestStartPhase : Phase
 			// ステート遷移しているならステート遷移時の処理を行って次のループへ
 			if ((StartPhaseState)bufferState != (StartPhaseState)GetSetState)
 			{
+				CardAbilityManager abilityManager = CardAbilityManager.instance;
+				// アビリティキューが空になるまで待機
+				await UniTask.WaitUntil(() => abilityManager.IsQueueEmpty() && !abilityManager.IsExecuting());
+
 				// ステート遷移時の処理
 				OnSwitchState();
 			}
