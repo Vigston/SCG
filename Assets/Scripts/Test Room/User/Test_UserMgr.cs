@@ -39,8 +39,8 @@ public class Test_UserMgr : MonoBehaviour
 
         /////通信同期/////
         Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-        test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetID, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
-		test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)enemyUser.GetSetSide, (int)enemyUser.GetSetID, (int)enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag);
+        test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetID, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+		test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)enemyUser.GetSetSide, (int)enemyUser.GetSetID, (int)enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
 	}
 
     // Update is called once per frame

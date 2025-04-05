@@ -22,6 +22,10 @@ public class Test_User : MonoBehaviour
 	// フェイズ同期待ちフラグ
 	bool m_PhaseReadyFlag;
 
+    // 対戦開始しているか
+    [SerializeField, ReadOnly]
+    bool m_GameStartFlag;
+
 	// フェイズ情報の初期化
 	public void Init_PhaseInfo()
     {
@@ -61,4 +65,11 @@ public class Test_User : MonoBehaviour
         get { return m_PhaseReadyFlag; }
         set { m_PhaseReadyFlag = value; }
     }
+
+	// --対戦開始しているか--
+	public bool GetSetGameStartFlag
+	{
+		get { return m_GameStartFlag; }
+		set { m_GameStartFlag = value; }
+	}
 }

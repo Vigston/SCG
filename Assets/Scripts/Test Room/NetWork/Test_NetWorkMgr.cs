@@ -115,7 +115,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 	//////////////////////////
 	// ユーザー情報の通信同期
 	[PunRPC]
-    public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag)
+    public async void RPC_SyncUser_MC(int _userSide, int _id, int _phaseType, bool _phaseReadyFlag, bool _gameStartFlag)
     {
 		Debug.Log($"{nameof(RPC_SyncUser_MC)}" +
 				  $"_userSide：{_userSide}, _id：{_id}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
@@ -144,11 +144,12 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 		}
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
+		test_User.GetSetGameStartFlag = _gameStartFlag;
 	}
 
     // ユーザー情報の送信
     [PunRPC]
-    public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag)
+    public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag, bool _gameStartFlag)
     {
 		Debug.Log($"{nameof(RPC_PushUser_CM)}" +
 				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
@@ -171,6 +172,7 @@ public class Test_NetWorkMgr : MonoBehaviourPun
 
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
+		test_User.GetSetGameStartFlag = _gameStartFlag;
 	}
 
 	/////////////////////////////

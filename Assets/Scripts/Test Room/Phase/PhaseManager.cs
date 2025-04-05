@@ -143,10 +143,13 @@ public class PhaseManager : MonoBehaviour
 			Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
 			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
 
+			// 対戦開始フラグを立てる
+			playerUser.GetSetGameStartFlag = true;
+
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if (!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
 
 			// フェイズ開始可能な状態になるまで待機
@@ -157,8 +160,8 @@ public class PhaseManager : MonoBehaviour
 			////////////////////
 			if (PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
 			}
 
 			// フェイズ処理
@@ -173,7 +176,7 @@ public class PhaseManager : MonoBehaviour
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if(!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
 
 			// 次のフェイズに遷移可能な状態になるまで待機
@@ -184,8 +187,8 @@ public class PhaseManager : MonoBehaviour
 			////////////////////
 			if(PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag);
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
 			}
 
 			////////////////////////
@@ -302,6 +305,14 @@ public class PhaseManager : MonoBehaviour
 		{
 			Debug.LogError($"{nameof(IsSwitchPhase)}でユーザー取得ができていなかったのでフェイズ処理を開始できませんでした。" +
 						   $"PlayerUser：{playerUser} || EnemyUser：{enemyUser}");
+			return false;
+		}
+
+		// ゲーム開始していないならはじく
+		if (!playerUser.GetSetGameStartFlag || !enemyUser.GetSetGameStartFlag)
+		{
+			Debug.LogError($"自分と相手のゲームが開始されていないのでフェイズ処理を開始できませんでした。通信同期が正しく行えているのか確認をお願いします。" +
+						   $"PlayerUser：{playerUser.GetSetGameStartFlag} || EnemyUser：{enemyUser.GetSetGameStartFlag}");
 			return false;
 		}
 
