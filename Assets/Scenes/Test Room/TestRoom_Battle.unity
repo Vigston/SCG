@@ -389,6 +389,7 @@ MonoBehaviour:
   m_SelectedCardArea: {fileID: 0}
   m_PhaseType: 0
   m_PhaseReadyFlag: 0
+  m_GameStartFlag: 0
 --- !u!1 &820729693
 GameObject:
   m_ObjectHideFlags: 0
@@ -438,6 +439,7 @@ MonoBehaviour:
   m_SelectedCardArea: {fileID: 0}
   m_PhaseType: 0
   m_PhaseReadyFlag: 0
+  m_GameStartFlag: 0
 --- !u!1 &923004747
 GameObject:
   m_ObjectHideFlags: 0
@@ -1010,6 +1012,8 @@ MonoBehaviour:
   m_PhaseType: 0
   m_PhaseParent: {fileID: 923004747}
   m_SyncDelay: 500
+  m_TimeoutDuration: 10
+  m_IsWaitingForNetWork: 0
 --- !u!4 &1732921042
 Transform:
   m_ObjectHideFlags: 0
@@ -1069,6 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b46fc5f41f3226b4d880e14611988e9e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_TurmCnt: 0
 --- !u!1 &2005955274
 GameObject:
   m_ObjectHideFlags: 0

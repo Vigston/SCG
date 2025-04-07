@@ -30,6 +30,12 @@ public class PhaseManager : MonoBehaviour
 	[SerializeField]
 	private int m_SyncDelay;    // 同期待機時間
 
+	[SerializeField]
+	private int m_TimeoutDuration; // タイムアウトまでの時間（秒）
+
+	[SerializeField, ReadOnly]
+	private bool m_IsWaitingForNetWork = false; // 通信同期状態
+
 	private void Awake()
 	{
 		// インスタンス生成
@@ -149,11 +155,28 @@ public class PhaseManager : MonoBehaviour
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if (!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
 
 			// フェイズ開始可能な状態になるまで待機
-			await UniTask.WaitUntil(() => IsPhaseStartable());
+			try
+			{
+				IsWaitingForCommunication = true;
+				await UniTask.WaitUntil(() => IsPhaseStartable()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
+				break;
+			}
+			catch (TimeoutException)
+			{
+				Debug.LogError($"フェイズ開始可能な状態になるまでの時間が経過しました。タイムアウト処理を実行します。");
+				OnTimeout();
+				// 再試行のためにループを続ける
+			}
+			finally
+			{
+				IsWaitingForCommunication = false;
+			}
+
+
 
 			////////////////////
 			///// 通信同期 /////
@@ -176,16 +199,31 @@ public class PhaseManager : MonoBehaviour
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if(!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.MasterClient, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
 
 			// 次のフェイズに遷移可能な状態になるまで待機
-			await UniTask.WaitUntil(() => IsSwitchPhase());
+			try
+			{
+				IsWaitingForCommunication = true;
+				await UniTask.WaitUntil(() => IsSwitchPhase()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
+				break;
+			}
+			catch (TimeoutException)
+			{
+				Debug.LogError("次のフェイズに遷移可能な状態になるまでの待機がタイムアウトしました。");
+				OnTimeout();
+				// 再試行のためにループを続ける
+			}
+			finally
+			{
+				IsWaitingForCommunication = false;
+			}
 
 			////////////////////
 			///// 通信同期 /////
 			////////////////////
-			if(PhotonNetwork.IsMasterClient)
+			if (PhotonNetwork.IsMasterClient)
 			{
 				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
@@ -217,6 +255,16 @@ public class PhaseManager : MonoBehaviour
 
 			await UniTask.Yield();
 		}
+	}
+
+	// タイムアウト時の処理
+	private void OnTimeout()
+	{
+		// ここにタイムアウト時の処理を実装します
+		// 例: ゲームを一時停止し、再接続を試みる
+		Debug.Log("タイムアウトが発生しました。ゲームを一時停止し、再接続を試みます...");
+		// 再接続処理を実装
+		PhotonNetwork.ReconnectAndRejoin();
 	}
 
 	////////////////////////
@@ -325,7 +373,7 @@ public class PhaseManager : MonoBehaviour
 		}
 
 		// 自分と相手のユーザーフェイズ同期待ちフラグがどちらか立っているので不可能
-		if (playerUser.GetSetPhaseReadyFlag || enemyUser.GetSetPhaseReadyFlag)
+		if (!playerUser.GetSetPhaseReadyFlag || !enemyUser.GetSetPhaseReadyFlag)
 		{
 			Debug.LogError($"自分と相手のフェイズ同期待ちフラグがどちらか立っているのでフェイズ処理を開始できませんでした。通信同期が正しく行えているのか確認をお願いします。" +
 						   $"PlayerUser：{playerUser.GetSetPhaseReadyFlag} || EnemyUser：{enemyUser.GetSetPhaseReadyFlag}");
@@ -405,5 +453,11 @@ public class PhaseManager : MonoBehaviour
 	{
 		get { return m_SyncDelay; }
 		set { m_SyncDelay = value; }
+	}
+
+	public bool IsWaitingForCommunication
+	{
+		get { return m_IsWaitingForNetWork; }
+		private set { m_IsWaitingForNetWork = value; }
 	}
 }
