@@ -145,6 +145,7 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
 		test_User.GetSetGameStartFlag = _gameStartFlag;
+		Debug.Log($"{nameof(RPC_SyncUser_MC)} || test_User：{test_User.GetSetSide}, GetSetGameStartFlag：{test_User.GetSetGameStartFlag}");
 	}
 
     // ユーザー情報の送信
@@ -152,7 +153,7 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
     public async void RPC_PushUser_CM(int _userSide, int _phaseType, bool _phaseReadyFlag, bool _gameStartFlag)
     {
 		Debug.Log($"{nameof(RPC_PushUser_CM)}" +
-				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}");
+				  $"_userSide：{_userSide}, _phaseType：{_phaseType}, _phaseReadyFlag：{_phaseReadyFlag}, _gameStartFlag：{_gameStartFlag}");
         // 非マスタークライアントならはじく
         if(!PhotonNetwork.IsMasterClient)
         {
@@ -173,6 +174,7 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 		test_User.GetSetPhaseType = phaseType;
 		test_User.GetSetPhaseReadyFlag = _phaseReadyFlag;
 		test_User.GetSetGameStartFlag = _gameStartFlag;
+		Debug.Log($"{nameof(RPC_PushUser_CM)} || test_User：{test_User.GetSetSide}, GetSetGameStartFlag：{test_User.GetSetGameStartFlag}");
 	}
 
 	/////////////////////////////

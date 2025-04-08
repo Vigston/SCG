@@ -70,6 +70,6 @@ public class Test_User : MonoBehaviour
 	public bool GetSetGameStartFlag
 	{
 		get { return m_GameStartFlag; }
-		set { m_GameStartFlag = value; }
+		set { m_GameStartFlag = value; Debug.Log($"[Set]GetSetGameStartFlag：{value}"); }
 	}
 }

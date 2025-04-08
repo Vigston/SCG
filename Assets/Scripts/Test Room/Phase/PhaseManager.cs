@@ -151,19 +151,20 @@ public class PhaseManager : MonoBehaviour
 
 			// 対戦開始フラグを立てる
 			playerUser.GetSetGameStartFlag = true;
+			Debug.Log($"対戦開始フラグを立てる：{playerUser.GetSetGameStartFlag}");
 
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if (!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
 
+			//await UniTask.WaitUntil(() => IsPhaseStartable());
 			// フェイズ開始可能な状態になるまで待機
 			try
 			{
 				IsWaitingForCommunication = true;
 				await UniTask.WaitUntil(() => IsPhaseStartable()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
-				break;
 			}
 			catch (TimeoutException)
 			{
@@ -183,8 +184,8 @@ public class PhaseManager : MonoBehaviour
 			////////////////////
 			if (PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetID, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)enemyUser.GetSetSide, (int)enemyUser.GetSetID, (int)enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
 			}
 
 			// フェイズ処理
@@ -199,15 +200,16 @@ public class PhaseManager : MonoBehaviour
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if(!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, playerUser.GetSetSide, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
 			}
+
+			//await UniTask.WaitUntil(() => IsSwitchPhase());
 
 			// 次のフェイズに遷移可能な状態になるまで待機
 			try
 			{
 				IsWaitingForCommunication = true;
 				await UniTask.WaitUntil(() => IsSwitchPhase()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
-				break;
 			}
 			catch (TimeoutException)
 			{
@@ -225,8 +227,8 @@ public class PhaseManager : MonoBehaviour
 			////////////////////
 			if (PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, playerUser.GetSetSide, playerUser.GetSetID, playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, enemyUser.GetSetSide, enemyUser.GetSetID, enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetID, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncUser_MC), RpcTarget.OthersBuffered, (int)enemyUser.GetSetSide, (int)enemyUser.GetSetID, (int)enemyUser.GetSetPhaseType, enemyUser.GetSetPhaseReadyFlag, enemyUser.GetSetGameStartFlag);
 			}
 
 			////////////////////////
@@ -373,7 +375,7 @@ public class PhaseManager : MonoBehaviour
 		}
 
 		// 自分と相手のユーザーフェイズ同期待ちフラグがどちらか立っているので不可能
-		if (!playerUser.GetSetPhaseReadyFlag || !enemyUser.GetSetPhaseReadyFlag)
+		if (playerUser.GetSetPhaseReadyFlag || enemyUser.GetSetPhaseReadyFlag)
 		{
 			Debug.LogError($"自分と相手のフェイズ同期待ちフラグがどちらか立っているのでフェイズ処理を開始できませんでした。通信同期が正しく行えているのか確認をお願いします。" +
 						   $"PlayerUser：{playerUser.GetSetPhaseReadyFlag} || EnemyUser：{enemyUser.GetSetPhaseReadyFlag}");
