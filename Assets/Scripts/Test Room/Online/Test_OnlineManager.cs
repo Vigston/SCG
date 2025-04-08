@@ -17,6 +17,22 @@ public class Test_OnlineManager : MonoBehaviourPunCallbacks
 		PhotonNetwork.AutomaticallySyncScene = true;
 	}
 
+	private void Start()
+	{
+		//if (PlayerPrefs.HasKey("LastRoomName"))
+		//{
+		//	string lastRoomName = PlayerPrefs.GetString("LastRoomName");
+		//	Debug.Log($"保存されたルーム名: {lastRoomName}");
+
+		//	// ここで復帰処理に使う
+		//	PhotonNetwork.RejoinRoom(lastRoomName);
+		//}
+		//else
+		//{
+		//	Debug.Log("前回のルーム名が見つかりませんでした");
+		//}
+	}
+
 	/// <summary>
 	/// サーバーに接続する。
 	/// </summary>
