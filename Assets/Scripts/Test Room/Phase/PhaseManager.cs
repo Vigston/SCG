@@ -34,7 +34,7 @@ public class PhaseManager : MonoBehaviour
 	private int m_TimeoutDuration; // タイムアウトまでの時間（秒）
 
 	[SerializeField, ReadOnly]
-	private bool m_IsWaitingForNetWork = false; // 通信同期状態
+	private bool m_IsWaitingForNetWork; // 通信同期状態
 
 	private void Awake()
 	{

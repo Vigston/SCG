@@ -6,7 +6,7 @@ using battleTypes;
 using System;
 using Photon.Realtime;
 
-public class Test_NetWorkMgr : MonoBehaviourPun
+public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 {
 	// インスタンス
 	public static Test_NetWorkMgr instance;
