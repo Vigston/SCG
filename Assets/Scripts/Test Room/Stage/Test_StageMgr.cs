@@ -13,8 +13,14 @@ public class Test_StageMgr : MonoBehaviour
     // エネミーエリア
     public BoxCollider EnemyArea;
 
+	// カードエリア親オブジェクト
+	[SerializeField]
+	private GameObject m_PlayerCardAreaParent;
+	[SerializeField]
+	private GameObject m_EnemyCardAreaParent;
 	// カードエリアオブジェクト
-	public GameObject cardAreaPrefab;
+	[SerializeField]
+	private GameObject cardAreaPrefab;
 	// 縦に並ぶカード枚数
 	[SerializeField]
 	private int heightNum = 0;
@@ -87,29 +93,44 @@ public class Test_StageMgr : MonoBehaviour
 			// 右上の手前
 			Vector3 vecCardRightTopUp = Common.GetBoxColliderVertices(cardCollider)[1];
 
-			// カードの半分だけ上に移動。
-			baseVec.z += Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) / 2;
-			// カード間の幅の半分上に移動。
-			baseVec.z += interval_H / 2;
+			// カード横幅の半分
+			float cardHarfSize_x = Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) / 2;
 
-			// カード2枚分横に移動。
-			baseVec.x += Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * 2;
-
+			//////////////////////////
+			///// 中心座標を計算 /////
+			//////////////////////////
 			// プレイヤー側
 			if (Side == Side.eSide_Player)
 			{
 				Vector3 vecLeftTopUp = Common.GetBoxColliderVertices(PlayerArea)[0];
-				Vector3 vecLeftBottomUp = Common.GetBoxColliderVertices(PlayerArea)[6];
+				Vector3 vecRightBottomUp = Common.GetBoxColliderVertices(PlayerArea)[7];
+				Vector3 playerAreaCenter = PlayerArea.bounds.center;
 
-				baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
+				baseVec = playerAreaCenter;
+				// 横列数に応じてZ軸をカードエリアの中心に合わせる。
+				baseVec.z += (Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) * (heightNum - 1)) / 2;
 			}
 			// 敵側
 			else if (Side == Side.eSide_Enemy)
 			{
 				Vector3 vecLeftTopUp = Common.GetBoxColliderVertices(EnemyArea)[0];
 				Vector3 vecLeftBottomUp = Common.GetBoxColliderVertices(EnemyArea)[6];
+				Vector3 enemyAreaCenter = EnemyArea.bounds.center;
 
-				baseVec += (vecLeftTopUp + vecLeftBottomUp) / 2;
+				baseVec = enemyAreaCenter;
+
+				// 横列数に応じてZ軸をカードエリアの中心に合わせる。
+				baseVec.z -= (Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) * (heightNum - 1)) / 2;
+			}
+
+			// 縦列のカード数に応じてX軸をカードエリアの中心に合わせる。
+			baseVec.x -= cardHarfSize_x * (widthNum - 1);
+			baseVec.x -= interval_W * ((widthNum - 1) / 2);
+
+			// 偶数
+			if(widthNum % 2 == 0)
+			{
+				baseVec.x -= cardHarfSize_x / 2;
 			}
 
 			// カードの厚み
@@ -157,7 +178,7 @@ public class Test_StageMgr : MonoBehaviour
 
 						areaVec.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
 						areaVec.y += CardHeightSize;
-						areaVec.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
+						areaVec.z += j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
 
 						// カードエリア生成
 						CreateCardArea(areaVec, Side, areaPos);
@@ -171,6 +192,13 @@ public class Test_StageMgr : MonoBehaviour
 	public void CreateCardArea(Vector3 _position, Side _side, Position _posIndex)
 	{
 		GameObject cardAreaClone = Instantiate(cardAreaPrefab, _position, Quaternion.identity);
+
+		// カードエリアの親オブジェクトを設定
+		if(GetCardAreaParent(_side))
+		{
+			cardAreaClone.transform.SetParent(GetCardAreaParent(_side).transform);
+		}
+
 		Test_CardArea cardArea = cardAreaClone.GetComponent<Test_CardArea>();
 		cardArea.SetSide(_side);
 		cardArea.SetPosiiton(_posIndex);
@@ -276,4 +304,23 @@ public class Test_StageMgr : MonoBehaviour
 
         return cardArea;
     }
+	////////////////////////
+	/// GetSetプロパティ ///
+	////////////////////////
+	// カードエリア親オブジェクト取得
+	private GameObject GetCardAreaParent(Side _side)
+	{
+		if (_side == Side.eSide_Player)
+		{
+			return m_PlayerCardAreaParent;
+		}
+		else if (_side == Side.eSide_Enemy)
+		{
+			return m_EnemyCardAreaParent;
+		}
+
+		// どちらでもない場合はエラー
+		Debug.LogError($"{this}のGetCardAreaParentでエラーが発生しました");
+		return null;
+	}
 }
