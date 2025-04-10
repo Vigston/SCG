@@ -450,6 +450,7 @@ Transform:
   - {fileID: 72402036}
   - {fileID: 992578736}
   - {fileID: 1894638783}
+  - {fileID: 1034041621}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &736121834
@@ -462,7 +463,7 @@ GameObject:
   m_Component:
   - component: {fileID: 736121835}
   - component: {fileID: 736121837}
-  - component: {fileID: 736121836}
+  - component: {fileID: 736121838}
   m_Layer: 0
   m_Name: PlayerArea
   m_TagString: PlayerArea
@@ -485,19 +486,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 157173356}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &736121836
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 736121834}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3df651b82ba8b3b4c87fbdc3ded0a4b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Side: 0
 --- !u!65 &736121837
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -519,6 +507,19 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &736121838
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 736121834}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8b4fee62f1f7249a26d30e7630b23d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Side: 0
 --- !u!1 &749679955
 GameObject:
   m_ObjectHideFlags: 0
@@ -708,7 +709,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1027392651}
   - component: {fileID: 1027392653}
-  - component: {fileID: 1027392652}
+  - component: {fileID: 1027392654}
   m_Layer: 0
   m_Name: EnemyArea
   m_TagString: EnemyArea
@@ -731,19 +732,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 157173356}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1027392652
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1027392650}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3df651b82ba8b3b4c87fbdc3ded0a4b8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Side: 1
 --- !u!65 &1027392653
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -765,6 +753,64 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &1027392654
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1027392650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce8b4fee62f1f7249a26d30e7630b23d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Side: 1
+--- !u!1 &1034041620
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1034041621}
+  - component: {fileID: 1034041622}
+  m_Layer: 0
+  m_Name: DebugMenuManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1034041621
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034041620}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 735313350}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1034041622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1034041620}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67b5ba8a1b2a4b648b81ee01f357a311, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  variablesPerPage: 21
 --- !u!1 &1112855916
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,9 +1479,9 @@ MonoBehaviour:
   m_PlayerCardAreaParent: {fileID: 2024424756}
   m_EnemyCardAreaParent: {fileID: 1249433990}
   cardAreaPrefab: {fileID: 2124720588745271832, guid: 142d7e2b3d316c24fb258efdc438b350, type: 3}
-  heightNum: 1
+  heightNum: 2
   widthNum: 3
-  interval_H: 2
+  interval_H: 0
   interval_W: 3
   m_CardAreaList: []
 --- !u!1 &2005955274
