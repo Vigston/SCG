@@ -17,6 +17,7 @@ public class SteamAPIMgr : MonoBehaviour
 
 	private void OnApplicationQuit()
 	{
+		Debug.Log($"{this}：{nameof(OnApplicationQuit)}");
 		SteamAPI.Shutdown();
 	}
 }
