@@ -1,5 +1,6 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+using Steamworks;
 using UnityEngine;
 
 /// <summary>
@@ -38,6 +39,23 @@ public class Test_OnlineManager : MonoBehaviourPunCallbacks
 	/// </summary>
 	public void OnlineConnect()
 	{
+		// UserAuthManager から取得（Steam or Firebase）
+		string userId = UserAuthManager.Instance?.UserId;
+		bool isFirstLogin = UserAuthManager.Instance?.IsFirstLogin ?? false;
+
+		if (string.IsNullOrEmpty(userId))
+		{
+			Debug.LogWarning("ユーザーIDが取得できていないため、接続できません。");
+			return;
+		}
+
+		Debug.Log($"{this}：isFirstLogin = {isFirstLogin}");
+
+		// 認証情報をPhotonに渡す
+		PhotonNetwork.AuthValues = new AuthenticationValues(userId);
+		PhotonNetwork.NickName = userId;
+
+		// Photon接続開始
 		PhotonNetwork.ConnectUsingSettings();
 	}
 

@@ -8,16 +8,15 @@ using Firebase.Auth;
 using Steamworks;
 #endif
 
-public class UserAuthMgr : MonoBehaviour
+public class UserAuthManager : MonoBehaviour
 {
-	public static UserAuthMgr Instance { get; private set; }
-	public string UserId { get; private set; } = "";
+	public static UserAuthManager Instance { get; private set; }
+	public string UserId => provider?.UserId;
+	public bool IsFirstLogin => provider?.IsFirstLogin　?? false;
 
-#if UNITY_IOS || UNITY_ANDROID
-    private FirebaseAuth auth;
-#endif
+	public event Action OnUserIdReady;
 
-	public Action OnUserIdReady;
+	private ISocialAuthProvider provider;
 
 	void Awake()
 	{
@@ -29,57 +28,30 @@ public class UserAuthMgr : MonoBehaviour
 
 		Instance = this;
 		DontDestroyOnLoad(gameObject);
-
-		Initialize();
 	}
 
-	private void Initialize()
+	private void Start()
 	{
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-		InitSteam();
+		// プラットフォームごとにプロバイダーを選択
+#if UNITY_STANDALONE || UNITY_EDITOR
+		provider = SteamAPIMgr.Instance;
 #elif UNITY_IOS || UNITY_ANDROID
-        InitFirebase();
-#else
-        Debug.LogWarning("Unsupported platform for UserAuthManager");
+        provider = FirebaseAPIMgr.Instance;
 #endif
-	}
 
-#if UNITY_STANDALONE_WIN || UNITY_EDITOR
-	private void InitSteam()
-	{
-		if (SteamManager.Initialized)
+		if (provider != null)
 		{
-			UserId = SteamUser.GetSteamID().ToString();
-			Debug.Log("Steam User ID: " + UserId);
-			OnUserIdReady?.Invoke();
+			provider.OnUserIdReady += () =>
+			{
+				Debug.Log("UserAuthManager: UserId Ready: " + provider.UserId);
+				OnUserIdReady?.Invoke(); // ★ここで他に伝播
+			};
+
+			provider.Initialize(); // ★ここで初期化スタート
 		}
 		else
 		{
-			Debug.LogError("Steam not initialized!");
+			Debug.LogError("プロバイダーが見つかりません！");
 		}
 	}
-#endif
-
-#if UNITY_IOS || UNITY_ANDROID
-    private async void InitFirebase()
-    {
-        var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
-        if (dependencyStatus != DependencyStatus.Available)
-        {
-            Debug.LogError("Could not resolve Firebase dependencies: " + dependencyStatus);
-            return;
-        }
-
-        auth = FirebaseAuth.DefaultInstance;
-
-        if (auth.CurrentUser == null)
-        {
-            await auth.SignInAnonymouslyAsync();
-        }
-
-        UserId = auth.CurrentUser.UserId;
-        Debug.Log("Firebase User ID: " + UserId);
-        OnUserIdReady?.Invoke();
-    }
-#endif
 }
