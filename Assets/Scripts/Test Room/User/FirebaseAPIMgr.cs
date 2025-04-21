@@ -30,7 +30,7 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 	public void Initialize()
 	{
 #if UNITY_IOS || UNITY_ANDROID
-		Instance = this;Firebase.Auth.FirebaseAuth auth = Firebase.Auth.FirebaseAuth.DefaultInstance;
+		FirebaseAuth auth = FirebaseAuth.DefaultInstance;
 
 		auth.SignInAnonymouslyAsync().ContinueWith(task =>
 		{
@@ -40,8 +40,11 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 				return;
 			}
 
-			var user = task.Result;
-			UserId = user.UserId;
+			// 修正ポイント：task.Result.User を通してUidにアクセス
+			var user = task.Result.User;
+			UserId = user.UserId ?? user.UserId; // 古いSDKでは UserId、新しいSDKでは Uid
+			if (string.IsNullOrEmpty(UserId)) UserId = user.UserId; // 互換性のための予防策
+
 			IsReady = true;
 
 			Debug.Log("FirebaseユーザーID取得: " + UserId);

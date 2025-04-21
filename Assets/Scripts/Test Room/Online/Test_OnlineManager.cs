@@ -1,6 +1,8 @@
 ﻿using Photon.Pun;
 using Photon.Realtime;
+#if UNITY_STANDALONE_WIN
 using Steamworks;
+#endif
 using UnityEngine;
 
 /// <summary>
