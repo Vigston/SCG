@@ -27,30 +27,53 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 		DontDestroyOnLoad(gameObject);
 	}
 
-	public void Initialize()
+	public async void Initialize()
 	{
 #if UNITY_IOS || UNITY_ANDROID
-		FirebaseAuth auth = FirebaseAuth.DefaultInstance;
-
-		auth.SignInAnonymouslyAsync().ContinueWith(task =>
+		await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
 		{
-			if (task.IsCanceled || task.IsFaulted)
+			if (task.IsFaulted || task.IsCanceled)
 			{
-				Debug.LogError("Firebaseログイン失敗");
+				Debug.LogError("Firebase依存関係の解決に失敗しました: " + task.Exception?.Message);
+			}
+			else
+			{
+				Debug.Log("Firebaseの依存関係は正常です");
+
+				// 初期化が成功した場合、Firebaseのデフォルトインスタンスを確認
+				if (FirebaseApp.DefaultInstance == null)
+				{
+					Debug.LogError("Firebaseのインスタンスが初期化されていません");
+				}
+				else
+				{
+					Debug.Log("Firebaseが正常に初期化されました");
+				}
+			}
+		});
+
+		try
+		{
+			FirebaseAuth auth = FirebaseAuth.DefaultInstance;
+			var userCredential = await auth.SignInAnonymouslyAsync();
+			var user = userCredential?.User;
+
+			if (user == null)
+			{
+				Debug.LogError("Firebaseユーザーがnullです");
 				return;
 			}
 
-			// 修正ポイント：task.Result.User を通してUidにアクセス
-			var user = task.Result.User;
-			UserId = user.UserId ?? user.UserId; // 古いSDKでは UserId、新しいSDKでは Uid
-			if (string.IsNullOrEmpty(UserId)) UserId = user.UserId; // 互換性のための予防策
-
+			UserId = user.UserId;
 			IsReady = true;
 
 			Debug.Log("FirebaseユーザーID取得: " + UserId);
-
-			OnUserIdReady?.Invoke(); // ★イベント発火
-		});
+			OnUserIdReady?.Invoke();
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Firebaseログイン中に例外発生: " + ex);
+		}
 #endif
 	}
 }
