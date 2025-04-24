@@ -1,14 +1,20 @@
 ﻿#if UNITY_IOS || UNITY_ANDROID
 using Firebase;
 using Firebase.Auth;
+using Firebase.Firestore;
 #endif
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 {
 	public static FirebaseAPIMgr Instance { get; private set; }
+
+	private FirebaseAuth auth;
+	private FirebaseFirestore db;
 
 	public string UserId { get; private set; }
 	public bool IsFirstLogin { get; private set; }
@@ -30,31 +36,19 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 	public async void Initialize()
 	{
 #if UNITY_IOS || UNITY_ANDROID
-		await FirebaseApp.CheckAndFixDependenciesAsync().ContinueWith(task =>
-		{
-			if (task.IsFaulted || task.IsCanceled)
-			{
-				Debug.LogError("Firebase依存関係の解決に失敗しました: " + task.Exception?.Message);
-			}
-			else
-			{
-				Debug.Log("Firebaseの依存関係は正常です");
+		var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
 
-				// 初期化が成功した場合、Firebaseのデフォルトインスタンスを確認
-				if (FirebaseApp.DefaultInstance == null)
-				{
-					Debug.LogError("Firebaseのインスタンスが初期化されていません");
-				}
-				else
-				{
-					Debug.Log("Firebaseが正常に初期化されました");
-				}
-			}
-		});
+		if (dependencyStatus != DependencyStatus.Available)
+		{
+			Debug.LogError("Firebaseの依存関係に問題があります: " + dependencyStatus);
+			return;
+		}
+
+		auth = FirebaseAuth.DefaultInstance;
+		db = FirebaseFirestore.DefaultInstance; // 🔄 ここで初期化
 
 		try
 		{
-			FirebaseAuth auth = FirebaseAuth.DefaultInstance;
 			var userCredential = await auth.SignInAnonymouslyAsync();
 			var user = userCredential?.User;
 
@@ -68,11 +62,42 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 			IsReady = true;
 
 			Debug.Log("FirebaseユーザーID取得: " + UserId);
+
+			// 初回ログインチェック
+			await CheckFirstLogin(user); // 🔄 await 忘れずに！
+
 			OnUserIdReady?.Invoke();
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError("Firebaseログイン中に例外発生: " + ex);
+		}
+#endif
+	}
+
+	public async UniTask CheckFirstLogin(FirebaseUser user)
+	{
+#if UNITY_IOS || UNITY_ANDROID
+		db = FirebaseFirestore.DefaultInstance;
+		var userDoc = db.Collection("users").Document(user.UserId);
+
+		var snapshot = await userDoc.GetSnapshotAsync();
+
+		if (!snapshot.Exists)
+		{
+			Debug.Log("初回ログインです！");
+			Dictionary<string, object> userData = new Dictionary<string, object>
+		{
+			{ "isFirstLogin", false },
+			{ "createdAt", Timestamp.GetCurrentTimestamp() }
+		};
+			await userDoc.SetAsync(userData);
+			IsFirstLogin = true;
+		}
+		else
+		{
+			Debug.Log("通常ログインです");
+			IsFirstLogin = false;
 		}
 #endif
 	}
