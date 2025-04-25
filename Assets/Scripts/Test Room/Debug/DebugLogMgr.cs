@@ -10,6 +10,9 @@ public class DebugLogMgr : MonoBehaviour
 	private GUIStyle backgroundStyle;
 	private Texture2D backgroundTexture;
 
+	private Vector2 lastDragPos;
+	private bool isDragging = false;
+
 	void Awake()
 	{
 		if (instance == null)
@@ -25,9 +28,8 @@ public class DebugLogMgr : MonoBehaviour
 
 	private void Start()
 	{
-		// 背景の準備
 		backgroundTexture = new Texture2D(1, 1);
-		backgroundTexture.SetPixel(0, 0, new Color(0.3f, 0.3f, 0.3f, 0.8f)); // 半透明の灰色
+		backgroundTexture.SetPixel(0, 0, new Color(0.3f, 0.3f, 0.3f, 0.8f));
 		backgroundTexture.Apply();
 
 		backgroundStyle = new GUIStyle();
@@ -62,14 +64,36 @@ public class DebugLogMgr : MonoBehaviour
 		GUI.skin.verticalScrollbar = scrollBarStyle;
 		GUI.skin.verticalScrollbarThumb = thumbStyle;
 
-		// 背景描画
 		Rect bgRect = new Rect(0, 0, Screen.width, Screen.height / 2);
 		GUI.Box(bgRect, GUIContent.none, backgroundStyle);
 
-		// スクロールビュー
+		// ドラッグでスクロール処理
+		Event e = Event.current;
+		if (e.type == EventType.MouseDown && bgRect.Contains(e.mousePosition))
+		{
+			isDragging = true;
+			lastDragPos = e.mousePosition;
+			e.Use();
+		}
+		else if (e.type == EventType.MouseDrag && isDragging)
+		{
+			Vector2 delta = e.mousePosition - lastDragPos;
+			scrollPosition.y -= delta.y;
+			lastDragPos = e.mousePosition;
+			e.Use();
+		}
+		else if (e.type == EventType.MouseUp)
+		{
+			isDragging = false;
+		}
+
+		// 範囲制限
+		scrollPosition.y = Mathf.Max(0, scrollPosition.y);
+
+		// スクロールバー非表示で描画
 		scrollPosition = GUILayout.BeginScrollView(
 			scrollPosition,
-			false, true, // 横スクロール無し、縦スクロールあり
+			false, true, // 横スクロールバーは無し
 			GUI.skin.horizontalScrollbar,
 			GUI.skin.verticalScrollbar,
 			GUILayout.Width(Screen.width),

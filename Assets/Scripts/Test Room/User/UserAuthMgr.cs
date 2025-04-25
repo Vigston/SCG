@@ -33,10 +33,10 @@ public class UserAuthManager : MonoBehaviour
 	private void Start()
 	{
 		// プラットフォームごとにプロバイダーを選択
-#if UNITY_STANDALONE || UNITY_EDITOR
+#if UNITY_STANDALONE_WIN
 		provider = SteamAPIMgr.Instance;
 #elif UNITY_IOS || UNITY_ANDROID
-        provider = FirebaseAPIMgr.Instance;
+		provider = FirebaseAPIMgr.Instance;
 #endif
 
 		if (provider != null)
