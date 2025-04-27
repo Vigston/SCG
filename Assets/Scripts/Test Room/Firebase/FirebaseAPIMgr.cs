@@ -2,6 +2,7 @@
 using Firebase;
 using Firebase.Auth;
 using Firebase.Firestore;
+#endif
 
 using System;
 using System.Collections.Generic;
@@ -12,8 +13,10 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 {
 	public static FirebaseAPIMgr Instance { get; private set; }
 
+#if UNITY_IOS || UNITY_ANDROID
 	private FirebaseAuth auth;
 	private FirebaseFirestore db;
+#endif
 
 	public string UserId { get; private set; }
 	public bool IsFirstLogin { get; private set; }
@@ -34,8 +37,7 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 
 	public async void Initialize()
 	{
-		//FirebaseApp.LogLevel = LogLevel.Debug;
-
+#if UNITY_IOS || UNITY_ANDROID
 		var dependencyStatus = await FirebaseApp.CheckAndFixDependenciesAsync();
 
 		if (dependencyStatus != DependencyStatus.Available)
@@ -72,10 +74,12 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 		{
 			Debug.LogError("Firebaseログイン中に例外発生: " + ex);
 		}
+#endif
 	}
 
 	public async UniTask CheckFirstLogin(FirebaseUser user)
 	{
+#if UNITY_IOS || UNITY_ANDROID
 		if (user == null)
 		{
 			Debug.LogError("Firebaseユーザーがnullです");
@@ -116,6 +120,6 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 			Debug.LogError("Firestoreアクセス失敗：" + ex);
 			return;
 		}
+#endif
 	}
 }
-#endif

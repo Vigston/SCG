@@ -1,7 +1,9 @@
-﻿#if UNITY_STANDALONE_WIN
-using UnityEngine;
+﻿using UnityEngine;
 using System;
+
+#if UNITY_STANDALONE_WIN
 using Steamworks;
+#endif
 
 public class SteamAPIMgr : MonoBehaviour, ISocialAuthProvider
 {
@@ -26,6 +28,7 @@ public class SteamAPIMgr : MonoBehaviour, ISocialAuthProvider
 
 	public void Initialize()
 	{
+#if UNITY_STANDALONE_WIN
 		if (SteamManager.Initialized)
 		{
 			UserId = SteamUser.GetSteamID().ToString();
@@ -65,6 +68,6 @@ public class SteamAPIMgr : MonoBehaviour, ISocialAuthProvider
 		{
 			Debug.LogWarning("Steam未初期化");
 		}
+#endif
 	}
 }
-#endif
