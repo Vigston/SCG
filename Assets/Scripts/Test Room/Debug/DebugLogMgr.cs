@@ -13,6 +13,8 @@ public class DebugLogMgr : MonoBehaviour
 	private Vector2 lastDragPos;
 	private bool isDragging = false;
 
+	private bool isVisible = false;
+
 	void Awake()
 	{
 		if (instance == null)
@@ -28,6 +30,12 @@ public class DebugLogMgr : MonoBehaviour
 
 	private void Start()
 	{
+		// Android端末で実行されているなら常に表示
+		if (Application.platform == RuntimePlatform.Android)
+		{
+			isVisible = true;
+		}
+
 		backgroundTexture = new Texture2D(1, 1);
 		backgroundTexture.SetPixel(0, 0, new Color(0.3f, 0.3f, 0.3f, 0.8f));
 		backgroundTexture.Apply();
@@ -35,6 +43,12 @@ public class DebugLogMgr : MonoBehaviour
 		backgroundStyle = new GUIStyle();
 		backgroundStyle.normal.background = backgroundTexture;
 		backgroundStyle.padding = new RectOffset(10, 10, 10, 10);
+	}
+
+	private void Update()
+	{
+		// デバッグメニューの表示/非表示を切り替える
+		if (Input.GetKeyDown(KeyCode.F2)) isVisible = !isVisible;
 	}
 
 	void OnEnable()
@@ -54,6 +68,8 @@ public class DebugLogMgr : MonoBehaviour
 
 	void OnGUI()
 	{
+		if (!isVisible) return;
+
 		// スクロールバーの太さを大きくするためのスタイル設定
 		GUIStyle scrollBarStyle = new GUIStyle(GUI.skin.verticalScrollbar);
 		scrollBarStyle.fixedWidth = 40f; // ← ここで太さを調整！（デフォルトは15くらい）
