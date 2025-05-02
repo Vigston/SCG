@@ -2,6 +2,8 @@
 using Firebase;
 using Firebase.Auth;
 using Firebase.Firestore;
+using Firebase.Extensions;
+using Google;
 #endif
 
 using System;
@@ -49,6 +51,8 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 		auth = FirebaseAuth.DefaultInstance;
 		db = FirebaseFirestore.DefaultInstance; // 🔄 ここで初期化
 
+		// エディターの場合はGoogleSignIn.DefaultInstance.SignIn()内でcurrentActivityが参照できないエラーが発生するためGoogleログインは諦めて匿名ログインを行う
+#if UNITY_EDITOR
 		try
 		{
 			var userCredential = await auth.SignInAnonymouslyAsync();
@@ -66,13 +70,106 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 			Debug.Log("FirebaseユーザーID取得: " + UserId);
 
 			// 初回ログインチェック
-			await CheckFirstLogin(user); // 🔄 await 忘れずに！
+			await CheckFirstLogin(user);
 
 			OnUserIdReady?.Invoke();
 		}
 		catch (Exception ex)
 		{
 			Debug.LogError("Firebaseログイン中に例外発生: " + ex);
+		}
+#else
+		// 初期化後、Googleログインを呼び出す(Firebaseも中でログイン)
+		SignInWithGoogle();
+#endif
+#endif
+	}
+
+	public void SignInWithGoogle()
+	{
+#if UNITY_IOS || UNITY_ANDROID
+		try
+		{
+			GoogleSignIn.Configuration = new GoogleSignInConfiguration
+			{
+				WebClientId = "868991135582-lsigt70n1vuat5l0rcmpkrngoeefc94k.apps.googleusercontent.com",
+				RequestIdToken = true,  // IDトークンをリクエストする
+				UseGameSignIn = false    // ← ここを false に
+			};
+
+			GoogleSignIn.DefaultInstance.SignIn().ContinueWithOnMainThread(task =>
+			{
+				if (task.IsCanceled)
+				{
+					Debug.LogError("Googleサインインがキャンセルされました");
+					return;
+				}
+
+				if (task.IsFaulted)
+				{
+					Debug.LogError("Googleサインインに失敗しました: " + task.Exception);
+					return;
+				}
+
+				GoogleSignInUser user = task.Result;
+
+				if (user == null)
+				{
+					Debug.LogError("Googleサインインに失敗しました。ユーザーがnullです。");
+					return;
+				}
+
+				if (string.IsNullOrEmpty(user.IdToken))
+				{
+					Debug.LogError("Googleサインインに失敗しました。ユーザーIDがnullまたは空です。");
+					return;
+				}
+
+				string idToken = user.IdToken;
+				Debug.Log("Googleログイン成功: " + user.DisplayName);
+				Debug.Log("IdToken: " + idToken);
+
+				// FirebaseにGoogleトークンでサインイン
+				Credential credential = GoogleAuthProvider.GetCredential(idToken, null);
+				SignInToFirebase(credential);
+			});
+		}
+		catch (Exception ex)
+		{
+			Debug.LogError("Googleサインイン中に例外が発生しました: " + ex.Message);
+		}
+#endif
+	}
+
+	private async void SignInToFirebase(Credential credential)
+	{
+#if UNITY_IOS || UNITY_ANDROID
+		if (credential == null)
+		{
+			Debug.LogError($"Credentialがnullなので{nameof(SignInToFirebase)}を終了します。");
+			return;
+		}
+
+		Debug.Log($"{nameof(SignInToFirebase)}起動");
+		try
+		{
+			var result = await FirebaseAuth.DefaultInstance.SignInWithCredentialAsync(credential);
+
+			if (result != null && result.UserId != null)
+			{
+				Debug.Log("Firebaseサインイン成功: " + result.UserId);
+				UserId = result.UserId;
+				IsReady = true;
+				OnUserIdReady?.Invoke();
+			}
+			else
+			{
+				Debug.LogError("SignInToFirebase: resultまたはUserがnull");
+			}
+		}
+		catch (Exception e)
+		{
+			Debug.LogError("サインインエラー: " + e.Message);
 		}
 #endif
 	}

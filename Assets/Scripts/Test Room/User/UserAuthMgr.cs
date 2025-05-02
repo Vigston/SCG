@@ -12,7 +12,7 @@ public class UserAuthManager : MonoBehaviour
 {
 	public static UserAuthManager Instance { get; private set; }
 	public string UserId => provider?.UserId;
-	public bool IsFirstLogin => provider?.IsFirstLogin　?? false;
+	public bool IsFirstLogin => provider?.IsFirstLogin ?? false;
 
 	public event Action OnUserIdReady;
 

@@ -1,4 +1,5 @@
-﻿using Photon.Pun;
+﻿using Cysharp.Threading.Tasks;
+using Photon.Pun;
 using Photon.Realtime;
 #if UNITY_STANDALONE_WIN
 using Steamworks;
@@ -20,7 +21,7 @@ public class Test_OnlineManager : MonoBehaviourPunCallbacks
 		PhotonNetwork.AutomaticallySyncScene = true;
 	}
 
-	private void Start()
+	private async void Start()
 	{
 		//if (PlayerPrefs.HasKey("LastRoomName"))
 		//{
@@ -34,6 +35,10 @@ public class Test_OnlineManager : MonoBehaviourPunCallbacks
 		//{
 		//	Debug.Log("前回のルーム名が見つかりませんでした");
 		//}
+
+		await UniTask.WaitUntil(() => !string.IsNullOrEmpty(UserAuthManager.Instance?.UserId));
+		Debug.Log("ユーザーID取得完了。オンライン接続を開始します。");
+		OnlineConnect();	// Photonサーバー接続
 	}
 
 	/// <summary>

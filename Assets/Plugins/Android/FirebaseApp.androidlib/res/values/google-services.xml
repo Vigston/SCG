@@ -1,9 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
-<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id">
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@string/gcm_defaultSenderId,@string/google_storage_bucket,@string/project_id,@string/google_api_key,@string/google_crash_reporting_api_key,@string/google_app_id,@string/default_web_client_id">
   <string name="gcm_defaultSenderId" translatable="false">868991135582</string>
   <string name="google_storage_bucket" translatable="false">conqueror-s-legacy.firebasestorage.app</string>
   <string name="project_id" translatable="false">conqueror-s-legacy</string>
   <string name="google_api_key" translatable="false">AIzaSyBIYcWCp5XO1tU3Cq5fFAz1Piz2yLPb4BE</string>
   <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBIYcWCp5XO1tU3Cq5fFAz1Piz2yLPb4BE</string>
   <string name="google_app_id" translatable="false">1:868991135582:android:1749f68bfe5dc2dc1569cf</string>
+  <string name="default_web_client_id" translatable="false">868991135582-lsigt70n1vuat5l0rcmpkrngoeefc94k.apps.googleusercontent.com</string>
 </resources>
