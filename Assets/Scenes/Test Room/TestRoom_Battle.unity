@@ -1435,7 +1435,7 @@ MonoBehaviour:
   cardAreaPrefab: {fileID: 2124720588745271832, guid: 142d7e2b3d316c24fb258efdc438b350, type: 3}
   heightNum: 2
   widthNum: 3
-  interval_H: 0
+  interval_H: 1
   interval_W: 3
   m_CardAreaList: []
 --- !u!1 &2005955274

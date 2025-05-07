@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using TMPro;
+using WebSocketSharp;
 
 public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 {
@@ -19,6 +21,9 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 	private FirebaseAuth auth;
 	private FirebaseFirestore db;
 #endif
+
+	[SerializeField] private string email;
+	[SerializeField] private string password;
 
 	public string UserId { get; private set; }
 	public bool IsFirstLogin { get; private set; }
@@ -53,20 +58,55 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 
 		// エディターの場合はGoogleSignIn.DefaultInstance.SignIn()内でcurrentActivityが参照できないエラーが発生するためGoogleログインは諦めて匿名ログインを行う
 #if UNITY_EDITOR
+		//try
+		//{
+		//	var userCredential = await auth.SignInAnonymouslyAsync();
+		//	var user = userCredential?.User;
+
+		//	if (user == null)
+		//	{
+		//		Debug.LogError("Firebaseユーザーがnullです");
+		//		return;
+		//	}
+
+		//	UserId = user.UserId;
+		//	IsReady = true;
+
+		//	Debug.Log("FirebaseユーザーID取得: " + UserId);
+
+		//	// 初回ログインチェック
+		//	await CheckFirstLogin(user);
+
+		//	OnUserIdReady?.Invoke();
+		//}
+		//catch (Exception ex)
+		//{
+		//	Debug.LogError("Firebaseログイン中に例外発生: " + ex);
+		//}
+		SignInWithEmail();
+#else
+		// 初期化後、Googleログインを呼び出す(Firebaseも中でログイン)
+		SignInWithGoogle();
+#endif
+#endif
+	}
+
+	public async void SignInWithEmail()
+	{
+		if(email.IsNullOrEmpty() || password.IsNullOrEmpty())
+		{
+			Debug.LogError("EmailまたはPasswordが未記入です");
+			return;
+		}
+
 		try
 		{
-			var userCredential = await auth.SignInAnonymouslyAsync();
-			var user = userCredential?.User;
-
-			if (user == null)
-			{
-				Debug.LogError("Firebaseユーザーがnullです");
-				return;
-			}
+			var authResult = await auth.SignInWithEmailAndPasswordAsync(email, password);
+			FirebaseUser user = authResult.User;
+			Debug.Log($"ログイン成功: {user.Email} (UID: {user.UserId})");
 
 			UserId = user.UserId;
 			IsReady = true;
-
 			Debug.Log("FirebaseユーザーID取得: " + UserId);
 
 			// 初回ログインチェック
@@ -74,15 +114,18 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 
 			OnUserIdReady?.Invoke();
 		}
-		catch (Exception ex)
+		catch (FirebaseException firebaseEx)
 		{
-			Debug.LogError("Firebaseログイン中に例外発生: " + ex);
+			Debug.LogError($"Firebaseエラー: {firebaseEx.Message}");
+
+			// エラーコードを知りたい場合
+			var authError = (AuthError)firebaseEx.ErrorCode;
+			Debug.LogError($"Authエラーコード: {authError}");
 		}
-#else
-		// 初期化後、Googleログインを呼び出す(Firebaseも中でログイン)
-		SignInWithGoogle();
-#endif
-#endif
+		catch (System.Exception ex)
+		{
+			Debug.LogError($"その他のエラー: {ex.Message}");
+		}
 	}
 
 	public void SignInWithGoogle()
@@ -153,13 +196,17 @@ public class FirebaseAPIMgr : MonoBehaviour, ISocialAuthProvider
 		Debug.Log($"{nameof(SignInToFirebase)}起動");
 		try
 		{
-			var result = await FirebaseAuth.DefaultInstance.SignInWithCredentialAsync(credential);
+			var user = await FirebaseAuth.DefaultInstance.SignInWithCredentialAsync(credential);
 
-			if (result != null && result.UserId != null)
+			if (user != null && user.UserId != null)
 			{
-				Debug.Log("Firebaseサインイン成功: " + result.UserId);
-				UserId = result.UserId;
+				Debug.Log("Firebaseサインイン成功: " + user.UserId);
+				UserId = user.UserId;
 				IsReady = true;
+
+				// 初回ログインチェック
+				await CheckFirstLogin(user);
+
 				OnUserIdReady?.Invoke();
 			}
 			else
