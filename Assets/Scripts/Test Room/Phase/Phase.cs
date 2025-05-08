@@ -68,7 +68,11 @@ public abstract class Phase : MonoBehaviour
 			int phaseIdx = (int)phaseManager.GetSetPhaseType;
 			int nextState = (int)(object)_nextState;
 
-			netWorkMgr.photonView.RPC(nameof(netWorkMgr.RPC_EndPhase_MC), RpcTarget.OthersBuffered, phaseIdx, nextState);
+			// シングルプレイデバッグモードならRPCを送信しない
+			if (!Test_DebugMgr.Instance.isSingleDebug)
+			{
+				netWorkMgr.photonView.RPC(nameof(netWorkMgr.RPC_EndPhase_MC), RpcTarget.OthersBuffered, phaseIdx, nextState);
+			}
 		}
 	}
 

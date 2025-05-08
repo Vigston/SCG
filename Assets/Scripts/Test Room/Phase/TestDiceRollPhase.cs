@@ -2,13 +2,12 @@
 using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
-using static TestStartPhase;
 using Photon.Pun;
 
-public class TestJoinPhase : Phase
+public class TestDiceRollPhase : Phase
 {
 	// 独自のState列挙型
-	public enum JoinPhaseState
+	public enum DiceRollPhaseState
 	{
 		StartState,             // 開始
 		MainState,              // メイン
@@ -22,9 +21,9 @@ public class TestJoinPhase : Phase
 		// ステートとアクションを辞書型で紐づける
 		GetSetActionDict = new Dictionary<Enum, Action>()
 		{
-			{ JoinPhaseState.StartState, StartStateAction },
-			{ JoinPhaseState.MainState, MainStateAction },
-			{ JoinPhaseState.EndState, EndStateAction }
+			{ DiceRollPhaseState.StartState, StartStateAction },
+			{ DiceRollPhaseState.MainState, MainStateAction },
+			{ DiceRollPhaseState.EndState, EndStateAction }
 		};
 	}
 
@@ -32,12 +31,12 @@ public class TestJoinPhase : Phase
 	public override async UniTask UpdatePhase()
 	{
 		// ターン終了じゃなければフェイズ更新を行う
-		while ((JoinPhaseState)GetSetState != JoinPhaseState.TurnEndState)
+		while ((DiceRollPhaseState)GetSetState != DiceRollPhaseState.TurnEndState)
 		{
 			Enum bufferState = GetSetState;
 
 			// マスタークライアントでアクションを実行
-			if (PhotonNetwork.IsMasterClient)
+			if (PhotonNetwork.IsMasterClient || Test_DebugMgr.Instance.isSingleDebug)
 			{
 				// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
 				if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
@@ -50,7 +49,7 @@ public class TestJoinPhase : Phase
 			GetSetPhaseFrame++;
 
 			// ステート遷移しているならステート遷移時の処理を行って次のループへ
-			if ((JoinPhaseState)bufferState != (JoinPhaseState)GetSetState)
+			if ((DiceRollPhaseState)bufferState != (DiceRollPhaseState)GetSetState)
 			{
 				CardAbilityManager abilityManager = CardAbilityManager.instance;
 				// アビリティキューが空になるまで待機
@@ -86,7 +85,7 @@ public class TestJoinPhase : Phase
 		}
 
 		// メインへ
-		SwitchState(JoinPhaseState.MainState);
+		SwitchState(DiceRollPhaseState.MainState);
 	}
 
 	private void MainStateAction()
@@ -97,7 +96,7 @@ public class TestJoinPhase : Phase
 		}
 
 		// 終了へ
-		SwitchState(JoinPhaseState.EndState);
+		SwitchState(DiceRollPhaseState.EndState);
 	}
 
 	private void EndStateAction()
@@ -108,20 +107,20 @@ public class TestJoinPhase : Phase
 		}
 
 		// ターン終了
-		SwitchState(JoinPhaseState.TurnEndState);
+		SwitchState(DiceRollPhaseState.TurnEndState);
 	}
 
 	// 初期状態
 	public override Enum GetInitState()
 	{
 		// 開始
-		return JoinPhaseState.StartState;
+		return DiceRollPhaseState.StartState;
 	}
 
 	// 終了状態
 	public override Enum GetEndState()
 	{
 		// 終了
-		return JoinPhaseState.TurnEndState;
+		return DiceRollPhaseState.TurnEndState;
 	}
 }

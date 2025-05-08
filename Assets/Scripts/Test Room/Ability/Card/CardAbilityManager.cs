@@ -81,7 +81,12 @@ public class CardAbilityManager : MonoBehaviour
 
 		Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
 		string abilityType_str = abilityType.AssemblyQualifiedName;
-		test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_ActivateAbility_Other), RpcTarget.OthersBuffered, abilityType_str, args);
+
+		// シングルプレイデバッグモードならRPCを送信しない
+		if (!Test_DebugMgr.Instance.isSingleDebug)
+		{
+			test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_ActivateAbility_Other), RpcTarget.OthersBuffered, abilityType_str, args);
+		}
 
 		return ability;
 	}

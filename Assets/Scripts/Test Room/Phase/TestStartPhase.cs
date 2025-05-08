@@ -36,7 +36,7 @@ public class TestStartPhase : Phase
 			Enum bufferState = GetSetState;
 
 			// マスタークライアントでアクションを実行
-			if (PhotonNetwork.IsMasterClient)
+			if (PhotonNetwork.IsMasterClient || Test_DebugMgr.Instance.isSingleDebug)
 			{
 				// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
 				if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))

@@ -8,7 +8,7 @@ public class PhaseManager : MonoBehaviour
 	public enum PhaseType
 	{
 		Start,
-		Join,
+		DiceRoll,
 		Main,
 		End,
 
@@ -17,9 +17,6 @@ public class PhaseManager : MonoBehaviour
 
 	// インスタンス
 	public static PhaseManager instance;
-
-	[SerializeField]
-	private Phase m_Phase;
 
 	[SerializeField]
 	private Phase[] m_Phases;
@@ -42,57 +39,9 @@ public class PhaseManager : MonoBehaviour
 		CreateInstance();
 	}
 
-	private async void Start()
+	private void Start()
 	{
 		Debug.Log($"PhotonNetwork.IsMasterClient：{PhotonNetwork.IsMasterClient}");
-
-		if (!GetSetPhaseParentObj)
-		{
-			Debug.LogError($"親フェイズオブジェクト「{nameof(GetSetPhaseParentObj)}」が見つかりません！{nameof(PhaseManager)}にアタッチされているか確認してください。");
-			return;
-		}
-
-		if(PhotonNetwork.IsMasterClient)
-		{
-			// 全フェイズゲームオブジェクト生成
-			GameObject startPhaseObj = CreatePhasePhotonObject("TestStartPhasePrefab");
-			GameObject joinPhaseObj = CreatePhasePhotonObject("TestJoinPhasePrefab");
-			GameObject mainPhaseObj = CreatePhasePhotonObject("TestMainPhasePrefab");
-			GameObject endPhaseObj = CreatePhasePhotonObject("TestEndPhasePrefab");
-
-			// フェイズ取得
-			GetSetPhases = new Phase[]
-			{
-				GetPhase(startPhaseObj),
-				GetPhase(joinPhaseObj),
-				GetPhase(mainPhaseObj),
-				GetPhase(endPhaseObj),
-			};
-
-			// 各フェイズオブジェクトのPhotonViewIdを取得
-			int[] phaseViewIDs = new int[GetSetPhases.Length];
-
-			for (int i = 0; i < GetSetPhases.Length; i++)
-			{
-				PhotonView photonView = GetSetPhases[i]?.GetComponent<PhotonView>();
-
-				if (!photonView)
-				{
-					Debug.LogWarning($"PhotonViewIdが取得できませんでした。|| m_Phases.Length：{GetSetPhases.Length}");
-					continue;
-				}
-
-				// PhotonViewId取得
-				phaseViewIDs[i] = photonView.ViewID;
-			}
-
-			// フェイズオブジェクトの通信同期を行う
-			Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-			test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_SyncPhases_MC), RpcTarget.OthersBuffered, phaseViewIDs);
-		}
-
-		// フェイズオブジェクトの生成、通信同期が正常に終了するまで待機
-		await WaitSyncCreatePhase();
 
 		// ターンループ処理
 		RunTurnCycle().Forget();
@@ -151,15 +100,22 @@ public class PhaseManager : MonoBehaviour
 
 			// 対戦開始フラグを立てる
 			playerUser.GetSetGameStartFlag = true;
-			Debug.Log($"対戦開始フラグを立てる：{playerUser.GetSetGameStartFlag}");
+			// シングルプレイデバッグモードなら相手の対戦開始フラグを立てる
+			if (Test_DebugMgr.Instance.isSingleDebug)
+			{
+				enemyUser.GetSetGameStartFlag = true;
+			}
 
 			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
 			if (!PhotonNetwork.IsMasterClient)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				// シングルプレイデバッグモードならRPCを送信しない
+				if (!Test_DebugMgr.Instance.isSingleDebug)
+				{
+					test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				}
 			}
 
-			//await UniTask.WaitUntil(() => IsPhaseStartable());
 			// フェイズ開始可能な状態になるまで待機
 			try
 			{
@@ -197,10 +153,20 @@ public class PhaseManager : MonoBehaviour
 			// フェイズ終了同期待ち状態に設定
 			playerUser.GetSetPhaseReadyFlag = true;
 
-			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
-			if(!PhotonNetwork.IsMasterClient)
+			// シングルプレイデバッグモードなら相手のフェイズ同期待ちフラグを立てる
+			if (Test_DebugMgr.Instance.isSingleDebug)
 			{
-				test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				enemyUser.GetSetPhaseReadyFlag = true;
+			}
+
+			// 非マスタークライアントならマスタークライアントに自分のユーザー情報を送信
+			if (!PhotonNetwork.IsMasterClient)
+			{
+				// シングルプレイデバッグモードならRPCを送信しない
+				if (!Test_DebugMgr.Instance.isSingleDebug)
+				{
+					test_NetWorkMgr.photonView.RPC(nameof(test_NetWorkMgr.RPC_PushUser_CM), RpcTarget.AllBuffered, (int)playerUser.GetSetSide, (int)playerUser.GetSetPhaseType, playerUser.GetSetPhaseReadyFlag, playerUser.GetSetGameStartFlag);
+				}
 			}
 
 			//await UniTask.WaitUntil(() => IsSwitchPhase());
@@ -334,6 +300,12 @@ public class PhaseManager : MonoBehaviour
 		GetSetPhases[(int)GetSetPhaseType].EndPhase();
 		// ユーザーのフェイズ情報を初期化
 		playerUser.Init_PhaseInfo();
+		// シングルプレイデバッグモードなら敵ユーザーのフェイズ情報を初期化
+		if (Test_DebugMgr.Instance.isSingleDebug)
+		{
+			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+			enemyUser.Init_PhaseInfo();
+		}
 	}
 	// フェイズ遷移時
 	private void OnSwitchPhase()
@@ -427,12 +399,6 @@ public class PhaseManager : MonoBehaviour
 	//////////////////////////////////
 	// ===== GetSetプロパティ ===== //
 	//////////////////////////////////
-	public Phase GetSetPhase
-	{
-		get { return m_Phase; }
-		set { m_Phase = value; }
-	}
-
 	public Phase[] GetSetPhases
 	{
 		get { return m_Phases; }

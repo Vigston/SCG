@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3027929953581919523}
   - component: {fileID: 2473536668349712091}
   m_Layer: 0
-  m_Name: TestJoinPhasePrefab
+  m_Name: TestDiceRollPhasePrefab
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

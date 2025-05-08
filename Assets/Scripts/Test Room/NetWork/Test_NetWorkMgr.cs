@@ -91,8 +91,8 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 			case PhaseManager.PhaseType.Start:
 				stateEnum = (TestStartPhase.StartPhaseState)_state;
 				break;
-			case PhaseManager.PhaseType.Join:
-				stateEnum = (TestJoinPhase.JoinPhaseState)_state;
+			case PhaseManager.PhaseType.DiceRoll:
+				stateEnum = (TestDiceRollPhase.DiceRollPhaseState)_state;
 				break;
 			case PhaseManager.PhaseType.Main:
 				stateEnum = (TestMainPhase.MainPhaseState)_state;
