@@ -21,7 +21,7 @@ public class TestMainPhase : Phase
 	private void Awake()
 	{
 		// ステートとアクションを辞書型で紐づける
-		GetSetActionDict = new Dictionary<Enum, Action>()
+		GetSetActionDict = new Dictionary<Enum, Func<UniTask>>()
 		{
 			{ MainPhaseState.StartState, StartStateAction },
 			{ MainPhaseState.MainState, MainStateAction },
@@ -41,9 +41,9 @@ public class TestMainPhase : Phase
 			if (PhotonNetwork.IsMasterClient || Test_DebugMgr.Instance.isSingleDebug)
 			{
 				// 状態遷移の処理はステートマシン側で行われるので、ここでアクションを実行
-				if (GetSetActionDict.TryGetValue(GetSetState, out Action stateAction))
+				if (GetSetActionDict.TryGetValue(GetSetState, out Func<UniTask> stateAction))
 				{
-					stateAction();
+					await stateAction();
 				}
 			}
 
@@ -79,7 +79,7 @@ public class TestMainPhase : Phase
 	//////アクション/////
 	/////////////////////
 	// 状態ごとのアクションを定義
-	private void StartStateAction()
+	private async UniTask StartStateAction()
 	{
 		if (IsFirstState())
 		{
@@ -88,9 +88,10 @@ public class TestMainPhase : Phase
 
 		// メインへ
 		SwitchState(MainPhaseState.MainState);
+		await UniTask.Yield();
 	}
 
-	private async void MainStateAction()
+	private async UniTask MainStateAction()
 	{
 		if (IsFirstState())
 		{
@@ -108,9 +109,10 @@ public class TestMainPhase : Phase
 
 		// 終了へ
 		SwitchState(MainPhaseState.EndState);
+		await UniTask.Yield();
 	}
 
-	private void EndStateAction()
+	private async UniTask EndStateAction()
 	{
 		if (IsFirstState())
 		{
@@ -119,6 +121,7 @@ public class TestMainPhase : Phase
 
 		// ターン終了
 		SwitchState(MainPhaseState.TurnEndState);
+		await UniTask.Yield();
 	}
 
 	// 初期状態

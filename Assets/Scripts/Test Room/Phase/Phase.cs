@@ -15,7 +15,7 @@ public abstract class Phase : MonoBehaviour
 	[SerializeField]
 	private int m_StateFrame;
 	[SerializeField]
-	private Dictionary<Enum, Action> m_ActionDict;
+	private Dictionary<Enum, Func<UniTask>> m_ActionDict;
 
 	private void Update()
 	{
@@ -104,7 +104,7 @@ public abstract class Phase : MonoBehaviour
 		get { return m_StateFrame; }
 		set { m_StateFrame = value; }
 	}
-	public virtual Dictionary<Enum, Action> GetSetActionDict
+	public virtual Dictionary<Enum, Func<UniTask>> GetSetActionDict
 	{
 		get { return m_ActionDict; }
 		set { m_ActionDict = value; }
