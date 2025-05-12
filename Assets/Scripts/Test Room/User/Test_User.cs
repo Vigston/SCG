@@ -3,6 +3,8 @@ using battleTypes;
 
 public class Test_User : MonoBehaviour
 {
+    [SerializeField]
+    private ResourceMgr resourceMgr; // ユーザーごとの資源管理
     // ===変数===
     // 側
     [SerializeField]
@@ -26,11 +28,23 @@ public class Test_User : MonoBehaviour
     [SerializeField, ReadOnly]
     bool m_GameStartFlag;
 
+	private void Awake()
+	{
+		// 資源管理の初期化
+		resourceMgr = new ResourceMgr();
+	}
+
 	// フェイズ情報の初期化
 	public void Init_PhaseInfo()
     {
 		GetSetPhaseReadyFlag = false;
     }
+
+	// 資源管理へのアクセス
+	public ResourceMgr GetResourceMgr()
+	{
+		return resourceMgr;
+	}
 
 	// --側--
 	public Side GetSetSide

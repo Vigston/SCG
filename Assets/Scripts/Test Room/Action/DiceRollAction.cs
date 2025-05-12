@@ -57,11 +57,6 @@ public class DiceRollAction : ActionBase
 
 		Debug.Log("サイコロを振りました！！");
 
-		foreach(GameObject diceNumObj in diceNumObjList)
-		{
-			Debug.Log($"{diceNumObj.name}");
-		}
-
 		// サイコロが停止するまで待機
 		await WaitUntilDiceStops(rb);
 
@@ -71,7 +66,6 @@ public class DiceRollAction : ActionBase
 		{
 			//_diseNumber[i]は１～６の判定用からオブジェクト
 			_dicePosY[i] = diceNumObjList[i].transform.position.y;
-			await UniTask.Yield();
 		}
 
 		float maxPos = _dicePosY.Max();
@@ -82,21 +76,19 @@ public class DiceRollAction : ActionBase
 				diceResultNum = i + 1;
 				break;
 			}
-			await UniTask.Yield();
 		}
 
 		Debug.Log($"サイコロの目：{diceResultNum}");
 
-		// サイコロを削除
+		// サイコロを削除、アセット解放
 		if (dice != null)
 		{
-			GameObject.Destroy(dice);
-			Debug.Log("サイコロを削除しました！");
-
-			// アセットを解放
-			AssetManager.Release(dicePrefab);
-			Debug.Log("サイコロのアセットを解放しました！");
+			GameObject.Destroy(dice);           // 削除
+			AssetManager.Release(dicePrefab);   // 解放
 		}
+
+		// 2秒待機（サイコロの目を確認するための時間）
+		await UniTask.Delay(2000);
 	}
 
 	// サイコロが停止するまで待つ処理
