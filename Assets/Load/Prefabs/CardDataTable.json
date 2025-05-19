@@ -1,0 +1,43 @@
+{
+  "cards": [
+    {
+      "name": "Military Card 1",
+      "costList": [
+        {
+          "Key": "Wood",
+          "Value": 3
+        },
+        {
+          "Key": "Stone",
+          "Value": 2
+        }
+      ]
+    },
+    {
+      "name": "Science Card 1",
+      "costList": [
+        {
+          "Key": "Gold",
+          "Value": 2
+        },
+        {
+          "Key": "Food",
+          "Value": 3
+        }
+      ]
+    },
+    {
+      "name": "Culture Card 1",
+      "costList": [
+        {
+          "Key": "Food",
+          "Value": 3
+        },
+        {
+          "Key": "Stone",
+          "Value": 2
+        }
+      ]
+    }
+  ]
+}

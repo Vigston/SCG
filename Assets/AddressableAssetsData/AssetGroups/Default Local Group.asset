@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: ffc502a0e50d2734990c34695e28deab
   m_SerializeEntries:
+  - m_GUID: 8f80da141f2e5134eb67735816a66310
+    m_Address: CardDataTable
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: ed593d144490e5c419a0a2244df2d93e
     m_Address: Dice_D6_White
     m_ReadOnly: 0

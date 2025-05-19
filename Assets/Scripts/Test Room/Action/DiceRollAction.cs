@@ -22,7 +22,8 @@ public class DiceRollAction : ActionBase
 
 		var tcs = new UniTaskCompletionSource();
 
-		AssetManager.Load<GameObject>("Dice_D6_White", prefab =>
+		AssetManager.Load<GameObject>("Dice_D6_White",
+		prefab =>
 		{
 			dicePrefab = prefab;
 			dice = GameObject.Instantiate(prefab) as GameObject;
@@ -43,6 +44,11 @@ public class DiceRollAction : ActionBase
 			rb.AddTorque(randomTorque, ForceMode.Impulse);
 
 			tcs.TrySetResult(); // 非同期処理完了を通知
+		},
+		error =>
+		{
+			Debug.LogError($"Dice prefab load failed: {error}");
+			tcs.TrySetException(error);
 		});
 
 		//Debug.Log($"{this.ToString()} {nameof(Execute)}");
