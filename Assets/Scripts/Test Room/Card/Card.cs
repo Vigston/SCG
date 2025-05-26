@@ -4,11 +4,11 @@ using UnityEngine;
 public class Card : MonoBehaviour
 {
 	public string Name { get; private set; }
-	public Dictionary<string, int> Cost { get; private set; } // 必要な資源の種類と量
+	public Dictionary<ResourceType, int> Cost { get; private set; } // 必要な資源の種類と量
 
-	public void Initialize(string name, Dictionary<string, int> cost)
+	public void Initialize(CardData _cardData)
 	{
-		Name = name;
-		Cost = cost;
+		Name = _cardData.name;
+		Cost = _cardData.cost;
 	}
 }

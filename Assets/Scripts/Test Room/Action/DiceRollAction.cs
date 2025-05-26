@@ -5,6 +5,8 @@ using System.Linq;
 
 public class DiceRollAction : ActionBase
 {
+	private const int DICE_FACE_COUNT = 6; // サイコロの目の数
+
 	private int diceResultNum;
 
 	public DiceRollAction()
@@ -51,10 +53,14 @@ public class DiceRollAction : ActionBase
 			tcs.TrySetException(error);
 		});
 
-		//Debug.Log($"{this.ToString()} {nameof(Execute)}");
-		//Debug.Log($"サイコロの目: {diceValue}");
-
 		await tcs.Task; // AssetManager.Load の完了を待つ
+
+		// サイコロのNULLチェック
+		if (dice == null && rb == null)
+		{
+			Debug.LogError("サイコロの生成に失敗しました。");
+			return;
+		}
 
 		foreach (Transform child in dice.transform)
 		{
@@ -66,22 +72,45 @@ public class DiceRollAction : ActionBase
 		// サイコロが停止するまで待機
 		await WaitUntilDiceStops(rb);
 
-		float[] _dicePosY = new float[6];
+		float[] _dicePosY = new float[DICE_FACE_COUNT];
 
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < DICE_FACE_COUNT; i++)
 		{
+			var diceNumObj = diceNumObjList[i]; // サイコロの目のオブジェクト
+
+			if(!diceNumObj)
+			{
+				Debug.LogError($"サイコロ目[{i + 1}]オブジェクトが見つかりませんでした。");
+				continue;
+			}
+
 			//_diseNumber[i]は１～６の判定用からオブジェクト
 			_dicePosY[i] = diceNumObjList[i].transform.position.y;
 		}
 
 		float maxPos = _dicePosY.Max();
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < DICE_FACE_COUNT; i++)
 		{
-			if (diceNumObjList[i].transform.position.y == maxPos)
+			var diceNumObj = diceNumObjList[i]; // サイコロの目のオブジェクト
+
+			if(!diceNumObj)
+			{
+				Debug.LogError($"サイコロ目[{i + 1}]オブジェクトが見つかりませんでした。");
+				continue;
+			}
+
+			if (diceNumObj.transform.position.y == maxPos)
 			{
 				diceResultNum = i + 1;
 				break;
 			}
+		}
+
+		// 範囲外の場合はエラー
+		if (diceResultNum <= 0 || diceResultNum > DICE_FACE_COUNT)
+		{
+			Debug.LogError("サイコロの目の判定に失敗しました。");
+			return;
 		}
 
 		Debug.Log($"サイコロの目：{diceResultNum}");
@@ -100,15 +129,8 @@ public class DiceRollAction : ActionBase
 	// サイコロが停止するまで待つ処理
 	private async UniTask WaitUntilDiceStops(Rigidbody rb)
 	{
-		// Rigidbodyがnullの場合は処理を終了
-		if (rb == null)
-		{
-			//Debug.LogWarning("Rigidbodyがnullです。");
-			await UniTask.Yield();
-		}
-
-		// 速度が十分に遅くなるまでループ
-		while (!rb.IsSleeping())
+		// 速度が十分に遅くなるまでループ(ゲームオブジェクトが存在するか毎回チェック)
+		while (rb != null && rb.gameObject != null && !rb.IsSleeping())
 		{
 			await UniTask.Yield();  // 非同期で次のフレームまで待つ
 		}

@@ -8,7 +8,7 @@ using Cysharp.Threading.Tasks;
 public class Test_UserMgr : MonoBehaviour
 {
     // インスタンス
-    public static Test_UserMgr instance;
+    public static Test_UserMgr Instance;
 
     [SerializeField]
     private Test_User[] m_Users = new Test_User[(int)Side.eSide_Max];
@@ -53,14 +53,14 @@ public class Test_UserMgr : MonoBehaviour
     public bool CreateInstance()
     {
         // 既にインスタンスが作成されていなければ作成する
-        if (instance == null)
+        if (Instance == null)
         {
             // 作成
-            instance = this;
+            Instance = this;
         }
 
         // インスタンスが作成済みなら終了
-        if (instance != null) { return true; }
+        if (Instance != null) { return true; }
 
         Debug.LogError($"{this}のインスタンスが生成できませんでした");
         return false;

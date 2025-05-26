@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using System.Threading;
 
 public class TestDiceRollPhase : Phase
 {
@@ -30,7 +31,7 @@ public class TestDiceRollPhase : Phase
 	}
 
 	// フェイズ進行中の処理
-	public override async UniTask UpdatePhase()
+	public override async UniTask UpdatePhase(CancellationToken token)
 	{
 		// ターン終了じゃなければフェイズ更新を行う
 		while ((DiceRollPhaseState)GetSetState != DiceRollPhaseState.TurnEndState)

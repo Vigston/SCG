@@ -9,7 +9,7 @@ public class CardData
 
 	public List<Cost> costList; // JSON用
 
-	public Dictionary<string, int> costs;
+	public Dictionary<ResourceType, int> cost;
 }
 
 [Serializable]

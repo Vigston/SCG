@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class CardLoader
@@ -15,12 +16,20 @@ public class CardLoader
 			cardDataList = dataList.cards;
 
 			// JSONのList<Cost>をDictionaryに変換
-			foreach (var card in cardDataList)
+			foreach (var cardData in cardDataList)
 			{
-				card.costs = new Dictionary<string, int>();
-				foreach (var cost in card.costList)
+				cardData.cost = new Dictionary<ResourceType, int>();
+				foreach (var cost in cardData.costList)
 				{
-					card.costs[cost.Key] = cost.Value;
+					// KeyをResourceTypeに変換してDictionaryに追加
+					if (Enum.TryParse<ResourceType>(cost.Key, out var type))
+					{
+						cardData.cost[type] = cost.Value;
+					}
+					else
+					{
+						Debug.LogError($"ResourceType変換失敗: {cost.Key}（カード名: {cardData.name}）");
+					}
 				}
 			}
 

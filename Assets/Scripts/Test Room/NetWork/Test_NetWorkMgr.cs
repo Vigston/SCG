@@ -131,7 +131,7 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 		Side		userSide	=	GetRevSide((Side)_userSide);	// ユーザー側
 		PhaseType	phaseType	=	(PhaseType)_phaseType;			// 現在のフェイズ
 
-		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+		Test_UserMgr test_UserMgr = Test_UserMgr.Instance;
 		Test_User test_User = test_UserMgr.GetUser(userSide);
 
 		// ユーザーの生成が完了するまで待機
@@ -165,7 +165,7 @@ public class Test_NetWorkMgr : MonoBehaviourPunCallbacks
 		Side userSide = GetRevSide((Side)_userSide);    // ユーザー側
 		PhaseType phaseType = (PhaseType)_phaseType;            // 現在のフェイズ
 
-		Test_UserMgr test_UserMgr = Test_UserMgr.instance;
+		Test_UserMgr test_UserMgr = Test_UserMgr.Instance;
 		Test_User test_User = test_UserMgr.GetUser(userSide);
 
 		// ユーザーの生成が完了するまで待機

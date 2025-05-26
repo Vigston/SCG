@@ -1,22 +1,30 @@
 ﻿using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class CardMgr : MonoBehaviour
 {
+	// インスタンス
+	public static CardMgr Instance;
+
 	[SerializeField]
 	private GameObject cardPrefab; // カードのプレハブ
-	[SerializeField]
-	private ResourceMgr resourceMgr; // 資源管理クラス
 	
 	private CardLoader cardLoader; // カードデータを読み込むクラス
 
 	private void Awake()
 	{
-		// カードローダーのインスタンス生成
-		if(cardLoader == null)
+		// インスタンス生成
+		if (Instance != null)
 		{
-			cardLoader = new CardLoader();
+			Destroy(gameObject);
+			return;
 		}
+
+		Instance = this;
+
+		// カードローダーのインスタンス生成
+		cardLoader = new CardLoader();
 
 		// カードデータを読み込む
 		cardLoader.LoadCardData();
@@ -40,14 +48,14 @@ public class CardMgr : MonoBehaviour
 		}
 
 		// コストを確認
-		if (!CanPayCost(cardData.costs))
+		if (!CanPayCost(cardData.cost))
 		{
 			Debug.LogWarning($"カード {cardData.name} を生成するための資源が不足しています！");
 			return null;
 		}
 
 		// コストを消費
-		PayCost(cardData.costs);
+		PayCost(cardData.cost);
 
 		// カードを生成
 		GameObject cardObject = Instantiate(cardPrefab);
@@ -56,7 +64,7 @@ public class CardMgr : MonoBehaviour
 		if (cardComponent != null)
 		{
 			// カードのプロパティを設定
-			cardComponent.Initialize(cardData.name, cardData.costs);
+			cardComponent.Initialize(cardData);
 		}
 		else
 		{
@@ -75,8 +83,12 @@ public class CardMgr : MonoBehaviour
 	}
 
 	// コストを支払えるか確認
-	private bool CanPayCost(Dictionary<string, int> cost)
+	private bool CanPayCost(Dictionary<ResourceType, int> cost)
 	{
+		if(cost == null) { return false; }
+
+		ResourceMgr resourceMgr = Test_UserMgr.Instance.GetSetPlayerUser.GetResourceMgr();
+
 		foreach (var resource in cost)
 		{
 			if (resourceMgr.GetResourceQuantity(resource.Key) < resource.Value)
@@ -88,8 +100,12 @@ public class CardMgr : MonoBehaviour
 	}
 
 	// コストを消費
-	private void PayCost(Dictionary<string, int> cost)
+	private void PayCost(Dictionary<ResourceType, int> cost)
 	{
+		if (cost == null) { return; }
+
+		ResourceMgr resourceMgr = Test_UserMgr.Instance.GetSetPlayerUser.GetResourceMgr();
+
 		foreach (var resource in cost)
 		{
 			resourceMgr.ConsumeResource(resource.Key, resource.Value);

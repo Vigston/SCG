@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Photon.Pun;
 using System;
+using System.Threading;
 using UnityEngine;
 
 public class PhaseManager : MonoBehaviour
@@ -33,10 +34,15 @@ public class PhaseManager : MonoBehaviour
 	[SerializeField, ReadOnly]
 	private bool m_IsWaitingForNetWork; // 通信同期状態
 
+	private CancellationTokenSource _cts; // キャンセルトークン
+
 	private void Awake()
 	{
 		// インスタンス生成
 		CreateInstance();
+
+		// キャンセルトークン生成
+		_cts = new CancellationTokenSource();
 	}
 
 	private void Start()
@@ -44,7 +50,14 @@ public class PhaseManager : MonoBehaviour
 		Debug.Log($"PhotonNetwork.IsMasterClient：{PhotonNetwork.IsMasterClient}");
 
 		// ターンループ処理
-		RunTurnCycle().Forget();
+		RunTurnCycle(_cts.Token).Forget();
+	}
+
+	private void OnDestroy()
+	{
+		// タスクの終了を通知
+		_cts?.Cancel();
+		_cts?.Dispose();
 	}
 
 	// インスタンスを作成
@@ -65,7 +78,7 @@ public class PhaseManager : MonoBehaviour
 	}
 
 	// ターンループ処理
-	private async UniTask RunTurnCycle()
+	private async UniTask RunTurnCycle(CancellationToken token)
 	{
 		Debug.Log("ターンループ処理開始");
 
@@ -78,6 +91,9 @@ public class PhaseManager : MonoBehaviour
 
 		while (true)
 		{
+			// キャンセルトークンのキャンセルチェック
+			token.ThrowIfCancellationRequested();
+
 			if (GetSetPhases == null)
 			{
 				Debug.LogError($" m_Phases がNULLなので {(double)(GetSetSyncDelay / 1000)} 秒同期待ちを行います。");
@@ -95,8 +111,8 @@ public class PhaseManager : MonoBehaviour
 
 			// 参照取得
 			Test_NetWorkMgr test_NetWorkMgr = Test_NetWorkMgr.instance;
-			Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+			Test_User playerUser = Test_UserMgr.Instance.GetSetPlayerUser;
+			Test_User enemyUser = Test_UserMgr.Instance.GetSetEnemyUser;
 
 			// 対戦開始フラグを立てる
 			playerUser.GetSetGameStartFlag = true;
@@ -120,7 +136,7 @@ public class PhaseManager : MonoBehaviour
 			try
 			{
 				IsWaitingForCommunication = true;
-				await UniTask.WaitUntil(() => IsPhaseStartable()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
+				await UniTask.WaitUntil(() => IsPhaseStartable(), cancellationToken: token).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
 			}
 			catch (TimeoutException)
 			{
@@ -145,7 +161,7 @@ public class PhaseManager : MonoBehaviour
 			}
 
 			// フェイズ処理
-			await GetSetPhases[(int)GetSetPhaseType].UpdatePhase();
+			await GetSetPhases[(int)GetSetPhaseType].UpdatePhase(token);
 
 			////////////////////////
 			///// フェイズ終了 /////
@@ -175,7 +191,7 @@ public class PhaseManager : MonoBehaviour
 			try
 			{
 				IsWaitingForCommunication = true;
-				await UniTask.WaitUntil(() => IsSwitchPhase()).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
+				await UniTask.WaitUntil(() => IsSwitchPhase(), cancellationToken: token).Timeout(TimeSpan.FromSeconds(m_TimeoutDuration));
 			}
 			catch (TimeoutException)
 			{
@@ -221,7 +237,7 @@ public class PhaseManager : MonoBehaviour
 				OnSwitchPhase();
 			}
 
-			await UniTask.Yield();
+			await UniTask.Yield(token);
 		}
 	}
 
@@ -295,7 +311,7 @@ public class PhaseManager : MonoBehaviour
 	// フェイズ終了時
 	private void OnPhaseEnd()
 	{
-		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
+		Test_User playerUser = Test_UserMgr.Instance.GetSetPlayerUser;
 		// フェイズ終了時処理
 		GetSetPhases[(int)GetSetPhaseType].EndPhase();
 		// ユーザーのフェイズ情報を初期化
@@ -303,7 +319,7 @@ public class PhaseManager : MonoBehaviour
 		// シングルプレイデバッグモードなら敵ユーザーのフェイズ情報を初期化
 		if (Test_DebugMgr.Instance.isSingleDebug)
 		{
-			Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+			Test_User enemyUser = Test_UserMgr.Instance.GetSetEnemyUser;
 			enemyUser.Init_PhaseInfo();
 		}
 	}
@@ -319,8 +335,8 @@ public class PhaseManager : MonoBehaviour
 	// フェイズ開始可能な状態か
 	private bool IsPhaseStartable()
 	{
-		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-		Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+		Test_User playerUser = Test_UserMgr.Instance.GetSetPlayerUser;
+		Test_User enemyUser = Test_UserMgr.Instance.GetSetEnemyUser;
 
 		// ユーザーが取得できていないなら不可能
 		if (!playerUser || !enemyUser)
@@ -361,8 +377,8 @@ public class PhaseManager : MonoBehaviour
 	// 次のフェイズへ遷移可能な状態か
 	private bool IsSwitchPhase()
 	{
-		Test_User playerUser = Test_UserMgr.instance.GetSetPlayerUser;
-		Test_User enemyUser = Test_UserMgr.instance.GetSetEnemyUser;
+		Test_User playerUser = Test_UserMgr.Instance.GetSetPlayerUser;
+		Test_User enemyUser = Test_UserMgr.Instance.GetSetEnemyUser;
 
 		// ユーザーが取得できていないなら不可能
 		if (!playerUser || !enemyUser)

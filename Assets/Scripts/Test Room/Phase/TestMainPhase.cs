@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using Photon.Pun;
+using System.Threading;
+using UnityEditor.SceneManagement;
 
 public class TestMainPhase : Phase
 {
@@ -16,7 +18,8 @@ public class TestMainPhase : Phase
 		TurnEndState = -1,      // ターン終了
 	}
 
-	DamageCardAbility m_DamageCardAbility;
+	// アクション
+	AssignCardAction m_AssignCardAction;    // カード割り当てアクション
 
 	private void Awake()
 	{
@@ -30,7 +33,7 @@ public class TestMainPhase : Phase
 	}
 
 	// フェイズ進行中の処理
-	public override async UniTask UpdatePhase()
+	public override async UniTask UpdatePhase(CancellationToken token)
 	{
 		// ターン終了じゃなければフェイズ更新を行う
 		while ((MainPhaseState)GetSetState != MainPhaseState.TurnEndState)
@@ -99,13 +102,12 @@ public class TestMainPhase : Phase
 
 			if(PhotonNetwork.IsMasterClient || Test_DebugMgr.Instance.isSingleDebug)
 			{
-				// カードアビリティテスト
-				int abilityId = PhotonNetwork.LocalPlayer.ActorNumber;
-				m_DamageCardAbility = CardAbilityManager.instance.ActivateAbility<DamageCardAbility>(abilityId, 10);
+				Test_CardArea targetCardArea = Test_StageMgr.instance.GetCardAreaFromIndex(1);
+				m_AssignCardAction = ActionManager.instance.ActivateAction<AssignCardAction>(targetCardArea.transform);
 			}
 		}
 
-		await CardAbilityManager.instance.WaitForAbility(m_DamageCardAbility);
+		await ActionManager.instance.WaitForAction(m_AssignCardAction);
 
 		// 終了へ
 		SwitchState(MainPhaseState.EndState);

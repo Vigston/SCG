@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using System.Threading;
 
 public class TestStartPhase : Phase
 {
@@ -28,7 +29,7 @@ public class TestStartPhase : Phase
 	}
 
 	// フェイズ進行中の処理
-	public override async UniTask UpdatePhase()
+	public override async UniTask UpdatePhase(CancellationToken token)
 	{
 		// ターン終了じゃなければフェイズ更新を行う
 		while ((StartPhaseState)GetSetState != StartPhaseState.TurnEndState)

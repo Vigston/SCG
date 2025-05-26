@@ -3,6 +3,7 @@ using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Photon.Pun;
+using System.Threading;
 
 public abstract class Phase : MonoBehaviour
 {
@@ -31,7 +32,7 @@ public abstract class Phase : MonoBehaviour
 		GetSetStateFrame = 0;
 	}
 	// フェイズ進行中の処理
-	public abstract UniTask UpdatePhase();
+	public abstract UniTask UpdatePhase(CancellationToken token);
 	// フェイズ終了時の処理
 	public virtual void EndPhase()
 	{

@@ -1,6 +1,15 @@
 ﻿using UnityEngine;
 using battleTypes;
 
+#if UNITY_EDITOR
+[System.Serializable]
+public class DebugResource
+{
+	public ResourceType type;
+	public int quantity;
+}
+#endif
+
 public class Test_User : MonoBehaviour
 {
     [SerializeField]
@@ -28,10 +37,34 @@ public class Test_User : MonoBehaviour
     [SerializeField, ReadOnly]
     bool m_GameStartFlag;
 
+#if UNITY_EDITOR
+	[Header("デバッグ用資源リスト（インスペクター編集可）")]
+	public System.Collections.Generic.List<DebugResource> debugResources = new System.Collections.Generic.List<DebugResource>();
+
+	private void OnValidate()
+	{
+		if (debugResources == null) debugResources = new System.Collections.Generic.List<DebugResource>();
+		var existTypes = debugResources.ConvertAll(r => r.type);
+		foreach (ResourceType t in System.Enum.GetValues(typeof(ResourceType)))
+		{
+			if (!existTypes.Contains(t))
+				debugResources.Add(new DebugResource { type = t, quantity = 0 });
+		}
+		debugResources.RemoveAll(r => !System.Enum.IsDefined(typeof(ResourceType), r.type));
+	}
+#endif
+
 	private void Awake()
 	{
 		// 資源管理の初期化
 		resourceMgr = new ResourceMgr();
+
+#if UNITY_EDITOR
+		foreach (var res in debugResources)
+		{
+			resourceMgr.AddResource(res.type, res.quantity);
+		}
+#endif
 	}
 
 	// フェイズ情報の初期化
