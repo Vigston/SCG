@@ -1587,6 +1587,37 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 351741861}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &373880188
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 373880189}
+  m_Layer: 0
+  m_Name: ===Card===
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &373880189
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 373880188}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &388360160
 GameObject:
   m_ObjectHideFlags: 0
@@ -1631,6 +1662,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a991c1eb5f5ad3419bf9e2ee5cc7241, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cardParentObj: {fileID: 373880188}
   cardPrefab: {fileID: 1777009815341847348, guid: a657bdceebd57134f95ec957b8b4574a, type: 3}
 --- !u!1 &406076518
 GameObject:
@@ -6090,3 +6122,4 @@ SceneRoots:
   - {fileID: 923004748}
   - {fileID: 1112855917}
   - {fileID: 1413836440}
+  - {fileID: 373880189}

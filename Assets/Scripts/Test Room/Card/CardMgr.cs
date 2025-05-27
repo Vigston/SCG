@@ -8,6 +8,9 @@ public class CardMgr : MonoBehaviour
 	public static CardMgr Instance;
 
 	[SerializeField]
+	private GameObject cardParentObj; // カードを配置する親オブジェクト
+
+	[SerializeField]
 	private GameObject cardPrefab; // カードのプレハブ
 	
 	private CardLoader cardLoader; // カードデータを読み込むクラス
@@ -59,6 +62,10 @@ public class CardMgr : MonoBehaviour
 
 		// カードを生成
 		GameObject cardObject = Instantiate(cardPrefab);
+		if(cardParentObj != null)
+		{
+			cardObject.transform.SetParent(cardParentObj.transform); // 親オブジェクトを設定
+		}
 		Card cardComponent = cardObject.GetComponent<Card>();
 
 		if (cardComponent != null)
