@@ -121,9 +121,6 @@ public class DiceRollAction : ActionBase
 			GameObject.Destroy(dice);           // 削除
 			AssetManager.Release(dicePrefab);   // 解放
 		}
-
-		// 2秒待機（サイコロの目を確認するための時間）
-		await UniTask.Delay(2000);
 	}
 
 	// サイコロが停止するまで待つ処理

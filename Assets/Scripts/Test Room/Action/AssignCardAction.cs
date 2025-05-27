@@ -19,7 +19,7 @@ public class AssignCardAction : ActionBase
 
 		if (card == null) return;
 
-		var anim = new AssignCardAnim(card.transform, targetTransform, 2f, 1f, 1.5f);
+		var anim = new AssignCardAnim(card.transform, targetTransform, 1f, 1.0f);
 		await anim.PlayAsync(); // ←ここで待てる！
 	}
 }
