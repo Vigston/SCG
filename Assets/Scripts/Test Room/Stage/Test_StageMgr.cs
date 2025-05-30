@@ -260,19 +260,4 @@ public class Test_StageMgr : MonoBehaviour
 
         return cardArea;
     }
-
-	// カードエリアがカードエリアフィールドに収まるか
-	private bool IsCardAreaFitInField()
-	{
-		float fieldWidth = m_CardAreaField.size.x;
-		float fieldDepth = m_CardAreaField.size.z;
-
-		float cardWidth = cardAreaPrefab.transform.localScale.x;
-		float cardDepth = cardAreaPrefab.transform.localScale.z;
-
-		float totalWidth = (cardWidth * widthNum) + (interval_W * (widthNum - 1));
-		float totalDepth = (cardDepth * heightNum) + (interval_H * (heightNum - 1));
-
-		return totalWidth <= fieldWidth && totalDepth <= fieldDepth;
-	}
 }
