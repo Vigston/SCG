@@ -99,7 +99,7 @@ public class TestDiceRollPhase : Phase
 			Debug.Log($"{this}：{nameof(MainStateAction)}");
 
 			// サイコロを振るアクションを実行
-			m_DiceRollAction = ActionManager.instance.ActivateAction<DiceRollAction>();
+			m_DiceRollAction = ActionManager.instance.ActivateAction<DiceRollAction>(2);
 		}
 
 		// アクションが終わるまで待機

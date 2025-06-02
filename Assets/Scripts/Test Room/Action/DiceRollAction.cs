@@ -7,17 +7,19 @@ public class DiceRollAction : ActionBase
 {
 	private const int DICE_FACE_COUNT = 6; // サイコロの目の数
 
+	private int diceNum; // サイコロの数
 	private int diceResultNum;
 
-	public DiceRollAction()
+	public DiceRollAction(int _diceNum)
 	{
+		this.diceNum = _diceNum;
 	}
 	protected override async UniTask Execute()
 	{
 		List<GameObject> diceNumObjList = new List<GameObject>();
 
-		GameObject dice = null;
-		Rigidbody rb = null;
+		GameObject diceObj_First = null;
+		GameObject diceObj_Second = null;
 
 		// プレハブの参照を保持する変数
 		GameObject dicePrefab = null;
@@ -28,23 +30,26 @@ public class DiceRollAction : ActionBase
 		prefab =>
 		{
 			dicePrefab = prefab;
-			dice = GameObject.Instantiate(prefab) as GameObject;
-			dice.transform.position = new Vector3(8, 8, 0);
+			// カメラ前方4ユニットの位置に生成
+			var camera = Camera.main;
+			Vector3 spawnPos_First = camera.transform.position + camera.transform.forward * 10.0f;
+			Vector3 spawnPos_Second = camera.transform.position + camera.transform.forward * 10.0f + camera.transform.right * 1.0f;
 
-			rb = dice.GetComponent<Rigidbody>();
+			// 2つ目のサイコロが必要な場合は、少し左にずらす
+			if (diceNum == 2)
+			{
+				spawnPos_First -= camera.transform.right * 1.0f;
+			}
 
-			// 前方斜め下への力（控えめ）
-			Vector3 throwDirection = new Vector3(0f, 0f, 0f).normalized;
-			rb.AddForce(throwDirection * 100f, ForceMode.Impulse); // パワーを調整
 
-			// ランダムな回転力
-			Vector3 randomTorque = new Vector3(
-				Random.Range(-1f, 1f),
-				Random.Range(-1f, 1f),
-				Random.Range(-1f, 1f)
-			).normalized * 50f;
-			rb.AddTorque(randomTorque, ForceMode.Impulse);
+			Quaternion spawnRot = Quaternion.identity;
+			diceObj_First = GameObject.Instantiate(prefab, spawnPos_First, spawnRot) as GameObject;
 
+			// 2つ目のサイコロが必要な場合にもう一つ生成
+			if (diceNum == 2)
+			{
+				diceObj_Second = GameObject.Instantiate(prefab, spawnPos_Second, spawnRot) as GameObject;
+			}
 			tcs.TrySetResult(); // 非同期処理完了を通知
 		},
 		error =>
@@ -56,82 +61,52 @@ public class DiceRollAction : ActionBase
 		await tcs.Task; // AssetManager.Load の完了を待つ
 
 		// サイコロのNULLチェック
-		if (dice == null && rb == null)
+		if (diceObj_First == null)
 		{
 			Debug.LogError("サイコロの生成に失敗しました。");
 			return;
 		}
-
-		foreach (Transform child in dice.transform)
+		if(diceNum == 2 && diceObj_Second == null)
 		{
-			diceNumObjList.Add(child.gameObject);
+			Debug.LogError("2つ目のサイコロの生成に失敗しました。");
+			return;
 		}
 
-		Debug.Log("サイコロを振りました！！");
-
-		// サイコロが停止するまで待機
-		await WaitUntilDiceStops(rb);
-
-		float[] _dicePosY = new float[DICE_FACE_COUNT];
-
-		for (int i = 0; i < DICE_FACE_COUNT; i++)
+		if(diceNum == 1)
 		{
-			var diceNumObj = diceNumObjList[i]; // サイコロの目のオブジェクト
-
-			if(!diceNumObj)
-			{
-				Debug.LogError($"サイコロ目[{i + 1}]オブジェクトが見つかりませんでした。");
-				continue;
-			}
-
-			//_diseNumber[i]は１～６の判定用からオブジェクト
-			_dicePosY[i] = diceNumObjList[i].transform.position.y;
+			diceResultNum = Random.Range(1, DICE_FACE_COUNT + 1); // サイコロの目をランダムに決定
 		}
-
-		float maxPos = _dicePosY.Max();
-		for (int i = 0; i < DICE_FACE_COUNT; i++)
+		else if(diceNum == 2)
 		{
-			var diceNumObj = diceNumObjList[i]; // サイコロの目のオブジェクト
-
-			if(!diceNumObj)
-			{
-				Debug.LogError($"サイコロ目[{i + 1}]オブジェクトが見つかりませんでした。");
-				continue;
-			}
-
-			if (diceNumObj.transform.position.y == maxPos)
-			{
-				diceResultNum = i + 1;
-				break;
-			}
+			diceResultNum = Random.Range(7, (DICE_FACE_COUNT * 2) + 1); // サイコロの目をランダムに決定
 		}
-
-		// 範囲外の場合はエラー
-		if (diceResultNum <= 0 || diceResultNum > DICE_FACE_COUNT)
+		else
 		{
-			Debug.LogError("サイコロの目の判定に失敗しました。");
+			Debug.LogError("サイコロの数は1または2でなければなりません。");
 			return;
 		}
 
 		Debug.Log($"サイコロの目：{diceResultNum}");
 
+		AnimationSequence animSeq = new AnimationSequence();
+
+		animSeq.Add(new DiceRollAnim(diceObj_First.transform, diceResultNum > DICE_FACE_COUNT ? 6 : diceResultNum, 0.5f)); // 1つ目のサイコロのアニメーションを追加
+		if (diceNum == 2)
+		{
+			animSeq.Add(new DiceRollAnim(diceObj_Second.transform, diceResultNum > DICE_FACE_COUNT ? diceResultNum - DICE_FACE_COUNT : 0, 0.5f)); // 2つ目のサイコロのアニメーションを追加
+		}
+
+		await animSeq.PlayParallelAsync(); // アニメーションを非同期で実行
+
 		// サイコロを削除、アセット解放
-		if (dice != null)
+		if (diceObj_First != null)
 		{
-			GameObject.Destroy(dice);           // 削除
-			AssetManager.Release(dicePrefab);   // 解放
+			GameObject.Destroy(diceObj_First);		// 削除
 		}
-	}
-
-	// サイコロが停止するまで待つ処理
-	private async UniTask WaitUntilDiceStops(Rigidbody rb)
-	{
-		// 速度が十分に遅くなるまでループ(ゲームオブジェクトが存在するか毎回チェック)
-		while (rb != null && rb.gameObject != null && !rb.IsSleeping())
+		if(diceObj_Second != null)
 		{
-			await UniTask.Yield();  // 非同期で次のフレームまで待つ
+			GameObject.Destroy(diceObj_Second);		// 削除
 		}
-
-		Debug.Log("サイコロが停止しました！");
+		AssetManager.Release(dicePrefab);			// 解放
 	}
 }
