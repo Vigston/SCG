@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEditor;
 
-[CustomEditor(typeof(Test_StageMgr))]
+[CustomEditor(typeof(StageMgr))]
 public class Test_StageMgrEditor : Editor
 {
 	public override void OnInspectorGUI()
@@ -10,7 +10,7 @@ public class Test_StageMgrEditor : Editor
 		DrawDefaultInspector();
 
 		// 対象取得
-		Test_StageMgr stageMgr = (Test_StageMgr)target;
+		StageMgr stageMgr = (StageMgr)target;
 
 		// Nullチェック
 		if (stageMgr.m_CardAreaField == null || stageMgr.cardAreaPrefab == null)

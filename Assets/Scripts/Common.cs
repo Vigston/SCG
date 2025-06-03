@@ -1,27 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using battleTypes;
-using System;
 
 public static class Common
 {
-    public static class PrefabPath
-    {
-		public static readonly string Card = "Prefabs/Card";
-		public static readonly string JoinPeopleGameAction = "Prefabs/JoinPeopleGameAction";
-		public static readonly string StartPhase = "Prefabs/StartPhase";
-		public static readonly string JoinPhase = "Prefabs/JoinPhase";
-		public static readonly string MainPhase = "Prefabs/MainPhase";
-		public static readonly string EndPhase = "Prefabs/EndPhase";
-	}
-
-	// バトルの共通定数
-	public static class BattleConst
-    {
-        public const int ADD_GOLD_EVERY_MERCHANT = 10;
-    }
-
     // BoxCollisionの頂点座標を取得
     /*
      * 0 = 左上(上)
@@ -102,48 +83,4 @@ public static class Common
         Debug.Log($"{nameof(GetRevSide)}で逆側を取得できなかったのでNoneを返しました：引数({_side})");
         return Side.eSide_None;
     }
-
-    // 操作側が自分か
-    public static bool IsMyOperateTurn()
-    {
-		Side operateSide = BattleUserMgr.instance.GetSetOperateSide;
-
-        return operateSide == Side.eSide_Player;
-	}
-
-	// 自分のターンか
-	public static bool IsMyTurn()
-	{
-        Side turnSide       = BattleMgr.instance.GetSetTurnSide;
-
-		return turnSide == Side.eSide_Player;
-	}
-
-    // 自分のカードか
-    public static bool IsMyCard(BattleCard _battleCard)
-    {
-		if (_battleCard == null) { return false; }
-
-		Side cardSide = _battleCard.GetSetSide;
-
-		return cardSide == Side.eSide_Player;
-	}
-
-	// 自分のターンで自分のカードか
-	public static bool IsMyTurnAndMyCard(BattleCard _battleCard)
-    {
-        if(_battleCard == null) { return false; }
-
-        return IsMyTurn() == IsMyCard(_battleCard);
-	}
-
-    // 自分のカードエリアか
-    public static bool IsMyCardArea(CardArea _cardArea)
-    {
-        if (!_cardArea) return false;
-
-        Side cardAreaSide = _cardArea.GetSide();
-
-        return cardAreaSide == Side.eSide_Player;
-	}
 }

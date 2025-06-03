@@ -2,14 +2,14 @@
 using UnityEditor;
 using UnityEngine;
 
-[CustomEditor(typeof(Test_User))]
+[CustomEditor(typeof(User))]
 public class UserEditor : Editor
 {
 	public override void OnInspectorGUI()
 	{
 		DrawDefaultInspector();
 
-		Test_User user = (Test_User)target;
+		User user = (User)target;
 
 		if (Application.isPlaying)
 		{
