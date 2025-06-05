@@ -30,7 +30,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 10, y: 1.233, z: 1.85}
-  m_LocalScale: {x: 3, y: 0.1, z: 4}
+  m_LocalScale: {x: -3, y: 0.1, z: -4}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -121,6 +121,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 48cae929d0c79a64db3e4b542e2b6829, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  m_Index: 0
   m_Side: 0
-  m_Position: 0
   m_CardList: []
