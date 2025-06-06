@@ -1663,7 +1663,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cardParentObj: {fileID: 373880188}
-  cardPrefab: {fileID: 1777009815341847348, guid: a657bdceebd57134f95ec957b8b4574a, type: 3}
+  cardPrefab: {fileID: 7759493649012840610, guid: df173469a97fc2740a6f5b35a70347e2, type: 3}
 --- !u!1 &406076518
 GameObject:
   m_ObjectHideFlags: 0
