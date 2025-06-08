@@ -69,62 +69,29 @@ public class StageMgr : MonoBehaviour
 	// カードエリア作成
 	public void CreateCardArea()
 	{
-		// 基準座標
-		Vector3 baseVec = new Vector3();
-
+		// コライダーサイズ取得
 		BoxCollider cardCollider = cardAreaPrefab.GetComponent<BoxCollider>();
+		float cardWidth = cardCollider.size.x * Mathf.Abs(cardAreaPrefab.transform.localScale.x);
+		float cardDepth = cardCollider.size.z * Mathf.Abs(cardAreaPrefab.transform.localScale.z);
 
-		// 左上の手前
-		Vector3 vecCardLeftTopUp = Common.GetBoxColliderVertices(cardCollider)[0];
-		// 左上の奥
-		Vector3 vecCardLeftTopDown = Common.GetBoxColliderVertices(cardCollider)[3];
-		// 左下の手前
-		Vector3 vecCardLeftBottomUp = Common.GetBoxColliderVertices(cardCollider)[6];
-		// 右上の手前
-		Vector3 vecCardRightTopUp = Common.GetBoxColliderVertices(cardCollider)[1];
+		Vector3 fieldCenter = m_CardAreaField.bounds.center;
 
-		// カード横幅の半分
-		float cardHarfSize_x = Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) / 2;
+		// 配置全体の幅・奥行き（カード中心基準）
+		float totalWidth = cardWidth * widthNum + interval_W * (widthNum - 1);
+		float totalDepth = cardDepth * heightNum + interval_H * (heightNum - 1);
 
-		//////////////////////////
-		///// 中心座標を計算 /////
-		//////////////////////////
-		Vector3 vecLeftTopUp = Common.GetBoxColliderVertices(m_CardAreaField)[0];
-		Vector3 vecRightBottomUp = Common.GetBoxColliderVertices(m_CardAreaField)[7];
-		Vector3 playerAreaCenter = m_CardAreaField.bounds.center;
-
-		baseVec = playerAreaCenter;
-		// 横列数に応じてZ軸をカードエリアフィールドの中心に合わせる。
-		baseVec.z += (Vector3.Distance(vecCardLeftTopUp, vecCardLeftBottomUp) * (heightNum - 1)) / 2;
-		// 横列間隔の分だけ調整
-		baseVec.z += (interval_H * (heightNum - 1)) / 2;
-
-		// 縦列数に応じてX軸をカードエリアフィールドの中心に合わせる。
-		baseVec.x -= (Vector3.Distance(vecCardLeftTopUp, vecCardRightTopUp) * (widthNum - 1)) / 2;
-		// 縦列間隔の分だけ調整
-		baseVec.x -= (interval_W * (widthNum - 1)) / 2;
-
-		// カードの厚み
-		float CardHeightSize = Vector3.Distance(vecCardLeftTopUp, vecCardLeftTopDown) / 2;
-
-		// カードエリアを全て生成する
-		int index = 0;	// ループカウンタインデックス
-		// 縦列の分回す
+		int index = 0;
 		for (int j = 0; j < heightNum; j++)
 		{
-			// 横列の分回す
 			for (int k = 0; k < widthNum; k++)
 			{
-				// エリアの表示位置
-				Vector3 areaVec = baseVec;
+				float x = fieldCenter.x - totalWidth / 2 + cardWidth / 2 + k * (cardWidth + interval_W);
+				float y = fieldCenter.y + cardCollider.size.y * cardAreaPrefab.transform.localScale.y / 2;
+				float z = fieldCenter.z + totalDepth / 2 - cardDepth / 2 - j * (cardDepth + interval_H);
 
-				areaVec.x += (k * cardAreaPrefab.transform.localScale.x) + (k * interval_W);
-				areaVec.y += CardHeightSize;
-				areaVec.z -= j * cardAreaPrefab.transform.localScale.z + (j * interval_H);
-
-				// カードエリア生成
+				Vector3 areaVec = new Vector3(x, y, z);
 				CreateCardArea(areaVec, index);
-				index++;	// インクリメント
+				index++;
 			}
 		}
 	}
