@@ -86,7 +86,7 @@ public class StageMgr : MonoBehaviour
 			for (int k = 0; k < widthNum; k++)
 			{
 				float x = fieldCenter.x - totalWidth / 2 + cardWidth / 2 + k * (cardWidth + interval_W);
-				float y = fieldCenter.y + cardCollider.size.y * cardAreaPrefab.transform.localScale.y / 2;
+				float y = fieldCenter.y + cardCollider.size.y * cardAreaPrefab.transform.localScale.y / 2 + 0.1f;
 				float z = fieldCenter.z + totalDepth / 2 - cardDepth / 2 - j * (cardDepth + interval_H);
 
 				Vector3 areaVec = new Vector3(x, y, z);
