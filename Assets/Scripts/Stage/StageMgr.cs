@@ -107,6 +107,7 @@ public class StageMgr : MonoBehaviour
 		CardArea cardArea = cardAreaClone.GetComponent<CardArea>();
 		cardArea.GetSetIndex = _Index;
 		cardArea.GetSetSide = Side.eSide_None;
+
 		m_CardAreaList.Add(cardArea);
 	}
 
