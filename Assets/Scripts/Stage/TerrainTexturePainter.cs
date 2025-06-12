@@ -1,12 +1,11 @@
 ﻿using UnityEngine;
 
-[ExecuteInEditMode] // エディター上でも動くようにする
+[ExecuteInEditMode]
 public class TerrainTexturePainter : MonoBehaviour
 {
 	public Terrain terrain;
 	public int targetTextureIndex = 1;
 
-	// 公開メソッド（Editorから呼び出せる）
 	public void PaintTextureInBox()
 	{
 		BoxCollider box = GetComponent<BoxCollider>();
@@ -20,9 +19,22 @@ public class TerrainTexturePainter : MonoBehaviour
 		Vector3 terrainPosition = terrain.transform.position;
 		int mapWidth = terrainData.alphamapWidth;
 		int mapHeight = terrainData.alphamapHeight;
+		int layerCount = terrainData.alphamapLayers;
 
-		float[,,] alphas = terrainData.GetAlphamaps(0, 0, mapWidth, mapHeight);
+		// Terrain全体を0番テクスチャに初期化
+		float[,,] alphas = new float[mapHeight, mapWidth, layerCount];
+		for (int y = 0; y < mapHeight; y++)
+		{
+			for (int x = 0; x < mapWidth; x++)
+			{
+				for (int i = 0; i < layerCount; i++)
+				{
+					alphas[y, x, i] = (i == 0) ? 1f : 0f;
+				}
+			}
+		}
 
+		// BoxCollider内だけ targetTextureIndex に上書き
 		for (int y = 0; y < mapHeight; y++)
 		{
 			for (int x = 0; x < mapWidth; x++)
@@ -33,15 +45,15 @@ public class TerrainTexturePainter : MonoBehaviour
 
 				if (box.bounds.Contains(worldPos))
 				{
-					for (int i = 0; i < terrainData.alphamapLayers; i++)
+					for (int i = 0; i < layerCount; i++)
 					{
-						alphas[y, x, i] = (i == targetTextureIndex) ? 1 : 0;
+						alphas[y, x, i] = (i == targetTextureIndex) ? 1f : 0f;
 					}
 				}
 			}
 		}
 
 		terrainData.SetAlphamaps(0, 0, alphas);
-		Debug.Log("テクスチャをBoxCollider内に塗りました！");
+		Debug.Log("Terrain全体を初期化してから、BoxCollider内にテクスチャを塗りました！");
 	}
 }
