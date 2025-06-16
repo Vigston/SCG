@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 2124720588745271834}
   - component: {fileID: 2124720588745271833}
   - component: {fileID: -141310667031712610}
+  - component: {fileID: -1307046308478027655}
   m_Layer: 0
   m_Name: CardArea
   m_TagString: CardArea
@@ -124,3 +125,15 @@ MonoBehaviour:
   m_Index: 0
   m_Side: 0
   m_CardList: []
+--- !u!114 &-1307046308478027655
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2124720588745271832}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d23c3ac63ebc2084d806771a28c1d170, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

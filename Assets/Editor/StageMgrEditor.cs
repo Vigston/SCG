@@ -33,14 +33,13 @@ public class Test_StageMgrEditor : Editor
 		// フィールドの実際のサイズ
 		BoxCollider fieldCollider = stageMgr.m_CardAreaField;
 		Vector3 fieldScale = fieldCollider.transform.lossyScale;
-		float fieldWidth = fieldCollider.size.x * fieldScale.x;
-		float fieldDepth = fieldCollider.size.z * fieldScale.z;
+		float fieldWidth = fieldCollider.size.x * Mathf.Abs(fieldScale.x);
+		float fieldDepth = fieldCollider.size.z * Mathf.Abs(fieldScale.z);
 
 		// カードエリアの実際のサイズ
 		BoxCollider cardCollider = stageMgr.cardAreaPrefab.GetComponent<BoxCollider>();
-		Vector3 cardScale = stageMgr.cardAreaPrefab.transform.lossyScale;
-		float cardWidth = cardCollider.size.x * cardScale.x;
-		float cardDepth = cardCollider.size.z * cardScale.z;
+		float cardWidth = cardCollider.size.x * Mathf.Abs(stageMgr.cardAreaPrefab.transform.localScale.x);
+		float cardDepth = cardCollider.size.z * Mathf.Abs(stageMgr.cardAreaPrefab.transform.localScale.z);
 
 		// 必要な全体サイズ
 		float totalWidth = (cardWidth * stageMgr.widthNum) + (stageMgr.interval_W * (stageMgr.widthNum - 1));
