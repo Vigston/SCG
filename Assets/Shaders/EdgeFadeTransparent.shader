@@ -20,7 +20,6 @@ Shader "Custom/EdgeFade_OutlineAlwaysFront"
         // --- Pass 1: アウトライン（最前面に描画） ---
         Cull Front
         ZWrite Off
-        ZTest Always // ★ 常にカメラ前面に表示！
         Pass
         {
             Name "OUTLINE"
