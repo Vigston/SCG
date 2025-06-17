@@ -108,7 +108,7 @@ public class StageMgr : MonoBehaviour
 		cardArea.GetSetIndex = _Index;
 		cardArea.GetSetSide = Side.eSide_None;
 
-		m_CardAreaList.Add(cardArea);
+		GetSetCardAreaList.Add(cardArea);
 	}
 
 
@@ -117,9 +117,9 @@ public class StageMgr : MonoBehaviour
     {
 		CardArea cardArea = new CardArea();
         // 指定Indexのエリアを取得
-        cardArea = m_CardAreaList[index];
-        // 削除
-        m_CardAreaList.Remove(cardArea);
+        cardArea = GetSetCardAreaList[index];
+		// 削除
+		GetSetCardAreaList.Remove(cardArea);
     }
 
     // カードエリアリストを削除
@@ -129,7 +129,7 @@ public class StageMgr : MonoBehaviour
 		Undo.RegisterCompleteObjectUndo(this, "Delete CardAreaList");
 #endif
 		// カードエリアリストの全てのカードエリアを削除
-		foreach (CardArea cardArea in m_CardAreaList)
+		foreach (CardArea cardArea in GetSetCardAreaList)
 		{
 #if UNITY_EDITOR
 			// エディター上で即時削除
@@ -140,7 +140,7 @@ public class StageMgr : MonoBehaviour
 #endif
 		}
 		// 全て削除
-		m_CardAreaList.Clear();
+		GetSetCardAreaList.Clear();
 
 #if UNITY_EDITOR
 		EditorUtility.SetDirty(this); // オブジェクトの変更をUnityに通知
@@ -153,7 +153,7 @@ public class StageMgr : MonoBehaviour
         // 指定側のカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
 
-        foreach(CardArea cardArea in m_CardAreaList)
+        foreach(CardArea cardArea in GetSetCardAreaList)
         {
             // 側が指定されているものと違うならはじく
             if(cardArea.GetSetSide != _Side) { continue; }
@@ -171,7 +171,7 @@ public class StageMgr : MonoBehaviour
         // カードが入ってないカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
 
-        foreach (CardArea cardArea in m_CardAreaList)
+        foreach (CardArea cardArea in GetSetCardAreaList)
         {
             // カードが入っているならはじく
             if (cardArea.GetCardList.Any()) { continue; }
@@ -189,7 +189,7 @@ public class StageMgr : MonoBehaviour
         // カードが入ってないカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
 
-        foreach (CardArea cardArea in m_CardAreaList)
+        foreach (CardArea cardArea in GetSetCardAreaList)
         {
             // カードが入っているならはじく
             if (cardArea.GetCardList.Any()) { continue; }
@@ -207,7 +207,7 @@ public class StageMgr : MonoBehaviour
         // カードが入ってないカードエリアリスト
         List<CardArea> cardAreaList = new List<CardArea>();
 
-        foreach (CardArea cardArea in m_CardAreaList)
+        foreach (CardArea cardArea in GetSetCardAreaList)
         {
             // 側が指定されているものと違うならはじく
             if (cardArea.GetSetSide != _Side) { continue; }
@@ -224,8 +224,15 @@ public class StageMgr : MonoBehaviour
     // 指定番号のカードエリアを取得
     public CardArea GetCardAreaFromIndex(int _Index)
     {
-		CardArea cardArea = m_CardAreaList.Find(x => x.GetSetIndex == _Index);
+		CardArea cardArea = GetSetCardAreaList.Find(x => x.GetSetIndex == _Index);
 
         return cardArea;
     }
+
+	/// === プロパティ === ///
+	public List<CardArea> GetSetCardAreaList
+	{
+		get { return m_CardAreaList; }
+		private set { m_CardAreaList = value; }
+	}
 }

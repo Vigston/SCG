@@ -11,6 +11,7 @@ public class Test_StageMgrEditor : Editor
 
 		// 対象取得
 		StageMgr stageMgr = (StageMgr)target;
+		AreaNumberUIMgr areaNumberUIMgr = FindFirstObjectByType<AreaNumberUIMgr>();
 
 		// Nullチェック
 		if (stageMgr.m_CardAreaField == null || stageMgr.cardAreaPrefab == null)
@@ -19,14 +20,22 @@ public class Test_StageMgrEditor : Editor
 			return;
 		}
 
+		if (areaNumberUIMgr == null)
+		{
+			EditorGUILayout.HelpBox("AreaNumberUIMgr が見つかりません。", MessageType.Warning);
+			return;
+		}
+
 		if (GUILayout.Button("カードエリア生成"))
 		{
 			stageMgr.DeleteCardAreaList();	// カードエリアリストを削除
-			stageMgr.CreateCardArea();		// 実際の生成処理をここで呼ぶ
+			stageMgr.CreateCardArea();      // 実際の生成処理をここで呼ぶ
+			areaNumberUIMgr.GenerateUIFromEditor();  // カードエリア番号UIを生成
 		}
 		if (GUILayout.Button("カードエリア削除"))
 		{
 			stageMgr.DeleteCardAreaList();  // カードエリアリストを削除
+			areaNumberUIMgr.ClearUI();      // UIをクリア
 		}
 
 		// 計算
